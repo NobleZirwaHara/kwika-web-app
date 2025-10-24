@@ -1,0 +1,139 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Enhanced coastal palette with more saturated, punchy colors while maintaining the same theme */
+  --background: oklch(0.98 0.008 240);
+  --foreground: oklch(0.22 0.08 215);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.08 215);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.08 215);
+  --primary: oklch(0.52 0.12 215);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.72 0.08 205);
+  --secondary-foreground: oklch(0.22 0.08 215);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.48 0.06 215);
+  --accent: oklch(0.72 0.08 55);
+  --accent-foreground: oklch(0.22 0.08 215);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.005 85);
+  --border: oklch(0.86 0.02 240);
+  --input: oklch(0.86 0.02 240);
+  --ring: oklch(0.52 0.12 215);
+  --chart-1: oklch(0.52 0.12 215);
+  --chart-2: oklch(0.62 0.1 205);
+  --chart-3: oklch(0.72 0.08 55);
+  --chart-4: oklch(0.32 0.1 215);
+  --chart-5: oklch(0.82 0.06 205);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.22 0.08 215);
+  --sidebar-primary: oklch(0.52 0.12 215);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.22 0.08 215);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  /* Enhanced dark mode with more vibrant teal tones */
+  --background: oklch(0.18 0.06 215);
+  --foreground: oklch(0.96 0.02 205);
+  --card: oklch(0.23 0.06 215);
+  --card-foreground: oklch(0.96 0.02 205);
+  --popover: oklch(0.23 0.06 215);
+  --popover-foreground: oklch(0.96 0.02 205);
+  --primary: oklch(0.62 0.1 205);
+  --primary-foreground: oklch(0.18 0.06 215);
+  --secondary: oklch(0.32 0.08 215);
+  --secondary-foreground: oklch(0.96 0.02 205);
+  --muted: oklch(0.28 0.04 215);
+  --muted-foreground: oklch(0.68 0.06 205);
+  --accent: oklch(0.68 0.08 55);
+  --accent-foreground: oklch(0.18 0.06 215);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.98 0.005 85);
+  --border: oklch(0.33 0.06 215);
+  --input: oklch(0.33 0.06 215);
+  --ring: oklch(0.62 0.1 205);
+  --chart-1: oklch(0.62 0.1 205);
+  --chart-2: oklch(0.72 0.08 205);
+  --chart-3: oklch(0.68 0.08 55);
+  --chart-4: oklch(0.42 0.1 215);
+  --chart-5: oklch(0.82 0.06 205);
+  --sidebar: oklch(0.23 0.06 215);
+  --sidebar-foreground: oklch(0.96 0.02 205);
+  --sidebar-primary: oklch(0.62 0.1 205);
+  --sidebar-primary-foreground: oklch(0.96 0.02 205);
+  --sidebar-accent: oklch(0.28 0.06 215);
+  --sidebar-accent-foreground: oklch(0.96 0.02 205);
+  --sidebar-border: oklch(0.28 0.06 215);
+  --sidebar-ring: oklch(0.48 0.08 215);
+}
+
+@theme inline {
+  /* Updated font configuration with Plus Jakarta Sans for headings and Inter for body */
+  --font-sans: var(--font-body), "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-heading), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback"; /* Kept existing mono font */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom z-index utilities for proper layering */
+@layer utilities {
+  .z-60 {
+    z-index: 60;
+  }
+  .z-70 {
+    z-index: 70;
+  }
+}
