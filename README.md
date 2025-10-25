@@ -4,9 +4,9 @@ A modern event service provider platform built with Laravel, Inertia.js, React, 
 
 ## Tech Stack
 
-- **Backend**: Laravel 11
+- **Backend**: Laravel 12
 - **Frontend**: React 18 + TypeScript
-- **Bridge**: Inertia.js
+- **Bridge**: Inertia.js v2
 - **Styling**: Tailwind CSS v4
 - **UI Components**: Radix UI
 - **Build Tool**: Vite
@@ -64,7 +64,7 @@ A modern event service provider platform built with Laravel, Inertia.js, React, 
 
 ### Prerequisites
 
-- PHP 8.2 or higher
+- PHP 8.3 or higher
 - Composer
 - Node.js 18+ and pnpm/npm
 - SQLite or MySQL (database)
@@ -230,10 +230,11 @@ import { Link } from '@inertiajs/react'
 
 ## Notes
 
-- This project structure follows Laravel 11 conventions
-- Inertia.js provides SPA-like experience without building an API
+- This project uses Laravel 12 with Inertia.js v2
+- Inertia.js v2 provides enhanced SPA-like experience without building an API
 - All UI components from the original Next.js project have been preserved
 - The frontend is fully functional; backend logic needs to be implemented based on your requirements
+- Laravel 12 requires PHP 8.3 or higher
 
 ## License
 
