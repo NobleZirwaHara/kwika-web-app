@@ -1,41 +1,67 @@
-import { Camera, Video, Palette, Music, UtensilsCrossed, Navigation, Building2, Landmark, Calendar } from "lucide-react"
+import { Camera, Video, Palette, Music, UtensilsCrossed, Navigation, Building2, Landmark, Calendar, Sparkles, Flower, Disc } from "lucide-react"
 import { Input } from "@/Components/ui/input"
 import { useMemo } from "react"
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
 
 interface SearchDropdownProps {
   activeField: "service" | "location" | "date"
   onClose: () => void
-  onSelect: (value: string) => void
+  onSelect: (value: string, categoryId?: number) => void
   searchValue: string
+  categories?: Category[]
 }
 
-const serviceOptions = [
-  { icon: Camera, name: "Photographers", description: "Capture your special moments", color: "text-blue-500" },
-  { icon: Video, name: "Videographers", description: "Professional video coverage", color: "text-purple-500" },
-  { icon: Palette, name: "Decorators", description: "Transform your venue", color: "text-pink-500" },
-  { icon: Music, name: "PA Systems", description: "Sound and audio equipment", color: "text-orange-500" },
-  { icon: UtensilsCrossed, name: "Catering", description: "Delicious food for your guests", color: "text-green-500" },
+const iconMap: Record<string, any> = {
+  camera: Camera,
+  video: Video,
+  sparkles: Sparkles,
+  music: Music,
+  utensils: UtensilsCrossed,
+  flower: Flower,
+  building: Building2,
+  disc: Disc,
+}
+
+const colorMap = [
+  "text-blue-500",
+  "text-purple-500",
+  "text-pink-500",
+  "text-orange-500",
+  "text-green-500",
+  "text-teal-500",
+  "text-red-500",
 ]
 
 const locationOptions = [
   { icon: Navigation, name: "Nearby", description: "Find what's around you", color: "text-blue-500" },
-  { icon: Building2, name: "Johannesburg, South Africa", description: "Popular business hub", color: "text-green-500" },
-  {
-    icon: Landmark,
-    name: "Cape Town, South Africa",
-    description: "Popular coastal destination",
-    color: "text-red-500",
-  },
-  { icon: Building2, name: "Durban, South Africa", description: "Beautiful beachfront city", color: "text-teal-500" },
-  { icon: Landmark, name: "Pretoria, South Africa", description: "Capital city venues", color: "text-purple-500" },
-  { icon: Building2, name: "Nairobi, Kenya", description: "East African events", color: "text-orange-500" },
+  { icon: Building2, name: "Lilongwe", description: "Capital city", color: "text-green-500" },
+  { icon: Landmark, name: "Blantyre", description: "Commercial hub", color: "text-red-500" },
+  { icon: Building2, name: "Mzuzu", description: "Northern region", color: "text-teal-500" },
+  { icon: Landmark, name: "Zomba", description: "Old capital", color: "text-purple-500" },
 ]
 
-export function SearchDropdown({ activeField, onClose, onSelect, searchValue }: SearchDropdownProps) {
+export function SearchDropdown({ activeField, onClose, onSelect, searchValue, categories = [] }: SearchDropdownProps) {
+  const serviceOptions = useMemo(() => {
+    return categories.map((category, index) => ({
+      id: category.id,
+      icon: iconMap[category.icon] || Camera,
+      name: category.name,
+      description: category.description || `Find ${category.name.toLowerCase()} for your event`,
+      color: colorMap[index % colorMap.length],
+    }))
+  }, [categories])
+
   const filteredServices = useMemo(() => {
     if (!searchValue) return serviceOptions
     return serviceOptions.filter((service) => service.name.toLowerCase().includes(searchValue.toLowerCase()))
-  }, [searchValue])
+  }, [searchValue, serviceOptions])
 
   const filteredLocations = useMemo(() => {
     if (!searchValue) return locationOptions
@@ -55,7 +81,7 @@ export function SearchDropdown({ activeField, onClose, onSelect, searchValue }: 
                 {filteredServices.map((service) => (
                   <button
                     key={service.name}
-                    onClick={() => onSelect(service.name)}
+                    onClick={() => onSelect(service.name, service.id)}
                     className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
                   >
                     <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-muted ${service.color}`}>

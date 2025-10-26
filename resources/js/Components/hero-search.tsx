@@ -2,8 +2,21 @@ import { Button } from "@/Components/ui/button"
 import { Search } from "lucide-react"
 import { useState, useEffect } from "react"
 import { SearchDropdown } from "./search-dropdown"
+import { router } from "@inertiajs/react"
 
-export function HeroSearch() {
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
+
+interface HeroSearchProps {
+  categories?: Category[]
+}
+
+export function HeroSearch({ categories = [] }: HeroSearchProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeField, setActiveField] = useState<"service" | "location" | "date" | null>(null)
   const [serviceValue, setServiceValue] = useState("")
@@ -19,11 +32,60 @@ export function HeroSearch() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleSelect = (value: string) => {
-    if (activeField === "service") setServiceValue(value)
+  const handleSelect = (value: string, categoryId?: number) => {
+    if (activeField === "service") {
+      setServiceValue(value)
+      // If a category ID is provided, perform search immediately
+      if (categoryId) {
+        performSearch(value, locationValue, categoryId)
+      }
+    }
     if (activeField === "location") setLocationValue(value)
     if (activeField === "date") setDateValue(value)
     setActiveField(null)
+  }
+
+  const performSearch = (service?: string, location?: string, categoryId?: number) => {
+    const params: any = {}
+
+    // Build search query from service value or passed service
+    const searchService = service || serviceValue
+    const searchLocation = location || locationValue
+
+    if (searchService) {
+      // Check if the service matches a category name
+      const matchedCategory = categories.find(
+        cat => cat.name.toLowerCase() === searchService.toLowerCase()
+      )
+
+      if (matchedCategory) {
+        params.category = matchedCategory.id
+      } else {
+        params.query = searchService
+      }
+    }
+
+    // Use categoryId if provided directly
+    if (categoryId) {
+      params.category = categoryId
+    }
+
+    if (searchLocation) {
+      params.city = searchLocation
+    }
+
+    // Navigate to search page with parameters
+    router.get('/search', params)
+  }
+
+  const handleSearchClick = () => {
+    performSearch()
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      performSearch()
+    }
   }
 
   return (
@@ -47,6 +109,7 @@ export function HeroSearch() {
                 value={serviceValue}
                 onChange={(e) => setServiceValue(e.target.value)}
                 onFocus={() => setActiveField("service")}
+                onKeyPress={handleKeyPress}
                 placeholder="Search photographers, decorators..."
                 className="text-sm text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground/60"
               />
@@ -56,6 +119,7 @@ export function HeroSearch() {
                   onClose={() => setActiveField(null)}
                   onSelect={handleSelect}
                   searchValue={serviceValue}
+                  categories={categories}
                 />
               )}
             </div>
@@ -67,6 +131,7 @@ export function HeroSearch() {
                 value={locationValue}
                 onChange={(e) => setLocationValue(e.target.value)}
                 onFocus={() => setActiveField("location")}
+                onKeyPress={handleKeyPress}
                 placeholder="Where is your event?"
                 className="text-sm text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground/60"
               />
@@ -76,6 +141,7 @@ export function HeroSearch() {
                   onClose={() => setActiveField(null)}
                   onSelect={handleSelect}
                   searchValue={locationValue}
+                  categories={categories}
                 />
               )}
             </div>
@@ -87,6 +153,7 @@ export function HeroSearch() {
                 value={dateValue}
                 onChange={(e) => setDateValue(e.target.value)}
                 onFocus={() => setActiveField("date")}
+                onKeyPress={handleKeyPress}
                 placeholder="Add dates"
                 className="text-sm text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground/60"
               />
@@ -96,11 +163,12 @@ export function HeroSearch() {
                   onClose={() => setActiveField(null)}
                   onSelect={handleSelect}
                   searchValue={dateValue}
+                  categories={categories}
                 />
               )}
             </div>
 
-            <Button size="lg" className="rounded-full h-14 w-14 sm:h-12 sm:w-12 shrink-0">
+            <Button size="lg" className="rounded-full h-14 w-14 sm:h-12 sm:w-12 shrink-0" onClick={handleSearchClick}>
               <Search className="h-5 w-5" />
             </Button>
           </div>

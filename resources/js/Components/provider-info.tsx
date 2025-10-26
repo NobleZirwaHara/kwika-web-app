@@ -4,16 +4,16 @@ import { useState } from "react"
 interface ProviderInfoProps {
   provider: {
     name: string
-    category: string
+    category?: string
     location: string
     description: string
-    about: string
-    badges: Array<{
+    about?: string
+    badges?: Array<{
       icon: string
       title: string
       description: string
     }>
-    languages: string[]
+    languages?: string[]
   }
 }
 
@@ -32,8 +32,12 @@ export function ProviderInfo({ provider }: ProviderInfoProps) {
             <MapPin className="h-4 w-4" />
             <span>{provider.location}</span>
           </div>
-          <span>•</span>
-          <span>{provider.category}</span>
+          {provider.category && (
+            <>
+              <span>•</span>
+              <span>{provider.category}</span>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -52,20 +56,22 @@ export function ProviderInfo({ provider }: ProviderInfoProps) {
       </div>
 
       {/* Host info */}
-      <div className="border-t pt-6">
-        <div className="flex items-start gap-4 mb-4">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-lg font-semibold text-primary">SC</span>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">Hosted by Sarah</h3>
-            <p className="text-sm text-muted-foreground">{provider.about}</p>
+      {provider.about && (
+        <div className="border-t pt-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-lg font-semibold text-primary">SC</span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Hosted by Sarah</h3>
+              <p className="text-sm text-muted-foreground">{provider.about}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Badges */}
-      {provider.badges.map((badge, index) => (
+      {provider.badges && provider.badges.length > 0 && provider.badges.map((badge, index) => (
         <div key={index} className="border-t pt-6">
           <div className="flex items-start gap-4">
             <div className="text-3xl shrink-0">{badge.icon}</div>
@@ -78,9 +84,11 @@ export function ProviderInfo({ provider }: ProviderInfoProps) {
       ))}
 
       {/* Languages */}
-      <div className="border-t pt-6">
-        <h3 className="font-semibold mb-2">Speaks {provider.languages.join(", ")}</h3>
-      </div>
+      {provider.languages && provider.languages.length > 0 && (
+        <div className="border-t pt-6">
+          <h3 className="font-semibold mb-2">Speaks {provider.languages.join(", ")}</h3>
+        </div>
+      )}
     </div>
   )
 }

@@ -4,8 +4,19 @@ interface ProviderGalleryProps {
   images: string[]
 }
 
-export function ProviderGallery({ images }: ProviderGalleryProps) {
+export function ProviderGallery({ images = [] }: ProviderGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0)
+
+  // If no images provided, show placeholder
+  if (!images || images.length === 0) {
+    return (
+      <div className="space-y-2">
+        <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground">No images available</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-2">

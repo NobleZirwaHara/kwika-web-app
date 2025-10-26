@@ -1,5 +1,6 @@
 import { Camera, Video, Sparkles, Music, Utensils, Flower, Building, Disc } from "lucide-react"
 import { useRef } from "react"
+import { Link } from "@inertiajs/react"
 
 interface Category {
   id: number
@@ -55,7 +56,11 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
             const image = categoryImages[category.name] || "/placeholder.svg"
 
             return (
-              <div key={category.slug} className="group cursor-pointer shrink-0 snap-start relative z-0">
+              <Link
+                key={category.slug}
+                href={`/search?category=${category.id}`}
+                className="group cursor-pointer shrink-0 snap-start relative z-0"
+              >
                 <div className="relative w-64 aspect-square overflow-hidden rounded-xl mb-3">
                   <img
                     src={image}
@@ -67,7 +72,7 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
                   <Icon className="h-4 w-4 text-foreground" />
                   <h3 className="font-medium text-foreground">{category.name}</h3>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

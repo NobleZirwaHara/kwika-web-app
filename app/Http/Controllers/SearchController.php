@@ -69,15 +69,23 @@ class SearchController
                 ];
             });
 
-        $categories = ServiceCategory::active()->get();
+        $categories = ServiceCategory::active()->get()->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+                'icon' => $category->icon,
+            ];
+        });
 
         return Inertia::render('Search', [
             'providers' => $providers,
             'categories' => $categories,
             'searchParams' => [
-                'query' => $request->query,
-                'category' => $request->category,
-                'city' => $request->city,
+                'query' => $request->filled('query') ? $request->query : null,
+                'category' => $request->filled('category') ? (int) $request->category : null,
+                'city' => $request->filled('city') ? $request->city : null,
             ],
             'totalResults' => $providers->total(),
         ]);

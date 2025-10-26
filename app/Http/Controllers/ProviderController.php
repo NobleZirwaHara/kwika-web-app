@@ -79,7 +79,7 @@ class ProviderController
      */
     public function show($slug)
     {
-        $provider = ServiceProvider::with(['user', 'services.category', 'reviews.user'])
+        $provider = ServiceProvider::with(['user', 'services.category', 'reviews.user', 'portfolioImages'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -158,6 +158,9 @@ class ProviderController
                 'logo' => $provider->logo,
                 'isVerified' => $provider->is_verified,
                 'isFeatured' => $provider->is_featured,
+                'images' => $provider->portfolioImages->map(function ($media) {
+                    return $media->url;
+                })->toArray(),
             ],
             'services' => $services,
             'reviews' => $reviews,
