@@ -1,7 +1,5 @@
-"use client"
-
 import { Camera, Video, Palette, Music, UtensilsCrossed, Navigation, Building2, Landmark, Calendar } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/Components/ui/input"
 import { useMemo } from "react"
 
 interface SearchDropdownProps {

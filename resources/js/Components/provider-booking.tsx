@@ -1,6 +1,4 @@
-"use client"
-
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 import { Calendar } from "lucide-react"
 
 interface ProviderBookingProps {

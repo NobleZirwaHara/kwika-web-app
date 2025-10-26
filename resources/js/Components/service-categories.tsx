@@ -1,42 +1,43 @@
-"use client"
-
-import { Camera, Video, Sparkles, Music } from "lucide-react"
+import { Camera, Video, Sparkles, Music, Utensils, Flower, Building, Disc } from "lucide-react"
 import { useRef } from "react"
 
-const categories = [
-  {
-    name: "Photographers",
-    icon: Camera,
-    image: "/professional-event-photographer-with-camera.jpg",
-  },
-  {
-    name: "Videographers",
-    icon: Video,
-    image: "/videographer-filming-wedding-event.jpg",
-  },
-  {
-    name: "Decorators",
-    icon: Sparkles,
-    image: "/elegant-event-decoration-setup.jpg",
-  },
-  {
-    name: "PA Systems",
-    icon: Music,
-    image: "/professional-sound-system-event-setup.jpg",
-  },
-  {
-    name: "Caterers",
-    icon: Sparkles,
-    image: "/professional-catering-service.jpg",
-  },
-  {
-    name: "Florists",
-    icon: Sparkles,
-    image: "/elegant-floral-arrangements.jpg",
-  },
-]
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
 
-export function ServiceCategories() {
+interface ServiceCategoriesProps {
+  categories: Category[]
+}
+
+// Map icon names to Lucide components
+const iconMap: Record<string, any> = {
+  camera: Camera,
+  video: Video,
+  sparkles: Sparkles,
+  music: Music,
+  utensils: Utensils,
+  flower: Flower,
+  building: Building,
+  disc: Disc,
+}
+
+// Map category names to images
+const categoryImages: Record<string, string> = {
+  Photographers: "/professional-event-photographer-with-camera.jpg",
+  Videographers: "/videographer-filming-wedding-event.jpg",
+  Decorators: "/elegant-event-decoration-setup.jpg",
+  "PA Systems": "/professional-sound-system-event-setup.jpg",
+  Caterers: "/professional-catering-service.jpg",
+  Florists: "/elegant-floral-arrangements.jpg",
+  Venues: "/elegant-event-venue.png",
+  DJs: "/professional-sound-system-event-setup.jpg",
+}
+
+export function ServiceCategories({ categories }: ServiceCategoriesProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
@@ -50,12 +51,14 @@ export function ServiceCategories() {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {categories.map((category) => {
-            const Icon = category.icon
+            const Icon = iconMap[category.icon] || Sparkles
+            const image = categoryImages[category.name] || "/placeholder.svg"
+
             return (
-              <div key={category.name} className="group cursor-pointer shrink-0 snap-start relative z-0">
+              <div key={category.slug} className="group cursor-pointer shrink-0 snap-start relative z-0">
                 <div className="relative w-64 aspect-square overflow-hidden rounded-xl mb-3">
                   <img
-                    src={category.image || "/placeholder.svg"}
+                    src={image}
                     alt={category.name}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />

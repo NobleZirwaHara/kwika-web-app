@@ -1,5 +1,3 @@
-import Image from "next/image"
-
 const testimonials = [
   {
     id: 1,
@@ -66,11 +64,10 @@ export function Testimonials() {
               <p className="text-foreground/90 leading-relaxed mb-4 text-pretty text-sm">"{testimonials[0].quote}"</p>
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/20">
-                  <Image
+                  <img
                     src={testimonials[0].image || "/placeholder.svg"}
                     alt={testimonials[0].name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>
@@ -87,11 +84,10 @@ export function Testimonials() {
               <p className="text-foreground/90 leading-relaxed mb-4 text-pretty text-sm">"{testimonials[1].quote}"</p>
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/20">
-                  <Image
+                  <img
                     src={testimonials[1].image || "/placeholder.svg"}
                     alt={testimonials[1].name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>
@@ -108,11 +104,10 @@ export function Testimonials() {
               <p className="text-foreground/90 leading-relaxed mb-4 text-pretty text-sm">"{testimonials[2].quote}"</p>
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/20">
-                  <Image
+                  <img
                     src={testimonials[2].image || "/placeholder.svg"}
                     alt={testimonials[2].name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>
@@ -129,11 +124,10 @@ export function Testimonials() {
               <p className="text-foreground/90 leading-relaxed mb-4 text-pretty text-sm">"{testimonials[3].quote}"</p>
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/20">
-                  <Image
+                  <img
                     src={testimonials[3].image || "/placeholder.svg"}
                     alt={testimonials[3].name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>
@@ -150,11 +144,10 @@ export function Testimonials() {
               <p className="text-foreground/90 leading-relaxed mb-4 text-pretty text-sm">"{testimonials[4].quote}"</p>
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/20">
-                  <Image
+                  <img
                     src={testimonials[4].image || "/placeholder.svg"}
                     alt={testimonials[4].name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>

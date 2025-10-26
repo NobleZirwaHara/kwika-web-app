@@ -1,5 +1,3 @@
-"use client"
-
 import { Share2, Heart, MapPin } from "lucide-react"
 import { useState } from "react"
 

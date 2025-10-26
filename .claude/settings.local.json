@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\development\\kwika-design-v1\\resources\\js\\Components\")",
+      "Bash(dir \"C:\\development\\kwika-design-v1\\resources\\js\\Components\\ui\")",
+      "Bash(git -C \"C:\\development\\kwika-design-v1\" log --oneline -10)",
+      "Bash(git -C \"C:\\development\\kwika-design-v1\" branch -a)",
+      "Bash(php artisan:*)",
+      "Bash(copy .env.example .env:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

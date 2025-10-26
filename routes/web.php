@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,45 +18,25 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home');
+// Home page - shows categories and featured providers
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/providers/{id}', function ($id) {
-    // Sample provider data - in a real app, this would come from a database
-    $providerData = [
-        'id' => $id,
-        'name' => 'Sarah Chen Photography',
-        'category' => 'Photographer',
-        'location' => 'San Francisco, CA',
-        'rating' => 4.95,
-        'reviews' => 234,
-        'price' => 2500,
-        'images' => [
-            '/professional-photographer-portfolio-wedding.jpg',
-            '/cinematic-wedding-videography.jpg',
-            '/luxury-wedding-decoration-flowers.jpg',
-            '/elegant-catering-food-display.jpg',
-        ],
-        'description' => 'Join award-winning photographer Sarah Chen for a professional photography session that captures your event\'s most precious moments. With over 10 years of experience and a keen eye for detail, Sarah specializes in creating timeless memories.',
-        'about' => 'Professional photographer with expertise in weddings, corporate events, and special occasions. Michelin-recognized for visual storytelling.',
-        'badges' => [
-            [
-                'icon' => '⭐',
-                'title' => 'Top Rated Provider',
-                'description' => 'This provider has consistently received 5-star reviews from clients.',
-            ],
-            [
-                'icon' => '🎖️',
-                'title' => 'Kwika.Events Original',
-                'description' => 'This photography service was designed exclusively for Kwika.Events.',
-            ],
-        ],
-        'languages' => ['English', 'Mandarin', 'Cantonese'],
-        'cancellationPolicy' => 'Free cancellation up to 7 days before the event',
-    ];
+// Search routes
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/api/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
 
-    return Inertia::render('ProviderDetail', [
-        'provider' => $providerData
-    ]);
-})->name('provider.show');
+// Provider routes
+Route::get('/providers', [ProviderController::class, 'index'])->name('providers.index');
+Route::get('/providers/{slug}', [ProviderController::class, 'show'])->name('providers.show');
+
+// Booking routes (will require authentication)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+});
+
+// Review routes (will require authentication)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});

@@ -8,18 +8,45 @@ import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
 import { Head } from '@inertiajs/react'
 
-export default function Home() {
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
+
+interface Provider {
+  id: number
+  slug: string
+  name: string
+  location: string
+  rating: number
+  reviews: number
+  image: string
+  logo?: string
+  description?: string
+  featured: boolean
+}
+
+interface HomeProps {
+  categories: Category[]
+  featuredProviders: Provider[]
+  topProviders: Provider[]
+}
+
+export default function Home({ categories, featuredProviders, topProviders }: HomeProps) {
   return (
     <>
-      <Head title="EventHub - Find Perfect Event Service Providers" />
+      <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
       <div className="min-h-screen">
         <Header />
         <main>
-          <HeroSearch />
-          <ServiceCategories />
-          <FeaturedProviders />
+          <HeroSearch categories={categories} />
+          <ServiceCategories categories={categories} />
+          <FeaturedProviders providers={featuredProviders} title="Featured providers" />
           <div className="border-t">
-            <FeaturedProviders />
+            <FeaturedProviders providers={topProviders} title="Top-rated providers" />
           </div>
           <BenefitsSection />
           <PromotionsSection />

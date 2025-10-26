@@ -1,6 +1,4 @@
-"use client"
-
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 import { Globe, Menu, User, Search } from "lucide-react"
 import { useState, useEffect } from "react"
 import { SearchDropdown } from "./search-dropdown"
