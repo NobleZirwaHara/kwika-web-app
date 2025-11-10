@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\ServiceProvider;
-use App\ServiceCategory;
+use App\Models\ServiceProvider;
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class SearchController
+class SearchController extends Controller
 {
     /**
      * Handle search requests from the hero search
@@ -21,7 +21,7 @@ class SearchController
         ]);
 
         $query = ServiceProvider::with(['user', 'services'])
-            ->verified()
+            // ->verified()
             ->active();
 
         // Search by query (business name or description)

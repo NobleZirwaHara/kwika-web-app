@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**EventHub** - A modern event service provider platform built with Laravel 12, Inertia.js v2, React 18, and TypeScript. This project was converted from Next.js to Laravel Inertia while maintaining the complete UI design.
+**Kwika Events** - A modern event service provider platform built with Laravel 12, Inertia.js v2, React 18, and TypeScript. This project was converted from Next.js to Laravel Inertia while maintaining the complete UI design.
 
 **Current Status**: Functional frontend with demo data; backend ready for feature implementation.
-
-## Development Commands
+**Notes**: - Make sure when you are generating code that similar files or structure for the new module doesnt already exist 
+## Developme
+nt Commands
 
 ### Backend (Laravel)
 

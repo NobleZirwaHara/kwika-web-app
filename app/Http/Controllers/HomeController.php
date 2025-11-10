@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\ServiceCategory;
-use App\ServiceProvider;
+use App\Models\ServiceCategory;
+use App\Models\ServiceProvider;
 use Inertia\Inertia;
 
-class HomeController
+class HomeController extends Controller
 {
     public function index()
     {
@@ -23,7 +23,7 @@ class HomeController
 
         // Get featured providers with their details
         $featuredProviders = ServiceProvider::with(['user'])
-            ->verified()
+            // ->verified()
             ->active()
             ->featured()
             ->get()
@@ -44,7 +44,7 @@ class HomeController
 
         // Get all top-rated providers (for the second section)
         $topProviders = ServiceProvider::with(['user'])
-            ->verified()
+            // ->verified()
             ->active()
             ->orderBy('average_rating', 'desc')
             ->orderBy('total_reviews', 'desc')

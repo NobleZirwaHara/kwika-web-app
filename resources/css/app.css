@@ -127,4 +127,11 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+  a,
+  a[href],
+  button[type="button"],
+  [role="button"],
+  [role="link"] {
+    cursor: pointer;
+  }
 }

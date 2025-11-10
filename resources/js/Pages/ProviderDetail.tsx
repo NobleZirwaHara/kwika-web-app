@@ -1,6 +1,7 @@
 import { Header } from "@/Components/header"
 import { ProviderGallery } from "@/Components/provider-gallery"
 import { ProviderInfo } from "@/Components/provider-info"
+import { ProviderServices } from "@/Components/provider-services"
 import { ProviderBooking } from "@/Components/provider-booking"
 import { ProviderReviews } from "@/Components/provider-reviews"
 import { SimilarProviders } from "@/Components/similar-providers"
@@ -66,8 +67,11 @@ interface Props {
 }
 
 export default function ProviderDetail({ provider, services, reviews, similarProviders }: Props) {
-  // Get the first service price for booking component, or use default
-  const basePrice = services.length > 0 ? services[0].basePrice : 0
+  // Get the first service for booking component
+  const firstService = services.length > 0 ? services[0] : null
+  const basePrice = firstService ? firstService.basePrice : 0
+  const serviceId = firstService ? firstService.id : undefined
+  const priceType = firstService ? firstService.priceType : 'event'
 
   return (
     <>
@@ -82,11 +86,21 @@ export default function ProviderDetail({ provider, services, reviews, similarPro
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 space-y-8">
+                {/* Services Section */}
+                <ProviderServices services={services} currency="MWK" />
+
+                {/* Reviews Section */}
                 <ProviderReviews rating={provider.rating} reviewCount={provider.totalReviews} />
               </div>
               <div className="lg:col-span-1">
-                <ProviderBooking price={basePrice} cancellationPolicy="Flexible cancellation up to 24 hours before the event" />
+                <ProviderBooking
+                  price={basePrice}
+                  currency="MWK"
+                  priceType={priceType}
+                  serviceId={serviceId}
+                  cancellationPolicy="Flexible cancellation up to 24 hours before the event"
+                />
               </div>
             </div>
 

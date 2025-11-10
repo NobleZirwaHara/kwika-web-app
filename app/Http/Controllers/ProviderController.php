@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\ServiceProvider;
-use App\ServiceCategory;
+use App\Models\ServiceProvider;
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ProviderController
+class ProviderController extends Controller
 {
     /**
      * Display a listing of providers with optional filtering
@@ -15,7 +15,7 @@ class ProviderController
     public function index(Request $request)
     {
         $query = ServiceProvider::with(['user'])
-            ->verified()
+            // ->verified()
             ->active();
 
         // Filter by category
@@ -140,6 +140,23 @@ class ProviderController
                 ];
             });
 
+        // Get portfolio images with fallback to cover image
+        $portfolioImages = $provider->portfolioImages->map(function ($media) {
+            return $media->url;
+        })->toArray();
+
+        // If no portfolio images, use cover image and logo as fallbacks
+        if (empty($portfolioImages)) {
+            $fallbackImages = [];
+            if ($provider->cover_image) {
+                $fallbackImages[] = asset('storage/' . $provider->cover_image);
+            }
+            if ($provider->logo) {
+                $fallbackImages[] = asset('storage/' . $provider->logo);
+            }
+            $portfolioImages = $fallbackImages;
+        }
+
         return Inertia::render('ProviderDetail', [
             'provider' => [
                 'id' => $provider->id,
@@ -158,9 +175,7 @@ class ProviderController
                 'logo' => $provider->logo,
                 'isVerified' => $provider->is_verified,
                 'isFeatured' => $provider->is_featured,
-                'images' => $provider->portfolioImages->map(function ($media) {
-                    return $media->url;
-                })->toArray(),
+                'images' => $portfolioImages,
             ],
             'services' => $services,
             'reviews' => $reviews,

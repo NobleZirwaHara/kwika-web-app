@@ -1,0 +1,274 @@
+import { useForm, Head } from '@inertiajs/react'
+import { FormEvent } from 'react'
+import {Header} from '@/Components/header'
+import { Footer } from '@/Components/footer'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
+import { Button } from '@/Components/ui/button'
+import { Input } from '@/Components/ui/input'
+import { Label } from '@/Components/ui/label'
+import { Textarea } from '@/Components/ui/textarea'
+import { Calendar, MapPin, Users, DollarSign } from 'lucide-react'
+
+interface Service {
+  id: number
+  name: string
+  description: string
+  base_price: number
+  price_type: string
+  max_price: number | null
+  currency: string
+  duration: number | null
+  max_attendees: number | null
+  category_name: string
+  provider: {
+    id: number
+    business_name: string
+    location: string
+    city: string
+  }
+}
+
+interface Props {
+  service: Service
+}
+
+export default function CreateBooking({ service }: Props) {
+  const { data, setData, post, processing, errors } = useForm({
+    service_id: service.id,
+    event_date: '',
+    event_end_date: '',
+    event_location: '',
+    attendees: '',
+    special_requests: '',
+  })
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    post('/bookings')
+  }
+
+  return (
+    <>
+      <Head title={`Book ${service.name}`} />
+      <Header />
+
+      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">Book This Service</h1>
+              <p className="text-muted-foreground">
+                Complete the form below to request a booking
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Booking Form */}
+              <div className="md:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Booking Details</CardTitle>
+                    <CardDescription>
+                      Provide information about your event
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Event Date */}
+                      <div className="space-y-2">
+                        <Label htmlFor="event_date">
+                          Event Date <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="event_date"
+                            type="datetime-local"
+                            value={data.event_date}
+                            onChange={(e) => setData('event_date', e.target.value)}
+                            className="pl-10"
+                            required
+                          />
+                        </div>
+                        {errors.event_date && (
+                          <p className="text-sm text-destructive">{errors.event_date}</p>
+                        )}
+                      </div>
+
+                      {/* Event End Date (Optional) */}
+                      {service.price_type === 'daily' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="event_end_date">
+                            Event End Date (Optional)
+                          </Label>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="event_end_date"
+                              type="datetime-local"
+                              value={data.event_end_date}
+                              onChange={(e) => setData('event_end_date', e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            For multi-day events
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Event Location */}
+                      <div className="space-y-2">
+                        <Label htmlFor="event_location">
+                          Event Location <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="event_location"
+                            type="text"
+                            value={data.event_location}
+                            onChange={(e) => setData('event_location', e.target.value)}
+                            placeholder="Enter full address of the event"
+                            className="pl-10"
+                            required
+                          />
+                        </div>
+                        {errors.event_location && (
+                          <p className="text-sm text-destructive">{errors.event_location}</p>
+                        )}
+                      </div>
+
+                      {/* Number of Attendees */}
+                      {service.max_attendees && (
+                        <div className="space-y-2">
+                          <Label htmlFor="attendees">
+                            Number of Attendees
+                            {service.max_attendees && (
+                              <span className="text-xs text-muted-foreground ml-2">
+                                (Max: {service.max_attendees})
+                              </span>
+                            )}
+                          </Label>
+                          <div className="relative">
+                            <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="attendees"
+                              type="number"
+                              min="1"
+                              max={service.max_attendees}
+                              value={data.attendees}
+                              onChange={(e) => setData('attendees', e.target.value)}
+                              placeholder="Number of guests"
+                              className="pl-10"
+                            />
+                          </div>
+                          {errors.attendees && (
+                            <p className="text-sm text-destructive">{errors.attendees}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Special Requests */}
+                      <div className="space-y-2">
+                        <Label htmlFor="special_requests">
+                          Special Requests or Requirements
+                        </Label>
+                        <Textarea
+                          id="special_requests"
+                          value={data.special_requests}
+                          onChange={(e) => setData('special_requests', e.target.value)}
+                          placeholder="Any special requests, dietary requirements, or other details..."
+                          rows={4}
+                        />
+                        {errors.special_requests && (
+                          <p className="text-sm text-destructive">{errors.special_requests}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Optional: Help the provider prepare for your event
+                        </p>
+                      </div>
+
+                      {/* Submit Button */}
+                      <div className="pt-4">
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          size="lg"
+                          disabled={processing}
+                        >
+                          {processing ? 'Processing...' : 'Continue to Payment'}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Service Summary Sidebar */}
+              <div className="md:col-span-1">
+                <Card className="sticky top-6">
+                  <CardHeader>
+                    <CardTitle>Service Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">{service.name}</h3>
+                      <p className="text-sm text-muted-foreground">{service.category_name}</p>
+                    </div>
+
+                    <div className="border-t pt-4 space-y-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Provider</p>
+                        <p className="font-medium">{service.provider.business_name}</p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                          <MapPin className="h-3 w-3" />
+                          {service.provider.city}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Pricing</p>
+                        <div className="flex items-baseline gap-2">
+                          <DollarSign className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-2xl font-bold">
+                            {service.currency} {service.base_price.toLocaleString()}
+                          </span>
+                          {service.max_price && (
+                            <span className="text-sm text-muted-foreground">
+                              - {service.max_price.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Per {service.price_type}
+                        </p>
+                      </div>
+
+                      {service.duration && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Duration</p>
+                          <p className="font-medium">{service.duration} minutes</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {service.description && (
+                      <div className="border-t pt-4">
+                        <p className="text-sm text-muted-foreground mb-1">Description</p>
+                        <p className="text-sm line-clamp-4">{service.description}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  )
+}

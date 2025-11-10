@@ -6,7 +6,15 @@
       "Bash(git -C \"C:\\development\\kwika-design-v1\" log --oneline -10)",
       "Bash(git -C \"C:\\development\\kwika-design-v1\" branch -a)",
       "Bash(php artisan:*)",
-      "Bash(copy .env.example .env:*)"
+      "Bash(copy .env.example .env:*)",
+      "Bash(del \"C:\\Users\\haran\\Herd\\kwika-design-v1\\database\\migrations\\2025_11_02_102621_create_providers_table.php\")",
+      "Bash(rm:*)",
+      "Bash(git mv:*)",
+      "Bash(for file in app/Models/*.php)",
+      "Bash(do sed -i 's/namespace App;/namespace App\\\\Models;/' \"$file\")",
+      "Bash(done)",
+      "Bash(for file in app/Http/Controllers/*.php app/Http/Controllers/Provider/*.php)",
+      "Bash(do)"
     ],
     "deny": [],
     "ask": []

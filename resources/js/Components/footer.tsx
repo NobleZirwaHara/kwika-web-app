@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Link } from '@inertiajs/react'
 
 export function Footer() {
   return (
@@ -48,9 +49,9 @@ export function Footer() {
             <h3 className="font-semibold mb-4">For Providers</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#" className="hover:text-foreground transition-colors">
+                <Link href="/onboarding/welcome" className="hover:text-foreground transition-colors">
                   List Your Service
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="#" className="hover:text-foreground transition-colors">
