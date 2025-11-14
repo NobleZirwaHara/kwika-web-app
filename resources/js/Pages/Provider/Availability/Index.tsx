@@ -55,7 +55,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
 
   // Form states
   const [formData, setFormData] = useState({
-    service_id: '',
+    service_id: 'none',
     date: '',
     start_time: '',
     end_time: '',
@@ -110,7 +110,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
       availability_type: formData.availability_type,
     }
 
-    if (formData.service_id) submitData.service_id = formData.service_id
+    if (formData.service_id && formData.service_id !== 'none') submitData.service_id = formData.service_id
     if (formData.start_time) submitData.start_time = formData.start_time
     if (formData.end_time) submitData.end_time = formData.end_time
     if (formData.notes) submitData.notes = formData.notes
