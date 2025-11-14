@@ -9,7 +9,7 @@ import { Textarea } from '@/Components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import { Checkbox } from '@/Components/ui/checkbox'
 import { Badge } from '@/Components/ui/badge'
-import { Plus } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 interface Catalogue {
   id: number
@@ -34,6 +34,7 @@ interface Product {
   specifications: string[] | null
   features: string[] | null
   primary_image: string | null
+  gallery_images: string[] | null
   is_active: boolean
   is_featured: boolean
   display_order: number
@@ -61,6 +62,7 @@ export default function ProductsEdit({ product, catalogues }: Props) {
     specifications: product.specifications || [],
     features: product.features || [],
     primary_image: null as File | null,
+    gallery_images: [] as File[],
     is_active: product.is_active,
     is_featured: product.is_featured,
     display_order: product.display_order.toString(),
@@ -70,6 +72,8 @@ export default function ProductsEdit({ product, catalogues }: Props) {
   const [processing, setProcessing] = useState(false)
   const [newSpecification, setNewSpecification] = useState('')
   const [newFeature, setNewFeature] = useState('')
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+  const [existingGalleryImages, setExistingGalleryImages] = useState<string[]>(product.gallery_images || [])
 
   function handleChange(field: string, value: any) {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -87,6 +91,34 @@ export default function ProductsEdit({ product, catalogues }: Props) {
     if (e.target.files && e.target.files[0]) {
       setFormData(prev => ({ ...prev, primary_image: e.target.files![0] }))
     }
+  }
+
+  function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      const files = Array.from(e.target.files)
+      setFormData(prev => ({ ...prev, gallery_images: [...prev.gallery_images, ...files] }))
+
+      // Create previews
+      files.forEach(file => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setGalleryPreviews(prev => [...prev, reader.result as string])
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+  }
+
+  function removeNewGalleryImage(index: number) {
+    setFormData(prev => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((_, i) => i !== index)
+    }))
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  function removeExistingGalleryImage(index: number) {
+    setExistingGalleryImages(prev => prev.filter((_, i) => i !== index))
   }
 
   function addSpecification() {
@@ -155,6 +187,16 @@ export default function ProductsEdit({ product, catalogues }: Props) {
     if (formData.primary_image) {
       submitData.append('primary_image', formData.primary_image)
     }
+
+    // Gallery images - new uploads
+    formData.gallery_images.forEach((file, index) => {
+      submitData.append(`gallery_images[${index}]`, file)
+    })
+
+    // Existing gallery images that should be kept
+    existingGalleryImages.forEach((image, index) => {
+      submitData.append(`existing_gallery_images[${index}]`, image)
+    })
 
     submitData.append('is_active', formData.is_active ? '1' : '0')
     submitData.append('is_featured', formData.is_featured ? '1' : '0')
@@ -475,13 +517,13 @@ export default function ProductsEdit({ product, catalogues }: Props) {
           {/* Media */}
           <Card>
             <CardHeader>
-              <CardTitle>Product Image</CardTitle>
-              <CardDescription>Upload a product image</CardDescription>
+              <CardTitle>Product Images</CardTitle>
+              <CardDescription>Upload product images</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {product.primary_image && (
                 <div className="space-y-2">
-                  <Label>Current Image</Label>
+                  <Label>Current Primary Image</Label>
                   <img
                     src={product.primary_image}
                     alt="Current product"
@@ -492,7 +534,7 @@ export default function ProductsEdit({ product, catalogues }: Props) {
 
               <div className="space-y-2">
                 <Label htmlFor="primary_image">
-                  {product.primary_image ? 'Replace Image' : 'Primary Image'}
+                  {product.primary_image ? 'Replace Primary Image' : 'Primary Image'}
                 </Label>
                 <Input
                   id="primary_image"
@@ -504,6 +546,75 @@ export default function ProductsEdit({ product, catalogues }: Props) {
                 <p className="text-xs text-muted-foreground">
                   Recommended size: 800x800px, Max size: 5MB
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Gallery Images</Label>
+
+                {/* Existing gallery images */}
+                {existingGalleryImages.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Current Gallery Images</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {existingGalleryImages.map((image, index) => (
+                        <div key={`existing-${index}`} className="relative">
+                          <img
+                            src={image}
+                            alt={`Gallery image ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 h-6 w-6 p-0"
+                            onClick={() => removeExistingGalleryImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New gallery images upload */}
+                <div className="space-y-2">
+                  <Label htmlFor="gallery_images">Add More Gallery Images</Label>
+                  <Input
+                    id="gallery_images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleGalleryImagesChange}
+                  />
+                  {errors.gallery_images && <p className="text-sm text-destructive">{errors.gallery_images}</p>}
+                  {galleryPreviews.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2 mt-2">
+                      {galleryPreviews.map((preview, index) => (
+                        <div key={`new-${index}`} className="relative">
+                          <img
+                            src={preview}
+                            alt={`New gallery preview ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 h-6 w-6 p-0"
+                            onClick={() => removeNewGalleryImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Upload multiple images to showcase your product from different angles
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

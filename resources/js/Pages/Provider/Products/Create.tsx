@@ -9,7 +9,7 @@ import { Textarea } from '@/Components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import { Checkbox } from '@/Components/ui/checkbox'
 import { Badge } from '@/Components/ui/badge'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, X } from 'lucide-react'
 
 interface Catalogue {
   id: number
@@ -38,6 +38,7 @@ export default function ProductsCreate({ catalogues }: Props) {
     specifications: [] as string[],
     features: [] as string[],
     primary_image: null as File | null,
+    gallery_images: [] as File[],
     is_active: true,
     is_featured: false,
     display_order: '0',
@@ -47,6 +48,7 @@ export default function ProductsCreate({ catalogues }: Props) {
   const [processing, setProcessing] = useState(false)
   const [newSpecification, setNewSpecification] = useState('')
   const [newFeature, setNewFeature] = useState('')
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
 
   function handleChange(field: string, value: any) {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -64,6 +66,30 @@ export default function ProductsCreate({ catalogues }: Props) {
     if (e.target.files && e.target.files[0]) {
       setFormData(prev => ({ ...prev, primary_image: e.target.files![0] }))
     }
+  }
+
+  function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      const files = Array.from(e.target.files)
+      setFormData(prev => ({ ...prev, gallery_images: [...prev.gallery_images, ...files] }))
+
+      // Create previews
+      files.forEach(file => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setGalleryPreviews(prev => [...prev, reader.result as string])
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+  }
+
+  function removeGalleryImage(index: number) {
+    setFormData(prev => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((_, i) => i !== index)
+    }))
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index))
   }
 
   function addSpecification() {
@@ -131,6 +157,11 @@ export default function ProductsCreate({ catalogues }: Props) {
     if (formData.primary_image) {
       submitData.append('primary_image', formData.primary_image)
     }
+
+    // Gallery images
+    formData.gallery_images.forEach((file, index) => {
+      submitData.append(`gallery_images[${index}]`, file)
+    })
 
     submitData.append('is_active', formData.is_active ? '1' : '0')
     submitData.append('is_featured', formData.is_featured ? '1' : '0')
@@ -451,8 +482,8 @@ export default function ProductsCreate({ catalogues }: Props) {
           {/* Media */}
           <Card>
             <CardHeader>
-              <CardTitle>Product Image</CardTitle>
-              <CardDescription>Upload a product image</CardDescription>
+              <CardTitle>Product Images</CardTitle>
+              <CardDescription>Upload product images</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -466,6 +497,43 @@ export default function ProductsCreate({ catalogues }: Props) {
                 {errors.primary_image && <p className="text-sm text-destructive">{errors.primary_image}</p>}
                 <p className="text-xs text-muted-foreground">
                   Recommended size: 800x800px, Max size: 5MB
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gallery_images">Gallery Images</Label>
+                <Input
+                  id="gallery_images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleGalleryImagesChange}
+                />
+                {errors.gallery_images && <p className="text-sm text-destructive">{errors.gallery_images}</p>}
+                {galleryPreviews.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {galleryPreviews.map((preview, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={preview}
+                          alt={`Gallery preview ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1 h-6 w-6 p-0"
+                          onClick={() => removeGalleryImage(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Upload multiple images to showcase your product from different angles
                 </p>
               </div>
             </CardContent>

@@ -155,7 +155,7 @@ export default function AdminDashboard({
               <p className="text-3xl font-bold text-yellow-600">{stats.pending_verifications}</p>
               {stats.pending_verifications > 0 && (
                 <Button size="sm" variant="link" className="px-0 h-auto mt-2" asChild>
-                  <Link href="/admin/service-providers/verification-queue">
+                  <Link href={route('admin.verification-queue.index')}>
                     Review Now <ChevronRight className="h-4 w-4 ml-1" />
                   </Link>
                 </Button>
@@ -195,7 +195,7 @@ export default function AdminDashboard({
               <p className="text-3xl font-bold text-yellow-600">{stats.pending_reviews}</p>
               {stats.pending_reviews > 0 && (
                 <Button size="sm" variant="link" className="px-0 h-auto mt-2" asChild>
-                  <Link href="/admin/reviews">
+                  <Link href={route('admin.reviews.index')}>
                     Moderate <ChevronRight className="h-4 w-4 ml-1" />
                   </Link>
                 </Button>
@@ -322,7 +322,7 @@ export default function AdminDashboard({
                   <CardTitle>Pending Provider Verifications</CardTitle>
                 </div>
                 <Button size="sm" asChild>
-                  <Link href="/admin/service-providers/verification-queue">
+                  <Link href={route('admin.verification-queue.index')}>
                     Review All
                   </Link>
                 </Button>
@@ -355,7 +355,7 @@ export default function AdminDashboard({
               <div className="flex items-center justify-between">
                 <CardTitle>Recent Users</CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/admin/users">View All</Link>
+                  <Link href={route('admin.users.index')}>View All</Link>
                 </Button>
               </div>
             </CardHeader>
@@ -389,7 +389,7 @@ export default function AdminDashboard({
               <div className="flex items-center justify-between">
                 <CardTitle>Recent Payments</CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/admin/payments">View All</Link>
+                  <Link href={route('admin.payments.index')}>View All</Link>
                 </Button>
               </div>
             </CardHeader>

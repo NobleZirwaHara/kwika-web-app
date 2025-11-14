@@ -50,8 +50,8 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
   // Filter states
   const [startDate, setStartDate] = useState(filters.start_date)
   const [endDate, setEndDate] = useState(filters.end_date)
-  const [serviceFilter, setServiceFilter] = useState(filters.service_id || '')
-  const [typeFilter, setTypeFilter] = useState(filters.type || '')
+  const [serviceFilter, setServiceFilter] = useState(filters.service_id || 'all')
+  const [typeFilter, setTypeFilter] = useState(filters.type || 'all')
 
   // Form states
   const [formData, setFormData] = useState({
@@ -73,8 +73,8 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
     router.get('/provider/availability', {
       start_date: startDate,
       end_date: endDate,
-      service_id: serviceFilter || undefined,
-      type: typeFilter || undefined,
+      service_id: serviceFilter !== 'all' ? serviceFilter : undefined,
+      type: typeFilter !== 'all' ? typeFilter : undefined,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -452,7 +452,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
                     <SelectValue placeholder="All Services" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Services</SelectItem>
+                    <SelectItem value="all">All Services</SelectItem>
                     {services.map((service) => (
                       <SelectItem key={service.id} value={service.id.toString()}>
                         {service.name}
@@ -469,7 +469,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="available">Available</SelectItem>
                     <SelectItem value="blocked">Blocked</SelectItem>
                     <SelectItem value="booked">Booked</SelectItem>

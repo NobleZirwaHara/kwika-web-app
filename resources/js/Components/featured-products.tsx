@@ -1,0 +1,130 @@
+import { Card, CardContent } from "@/Components/ui/card"
+import { Button } from "@/Components/ui/button"
+import { Badge } from "@/Components/ui/badge"
+import { MapPin, ArrowRight, ShoppingCart, Tag } from "lucide-react"
+import { Link } from "@inertiajs/react"
+
+interface Product {
+  id: number
+  name: string
+  slug: string
+  description: string
+  price: string
+  regular_price: number
+  sale_price: number | null
+  currency: string
+  image: string | null
+  is_on_sale: boolean
+  in_stock: boolean
+  provider: {
+    id: number
+    name: string
+    slug: string
+    city: string
+  }
+}
+
+interface FeaturedProductsProps {
+  products: Product[]
+}
+
+export function FeaturedProducts({ products }: FeaturedProductsProps) {
+  if (!products || products.length === 0) {
+    return null
+  }
+
+  return (
+    <section className="py-16 bg-background">
+      <div className="container mx-auto px-6 lg:px-20">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">Featured Products</h2>
+            <p className="text-muted-foreground">
+              Shop quality products from trusted event service providers
+            </p>
+          </div>
+          <Link href="/search?type=products">
+            <Button variant="outline" className="gap-2">
+              View all
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.slice(0, 8).map((product) => (
+            <Link
+              key={product.id}
+              href={`/providers/${product.provider.slug}`}
+              className="group"
+            >
+              <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
+                <div className="relative aspect-square overflow-hidden bg-muted">
+                  {product.image ? (
+                    <img
+                      src={product.image.startsWith('http') ? product.image : `/storage/${product.image}`}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                      <ShoppingCart className="w-16 h-16 text-primary/20" />
+                    </div>
+                  )}
+
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-2">
+                    {product.is_on_sale && (
+                      <Badge variant="destructive" className="gap-1">
+                        <Tag className="h-3 w-3" />
+                        Sale
+                      </Badge>
+                    )}
+                    {!product.in_stock && (
+                      <Badge variant="secondary">
+                        Out of Stock
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+                    <MapPin className="h-3 w-3" />
+                    <span>{product.provider.city}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      by {product.provider.name}
+                    </span>
+                    <div className="flex flex-col items-end">
+                      {product.is_on_sale && product.sale_price ? (
+                        <>
+                          <span className="text-xs text-muted-foreground line-through">
+                            {product.currency} {product.regular_price.toFixed(2)}
+                          </span>
+                          <span className="text-lg font-bold text-destructive">
+                            {product.price}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-lg font-bold text-primary">
+                          {product.price}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

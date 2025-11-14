@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -42,6 +43,10 @@ class ServiceController extends Controller
                     'category_name' => $service->category->name,
                     'is_active' => $service->is_active,
                     'bookings_count' => $service->bookings_count,
+                    'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                    'gallery_images' => $service->gallery_images ? collect($service->gallery_images)->map(function ($image) {
+                        return asset('storage/' . $image);
+                    })->toArray() : [],
                 ];
             });
 
@@ -81,12 +86,30 @@ class ServiceController extends Controller
             'max_attendees' => ['nullable', 'integer', 'min:1'],
             'inclusions' => ['nullable', 'array'],
             'is_active' => ['boolean'],
+            'primary_image' => ['nullable', 'image', 'max:5120'], // 5MB max
+            'gallery_images' => ['nullable', 'array'],
+            'gallery_images.*' => ['image', 'max:5120'],
         ]);
 
         // Generate slug
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
         $validated['service_provider_id'] = $provider->id;
         $validated['currency'] = 'MWK'; // Default currency
+
+        // Handle primary image upload
+        if ($request->hasFile('primary_image')) {
+            $path = $request->file('primary_image')->store('services', 'public');
+            $validated['primary_image'] = $path;
+        }
+
+        // Handle gallery images upload
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery_images') as $image) {
+                $galleryPaths[] = $image->store('services/gallery', 'public');
+            }
+            $validated['gallery_images'] = $galleryPaths;
+        }
 
         Service::create($validated);
 
@@ -119,11 +142,34 @@ class ServiceController extends Controller
             'max_attendees' => ['nullable', 'integer', 'min:1'],
             'inclusions' => ['nullable', 'array'],
             'is_active' => ['boolean'],
+            'primary_image' => ['nullable', 'image', 'max:5120'],
+            'gallery_images' => ['nullable', 'array'],
+            'gallery_images.*' => ['image', 'max:5120'],
         ]);
 
         // Update slug if name changed
         if ($validated['name'] !== $service->name) {
             $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
+        }
+
+        // Handle primary image upload
+        if ($request->hasFile('primary_image')) {
+            // Delete old image if exists
+            if ($service->primary_image) {
+                Storage::disk('public')->delete($service->primary_image);
+            }
+            $path = $request->file('primary_image')->store('services', 'public');
+            $validated['primary_image'] = $path;
+        }
+
+        // Handle gallery images upload
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = $service->gallery_images ?? [];
+
+            foreach ($request->file('gallery_images') as $image) {
+                $galleryPaths[] = $image->store('services/gallery', 'public');
+            }
+            $validated['gallery_images'] = $galleryPaths;
         }
 
         $service->update($validated);

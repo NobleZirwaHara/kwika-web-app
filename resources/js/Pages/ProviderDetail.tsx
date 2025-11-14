@@ -1,4 +1,4 @@
-import { Header } from "@/Components/header"
+import { SearchHeader } from "@/Components/search-header"
 import { ProviderGallery } from "@/Components/provider-gallery"
 import { ProviderInfo } from "@/Components/provider-info"
 import { ProviderServices } from "@/Components/provider-services"
@@ -59,14 +59,26 @@ interface SimilarProvider {
   image?: string
 }
 
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
+
 interface Props {
   provider: ProviderData
   services: Service[]
   reviews: Review[]
   similarProviders: SimilarProvider[]
+  categories?: Category[]
+  auth?: {
+    user?: any
+  }
 }
 
-export default function ProviderDetail({ provider, services, reviews, similarProviders }: Props) {
+export default function ProviderDetail({ provider, services, reviews, similarProviders, categories = [], auth }: Props) {
   // Get the first service for booking component
   const firstService = services.length > 0 ? services[0] : null
   const basePrice = firstService ? firstService.basePrice : 0
@@ -77,7 +89,7 @@ export default function ProviderDetail({ provider, services, reviews, similarPro
     <>
       <Head title={`${provider.name} - EventHub`} />
       <div className="min-h-screen">
-        <Header />
+        <SearchHeader categories={categories} user={auth?.user} />
         <main className="pt-24">
           <div className="container mx-auto px-6 lg:px-20 py-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -88,7 +100,7 @@ export default function ProviderDetail({ provider, services, reviews, similarPro
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
               <div className="lg:col-span-2 space-y-8">
                 {/* Services Section */}
-                <ProviderServices services={services} currency="MWK" />
+                <ProviderServices services={services} currency="MWK" providerId={provider.id} />
 
                 {/* Reviews Section */}
                 <ProviderReviews rating={provider.rating} reviewCount={provider.totalReviews} />

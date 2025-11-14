@@ -53,16 +53,16 @@ interface Props {
 
 export default function ProductsIndex({ products, catalogues, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '')
-  const [catalogueFilter, setCatalogueFilter] = useState(filters.catalogue_id || '')
-  const [stockStatusFilter, setStockStatusFilter] = useState(filters.stock_status || '')
-  const [activeFilter, setActiveFilter] = useState(filters.is_active || '')
+  const [catalogueFilter, setCatalogueFilter] = useState(filters.catalogue_id || 'all')
+  const [stockStatusFilter, setStockStatusFilter] = useState(filters.stock_status || 'all')
+  const [activeFilter, setActiveFilter] = useState(filters.is_active || 'all')
 
   function handleFilter() {
     router.get('/provider/products', {
       search: search || undefined,
-      catalogue_id: catalogueFilter || undefined,
-      stock_status: stockStatusFilter || undefined,
-      is_active: activeFilter || undefined,
+      catalogue_id: catalogueFilter !== 'all' ? catalogueFilter : undefined,
+      stock_status: stockStatusFilter !== 'all' ? stockStatusFilter : undefined,
+      is_active: activeFilter !== 'all' ? activeFilter : undefined,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -71,9 +71,9 @@ export default function ProductsIndex({ products, catalogues, filters }: Props) 
 
   function clearFilters() {
     setSearch('')
-    setCatalogueFilter('')
-    setStockStatusFilter('')
-    setActiveFilter('')
+    setCatalogueFilter('all')
+    setStockStatusFilter('all')
+    setActiveFilter('all')
     router.get('/provider/products')
   }
 
@@ -130,7 +130,7 @@ export default function ProductsIndex({ products, catalogues, filters }: Props) 
                     <SelectValue placeholder="All Catalogues" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Catalogues</SelectItem>
+                    <SelectItem value="all">All Catalogues</SelectItem>
                     {catalogues.map((catalogue) => (
                       <SelectItem key={catalogue.id} value={catalogue.id.toString()}>
                         {catalogue.name}
@@ -146,7 +146,7 @@ export default function ProductsIndex({ products, catalogues, filters }: Props) 
                     <SelectValue placeholder="All Stock" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Stock</SelectItem>
+                    <SelectItem value="all">All Stock</SelectItem>
                     <SelectItem value="in_stock">In Stock</SelectItem>
                     <SelectItem value="out_of_stock">Out of Stock</SelectItem>
                   </SelectContent>
@@ -159,7 +159,7 @@ export default function ProductsIndex({ products, catalogues, filters }: Props) 
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="true">Active</SelectItem>
                     <SelectItem value="false">Inactive</SelectItem>
                   </SelectContent>

@@ -41,14 +41,14 @@ interface Props {
 
 export default function PromotionsIndex({ promotions, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '')
-  const [statusFilter, setStatusFilter] = useState(filters.status || '')
-  const [typeFilter, setTypeFilter] = useState(filters.type || '')
+  const [statusFilter, setStatusFilter] = useState(filters.status || 'all')
+  const [typeFilter, setTypeFilter] = useState(filters.type || 'all')
 
   function handleFilter() {
     router.get('/provider/promotions', {
       search: search || undefined,
-      status: statusFilter || undefined,
-      type: typeFilter || undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      type: typeFilter !== 'all' ? typeFilter : undefined,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -57,8 +57,8 @@ export default function PromotionsIndex({ promotions, filters }: Props) {
 
   function clearFilters() {
     setSearch('')
-    setStatusFilter('')
-    setTypeFilter('')
+    setStatusFilter('all')
+    setTypeFilter('all')
     router.get('/provider/promotions')
   }
 
@@ -140,7 +140,7 @@ export default function PromotionsIndex({ promotions, filters }: Props) {
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="upcoming">Upcoming</SelectItem>
                     <SelectItem value="expired">Expired</SelectItem>
@@ -156,7 +156,7 @@ export default function PromotionsIndex({ promotions, filters }: Props) {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="percentage">Percentage Off</SelectItem>
                     <SelectItem value="fixed_amount">Fixed Amount</SelectItem>
                     <SelectItem value="bundle">Bundle Deal</SelectItem>

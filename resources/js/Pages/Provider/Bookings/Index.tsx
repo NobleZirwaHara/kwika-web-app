@@ -77,8 +77,8 @@ interface Props {
 export default function BookingsIndex({ bookings, services, statusCounts, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '')
   const [statusFilter, setStatusFilter] = useState(filters.status || '')
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState(filters.payment_status || '')
-  const [serviceFilter, setServiceFilter] = useState(filters.service_id || '')
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState(filters.payment_status || 'all')
+  const [serviceFilter, setServiceFilter] = useState(filters.service_id || 'all')
   const [dateFrom, setDateFrom] = useState(filters.date_from || '')
   const [dateTo, setDateTo] = useState(filters.date_to || '')
 
@@ -86,8 +86,8 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
     router.get('/provider/bookings', {
       search: search || undefined,
       status: statusFilter || undefined,
-      payment_status: paymentStatusFilter || undefined,
-      service_id: serviceFilter || undefined,
+      payment_status: paymentStatusFilter !== 'all' ? paymentStatusFilter : undefined,
+      service_id: serviceFilter !== 'all' ? serviceFilter : undefined,
       date_from: dateFrom || undefined,
       date_to: dateTo || undefined,
     }, {
@@ -99,8 +99,8 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
   function clearFilters() {
     setSearch('')
     setStatusFilter('')
-    setPaymentStatusFilter('')
-    setServiceFilter('')
+    setPaymentStatusFilter('all')
+    setServiceFilter('all')
     setDateFrom('')
     setDateTo('')
     router.get('/provider/bookings')
@@ -109,8 +109,8 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
   function handleStatusTab(status: string) {
     router.get('/provider/bookings', {
       status: status || undefined,
-      payment_status: paymentStatusFilter || undefined,
-      service_id: serviceFilter || undefined,
+      payment_status: paymentStatusFilter !== 'all' ? paymentStatusFilter : undefined,
+      service_id: serviceFilter !== 'all' ? serviceFilter : undefined,
       date_from: dateFrom || undefined,
       date_to: dateTo || undefined,
       search: search || undefined,
@@ -123,8 +123,8 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
   function handleExport() {
     const params = new URLSearchParams()
     if (statusFilter) params.append('status', statusFilter)
-    if (paymentStatusFilter) params.append('payment_status', paymentStatusFilter)
-    if (serviceFilter) params.append('service_id', serviceFilter)
+    if (paymentStatusFilter && paymentStatusFilter !== 'all') params.append('payment_status', paymentStatusFilter)
+    if (serviceFilter && serviceFilter !== 'all') params.append('service_id', serviceFilter)
     if (dateFrom) params.append('date_from', dateFrom)
     if (dateTo) params.append('date_to', dateTo)
 
@@ -229,7 +229,7 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
                     <SelectValue placeholder="All Services" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Services</SelectItem>
+                    <SelectItem value="all">All Services</SelectItem>
                     {services.map((service) => (
                       <SelectItem key={service.id} value={service.id.toString()}>
                         {service.name}
@@ -246,7 +246,7 @@ export default function BookingsIndex({ bookings, services, statusCounts, filter
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="pending_verification">Verifying</SelectItem>
                     <SelectItem value="deposit_paid">Deposit Paid</SelectItem>

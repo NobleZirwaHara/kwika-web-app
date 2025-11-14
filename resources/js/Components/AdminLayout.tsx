@@ -94,14 +94,15 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
           >
             <div className="flex h-full flex-col">
               {/* Mobile Header */}
-              <div className="flex h-16 items-center justify-between px-4 border-b">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-6 w-6 text-primary" />
-                  <span className="font-bold">Admin Panel</span>
+              <div className="flex h-16 items-center px-4 border-b relative">
+                <div className="flex items-center gap-2 flex-1 justify-center">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">Admin Panel</span>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="absolute right-4"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <X className="h-5 w-5" />
@@ -166,9 +167,9 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
         <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
           <div className="flex flex-col flex-1 min-h-0 bg-card border-r">
             {/* Logo */}
-            <div className="flex h-16 items-center gap-2 px-4 border-b">
-              <Shield className="h-6 w-6 text-primary" />
-              <span className="font-bold text-lg">Admin Panel</span>
+            <div className="flex h-16 items-center justify-center gap-2 px-4 border-b">
+              <Shield className="h-5 w-5 text-primary" />
+              <span className="font-semibold">Admin Panel</span>
             </div>
 
             {/* Navigation */}

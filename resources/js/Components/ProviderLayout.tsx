@@ -83,14 +83,14 @@ export default function ProviderLayout({ children, title, provider }: ProviderLa
           >
             <div className="flex h-full flex-col">
               {/* Mobile Header */}
-              <div className="flex h-16 items-center justify-between px-4 border-b">
-                <div className="flex items-center gap-2">
-                  <img src="/kwika-logo.png" alt="Kwika Events" width={100} />
-                  <span className="font-bold">Provider Panel</span>
+              <div className="flex h-16 items-center px-4 border-b relative">
+                <div className="flex items-center justify-center gap-2 flex-1">
+                  <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="absolute right-4"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <X className="h-5 w-5" />
@@ -144,8 +144,8 @@ export default function ProviderLayout({ children, title, provider }: ProviderLa
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-card px-6">
             {/* Logo */}
-            <div className="flex h-16 shrink-0 items-center gap-2 border-b -mx-6 px-6">
-              <img src="/kwika-logo.png" alt="Logo" />
+            <div className="flex h-16 shrink-0 items-center justify-center gap-2 border-b -mx-6 px-6">
+              <img src="/kwika-logo.png" alt="Logo" className="h-8 w-auto" />
             </div>
 
             {/* Provider Info */}

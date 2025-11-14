@@ -13,7 +13,7 @@ class Service extends Model
     protected $fillable = [
         'service_provider_id', 'service_category_id', 'catalogue_id', 'name', 'slug', 'description',
         'base_price', 'price_type', 'max_price', 'currency', 'duration', 'max_attendees',
-        'inclusions', 'requirements', 'is_active', 'requires_deposit',
+        'inclusions', 'requirements', 'primary_image', 'gallery_images', 'is_active', 'requires_deposit',
         'deposit_percentage', 'cancellation_hours',
     ];
 
@@ -25,6 +25,7 @@ class Service extends Model
             'deposit_percentage' => 'decimal:2',
             'inclusions' => 'array',
             'requirements' => 'array',
+            'gallery_images' => 'array',
             'is_active' => 'boolean',
             'requires_deposit' => 'boolean',
         ];

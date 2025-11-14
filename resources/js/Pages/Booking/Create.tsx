@@ -1,5 +1,5 @@
-import { useForm, Head } from '@inertiajs/react'
-import { FormEvent } from 'react'
+import { useForm, Head, router } from '@inertiajs/react'
+import { FormEvent, useEffect } from 'react'
 import {Header} from '@/Components/header'
 import { Footer } from '@/Components/footer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
@@ -7,7 +7,8 @@ import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
-import { Calendar, MapPin, Users, DollarSign } from 'lucide-react'
+import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle } from 'lucide-react'
+import { format } from 'date-fns'
 
 interface Service {
   id: number
@@ -33,9 +34,13 @@ interface Props {
 }
 
 export default function CreateBooking({ service }: Props) {
+  // Get pre-selected date from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search)
+  const preSelectedDate = urlParams.get('event_date')
+
   const { data, setData, post, processing, errors } = useForm({
     service_id: service.id,
-    event_date: '',
+    event_date: preSelectedDate || '',
     event_end_date: '',
     event_location: '',
     attendees: '',
@@ -63,6 +68,26 @@ export default function CreateBooking({ service }: Props) {
               </p>
             </div>
 
+            {/* Warning if no date selected */}
+            {!preSelectedDate && (
+              <Card className="mb-6 border-yellow-200 bg-yellow-50">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-yellow-900 mb-1">No Date Selected</h3>
+                      <p className="text-sm text-yellow-800 mb-3">
+                        You haven't selected a date for your booking. Please select a date below or go back to the provider page to select an available date.
+                      </p>
+                      <Button variant="outline" size="sm" onClick={() => window.history.back()}>
+                        Go Back to Provider Page
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid md:grid-cols-3 gap-6">
               {/* Booking Form */}
               <div className="md:col-span-2">
@@ -80,17 +105,34 @@ export default function CreateBooking({ service }: Props) {
                         <Label htmlFor="event_date">
                           Event Date <span className="text-destructive">*</span>
                         </Label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="event_date"
-                            type="datetime-local"
-                            value={data.event_date}
-                            onChange={(e) => setData('event_date', e.target.value)}
-                            className="pl-10"
-                            required
-                          />
-                        </div>
+                        {preSelectedDate ? (
+                          /* Pre-selected and Confirmed Date */
+                          <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <div>
+                              <p className="font-semibold text-green-900">
+                                {format(new Date(data.event_date), 'EEEE, MMMM dd, yyyy')}
+                              </p>
+                              <p className="text-sm text-green-700">
+                                This date is available for booking
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Manual Date Selection */
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="event_date"
+                              type="date"
+                              value={data.event_date}
+                              onChange={(e) => setData('event_date', e.target.value)}
+                              className="pl-10"
+                              min={new Date().toISOString().split('T')[0]}
+                              required
+                            />
+                          </div>
+                        )}
                         {errors.event_date && (
                           <p className="text-sm text-destructive">{errors.event_date}</p>
                         )}

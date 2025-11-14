@@ -48,6 +48,13 @@ Route::get('/api/search/suggestions', [SearchController::class, 'suggestions'])-
 Route::get('/providers', [ProviderController::class, 'index'])->name('providers.index');
 Route::get('/providers/{slug}', [ProviderController::class, 'show'])->name('providers.show');
 
+// Service routes
+Route::get('/services', [\App\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{slug}', [\App\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
+
+// Provider Availability API (public)
+Route::get('/api/providers/{providerId}/availability', [BookingController::class, 'getProviderAvailability'])->name('api.providers.availability');
+
 // Booking routes (will require authentication)
 Route::middleware(['auth'])->group(function () {
     // Create booking
@@ -244,6 +251,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{id}', [\App\Http\Controllers\Admin\ServicesController::class, 'destroy'])->name('destroy');
     });
 
+    // Products Management
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ProductsController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\ProductsController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\ProductsController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\ProductsController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\ProductsController::class, 'update'])->name('update');
+        Route::put('/{id}/toggle-active', [\App\Http\Controllers\Admin\ProductsController::class, 'toggleActive'])->name('toggle-active');
+        Route::put('/{id}/toggle-featured', [\App\Http\Controllers\Admin\ProductsController::class, 'toggleFeatured'])->name('toggle-featured');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\ProductsController::class, 'destroy'])->name('destroy');
+    });
+
     // Payments Management
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\PaymentsController::class, 'index'])->name('index');
@@ -265,7 +284,36 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{id}', [\App\Http\Controllers\Admin\SubscriptionPlansController::class, 'destroy'])->name('destroy');
     });
 
-    // Content Management: Products, Events (Phase 3)
-    // Companies, Promotions (Phase 5-6)
-    // Admin Users, Audit Logs, Settings, Reports (Phase 7-8)
+    // Companies Management
+    Route::prefix('companies')->name('companies.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\CompaniesController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\CompaniesController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\CompaniesController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\CompaniesController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\CompaniesController::class, 'update'])->name('update');
+        Route::put('/{id}/toggle-active', [\App\Http\Controllers\Admin\CompaniesController::class, 'toggleActive'])->name('toggle-active');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\CompaniesController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin Users Management (Phase 7)
+    Route::prefix('admin-users')->name('admin-users.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminUsersController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\AdminUsersController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminUsersController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\AdminUsersController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'update'])->name('update');
+        Route::post('/{id}/suspend', [\App\Http\Controllers\Admin\AdminUsersController::class, 'suspend'])->name('suspend');
+        Route::post('/{id}/restore', [\App\Http\Controllers\Admin\AdminUsersController::class, 'restore'])->name('restore');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'destroy'])->name('destroy');
+    });
+
+    // Audit Logs (Phase 7)
+    Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AuditLogsController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\AuditLogsController::class, 'show'])->name('show');
+    });
+
+    // Content Management: Events (Phase 3)
+    // Promotions (Phase 5)
+    // Settings, Reports (Phase 8)
 });

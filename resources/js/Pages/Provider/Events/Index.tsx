@@ -48,16 +48,16 @@ interface Props {
 
 export default function EventsIndex({ events, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '')
-  const [statusFilter, setStatusFilter] = useState(filters.status || '')
-  const [categoryFilter, setCategoryFilter] = useState(filters.category || '')
-  const [periodFilter, setPeriodFilter] = useState(filters.period || '')
+  const [statusFilter, setStatusFilter] = useState(filters.status || 'all')
+  const [categoryFilter, setCategoryFilter] = useState(filters.category || 'all')
+  const [periodFilter, setPeriodFilter] = useState(filters.period || 'all')
 
   function handleFilter() {
     router.get('/provider/events', {
       search: search || undefined,
-      status: statusFilter || undefined,
-      category: categoryFilter || undefined,
-      period: periodFilter || undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      category: categoryFilter !== 'all' ? categoryFilter : undefined,
+      period: periodFilter !== 'all' ? periodFilter : undefined,
     }, {
       preserveState: true,
       preserveScroll: true,
@@ -66,9 +66,9 @@ export default function EventsIndex({ events, filters }: Props) {
 
   function clearFilters() {
     setSearch('')
-    setStatusFilter('')
-    setCategoryFilter('')
-    setPeriodFilter('')
+    setStatusFilter('all')
+    setCategoryFilter('all')
+    setPeriodFilter('all')
     router.get('/provider/events')
   }
 
@@ -146,7 +146,7 @@ export default function EventsIndex({ events, filters }: Props) {
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="published">Published</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -162,7 +162,7 @@ export default function EventsIndex({ events, filters }: Props) {
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="conference">Conference</SelectItem>
                     <SelectItem value="workshop">Workshop</SelectItem>
                     <SelectItem value="concert">Concert</SelectItem>
@@ -181,7 +181,7 @@ export default function EventsIndex({ events, filters }: Props) {
                     <SelectValue placeholder="All Periods" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Periods</SelectItem>
+                    <SelectItem value="all">All Periods</SelectItem>
                     <SelectItem value="upcoming">Upcoming</SelectItem>
                     <SelectItem value="ongoing">Ongoing</SelectItem>
                     <SelectItem value="past">Past</SelectItem>

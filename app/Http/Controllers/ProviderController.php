@@ -91,6 +91,7 @@ class ProviderController extends Controller
             ->map(function ($service) {
                 return [
                     'id' => $service->id,
+                    'slug' => $service->slug,
                     'name' => $service->name,
                     'description' => $service->description,
                     'category' => $service->category->name,
@@ -157,6 +158,17 @@ class ProviderController extends Controller
             $portfolioImages = $fallbackImages;
         }
 
+        // Get all categories for search dropdown
+        $categories = ServiceCategory::active()->get()->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+                'icon' => $category->icon,
+            ];
+        });
+
         return Inertia::render('ProviderDetail', [
             'provider' => [
                 'id' => $provider->id,
@@ -180,6 +192,7 @@ class ProviderController extends Controller
             'services' => $services,
             'reviews' => $reviews,
             'similarProviders' => $similarProviders,
+            'categories' => $categories,
         ]);
     }
 }

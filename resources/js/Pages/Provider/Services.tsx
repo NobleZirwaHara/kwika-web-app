@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import ProviderLayout from '@/Components/ProviderLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
 import { Button } from '@/Components/ui/button'
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/Components/ui/dialog'
-import { Plus, Edit, Trash2, Package, DollarSign, Clock } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, DollarSign, Clock, Image as ImageIcon, X } from 'lucide-react'
 
 interface Service {
   id: number
@@ -38,6 +38,8 @@ interface Service {
   category_name: string
   is_active: boolean
   bookings_count: number
+  primary_image: string | null
+  gallery_images: string[]
 }
 
 interface Category {
@@ -61,8 +63,14 @@ export default function Services({ provider, services, categories }: Props) {
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [serviceToDelete, setServiceToDelete] = useState<number | null>(null)
+  const [processing, setProcessing] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [primaryImage, setPrimaryImage] = useState<File | null>(null)
+  const [galleryImages, setGalleryImages] = useState<File[]>([])
+  const [primaryImagePreview, setPrimaryImagePreview] = useState<string | null>(null)
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
 
-  const { data, setData, post, put, processing, errors, reset } = useForm({
+  const { data, setData, reset } = useForm({
     name: '',
     service_category_id: '',
     description: '',
@@ -80,6 +88,11 @@ export default function Services({ provider, services, categories }: Props) {
   function openCreateDialog() {
     reset()
     setEditingService(null)
+    setPrimaryImage(null)
+    setGalleryImages([])
+    setPrimaryImagePreview(null)
+    setGalleryPreviews([])
+    setErrors({})
     setDialogOpen(true)
   }
 
@@ -97,22 +110,105 @@ export default function Services({ provider, services, categories }: Props) {
       inclusions: [''],
       is_active: service.is_active,
     })
+    setPrimaryImage(null)
+    setGalleryImages([])
+    // Set existing image previews
+    setPrimaryImagePreview(service.primary_image)
+    setGalleryPreviews(service.gallery_images || [])
+    setErrors({})
     setDialogOpen(true)
   }
 
+  function handlePrimaryImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setPrimaryImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPrimaryImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      const files = Array.from(e.target.files)
+      setGalleryImages(prev => [...prev, ...files])
+
+      // Create previews
+      files.forEach(file => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setGalleryPreviews(prev => [...prev, reader.result as string])
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+  }
+
+  function removeGalleryImage(index: number) {
+    setGalleryImages(prev => prev.filter((_, i) => i !== index))
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
   function handleSubmit() {
+    setProcessing(true)
+    setErrors({})
+
+    const formData = new FormData()
+
+    // Append regular form fields
+    formData.append('name', data.name)
+    formData.append('service_category_id', data.service_category_id)
+    if (data.description) formData.append('description', data.description)
+    formData.append('base_price', data.base_price)
+    formData.append('price_type', data.price_type)
+    if (data.max_price) formData.append('max_price', data.max_price)
+    if (data.duration) formData.append('duration', data.duration)
+    if (data.max_attendees) formData.append('max_attendees', data.max_attendees)
+    formData.append('is_active', data.is_active ? '1' : '0')
+
+    // Append image files
+    if (primaryImage) {
+      formData.append('primary_image', primaryImage)
+    }
+
+    galleryImages.forEach((file, index) => {
+      formData.append(`gallery_images[${index}]`, file)
+    })
+
     if (editingService) {
-      put(`/provider/services/${editingService.id}`, {
+      formData.append('_method', 'PUT')
+      router.post(`/provider/services/${editingService.id}`, formData, {
+        onError: (errors) => {
+          setErrors(errors)
+          setProcessing(false)
+        },
         onSuccess: () => {
           setDialogOpen(false)
           reset()
+          setPrimaryImage(null)
+          setGalleryImages([])
+          setPrimaryImagePreview(null)
+          setGalleryPreviews([])
+          setProcessing(false)
         },
       })
     } else {
-      post('/provider/services', {
+      router.post('/provider/services', formData, {
+        onError: (errors) => {
+          setErrors(errors)
+          setProcessing(false)
+        },
         onSuccess: () => {
           setDialogOpen(false)
           reset()
+          setPrimaryImage(null)
+          setGalleryImages([])
+          setPrimaryImagePreview(null)
+          setGalleryPreviews([])
+          setProcessing(false)
         },
       })
     }
@@ -403,6 +499,85 @@ export default function Services({ provider, services, categories }: Props) {
                   onChange={(e) => setData('max_attendees', e.target.value)}
                   placeholder="100"
                 />
+              </div>
+            </div>
+
+            {/* Image Uploads */}
+            <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-2">
+                <Label htmlFor="primary_image">Primary Image</Label>
+                <Input
+                  id="primary_image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePrimaryImageChange}
+                />
+                {errors.primary_image && (
+                  <p className="text-sm text-destructive">{errors.primary_image}</p>
+                )}
+                {primaryImagePreview && (
+                  <div className="relative w-full max-w-xs">
+                    <img
+                      src={primaryImagePreview}
+                      alt="Primary preview"
+                      className="w-full h-40 object-cover rounded-lg border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setPrimaryImage(null)
+                        setPrimaryImagePreview(null)
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Recommended size: 1200x800px, Max size: 5MB
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gallery_images">Gallery Images</Label>
+                <Input
+                  id="gallery_images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleGalleryImagesChange}
+                />
+                {errors.gallery_images && (
+                  <p className="text-sm text-destructive">{errors.gallery_images}</p>
+                )}
+                {galleryPreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {galleryPreviews.map((preview, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={preview}
+                          alt={`Gallery preview ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1 h-6 w-6 p-0"
+                          onClick={() => removeGalleryImage(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Upload multiple images to showcase your service
+                </p>
               </div>
             </div>
           </div>

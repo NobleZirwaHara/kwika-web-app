@@ -206,7 +206,7 @@ class ServicesController extends Controller
                 'media' => $service->media->map(function ($media) {
                     return [
                         'id' => $media->id,
-                        'url' => $media->url,
+                        'url' => $media->url ? asset('storage/' . $media->url) : null,
                         'type' => $media->type,
                     ];
                 }),

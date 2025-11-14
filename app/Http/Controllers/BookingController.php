@@ -194,7 +194,7 @@ class BookingController extends Controller
             'notes' => $validated['notes'] ?? null,
         ]);
 
-        $booking->update(['payment_status' => 'pending_verification']);
+        //$booking->update(['payment_status' => 'pending_verification']);
 
         return redirect()->route('bookings.confirmation', $booking->id);
     }
@@ -438,6 +438,43 @@ class BookingController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Booking cancelled successfully');
+    }
+
+    /**
+     * Get provider availability (booked dates)
+     */
+    public function getProviderAvailability(Request $request, $providerId)
+    {
+        $startDate = $request->query('start_date', now()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->addMonths(3)->format('Y-m-d'));
+
+        // Get all bookings for this provider that are confirmed or pending
+        $bookedDates = Booking::where('service_provider_id', $providerId)
+            ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+            ->whereBetween('event_date', [$startDate, $endDate])
+            ->select('event_date', 'event_end_date')
+            ->get()
+            ->flatMap(function ($booking) {
+                // Create array of all dates between event_date and event_end_date
+                $dates = [];
+                $start = new \DateTime($booking->event_date);
+                $end = $booking->event_end_date ? new \DateTime($booking->event_end_date) : clone $start;
+
+                $interval = new \DateInterval('P1D');
+                $dateRange = new \DatePeriod($start, $interval, $end->modify('+1 day'));
+
+                foreach ($dateRange as $date) {
+                    $dates[] = $date->format('Y-m-d');
+                }
+
+                return $dates;
+            })
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'booked_dates' => $bookedDates,
+        ]);
     }
 
     /**
