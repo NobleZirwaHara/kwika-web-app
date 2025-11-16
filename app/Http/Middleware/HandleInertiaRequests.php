@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
                     'is_admin' => $request->user()->is_admin,
+                    'is_provider' => $request->user()->provider //&& $request->user()->provider->status === 'approved',
                 ] : null,
             ],
             'ziggy' => fn () => [

@@ -104,6 +104,9 @@ interface Provider {
   verified_at: string | null
   created_at: string
   days_waiting: number
+  hours_waiting: number
+  onboarding_completed: boolean
+  onboarding_step: number
   onboarding_data: any
   user: User
   services: Service[]
@@ -163,6 +166,19 @@ export default function VerificationQueueShow({ admin, provider }: Props) {
     })
   }
 
+  function formatWaitingTime(hoursWaiting: number): string {
+    const days = Math.floor(hoursWaiting / 24)
+    const hours = Math.round(hoursWaiting % 24)
+
+    if (days === 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}`
+    } else if (hours === 0) {
+      return `${days} day${days !== 1 ? 's' : ''}`
+    } else {
+      return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`
+    }
+  }
+
   function getStatusBadge(status: string) {
     switch (status) {
       case 'pending':
@@ -216,7 +232,7 @@ export default function VerificationQueueShow({ admin, provider }: Props) {
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <p className="text-sm font-medium text-red-900">
-                  URGENT: This application has been waiting for {provider.days_waiting} days
+                  URGENT: This application has been waiting for {formatWaitingTime(provider.hours_waiting)}
                 </p>
               </div>
             </CardContent>
@@ -612,7 +628,7 @@ export default function VerificationQueueShow({ admin, provider }: Props) {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Waiting Time</p>
-                  <p className="font-medium">{provider.days_waiting} days</p>
+                  <p className="font-medium">{formatWaitingTime(provider.hours_waiting)}</p>
                 </div>
                 {provider.verified_at && (
                   <div>

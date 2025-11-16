@@ -1,7 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card"
 import { Button } from "@/Components/ui/button"
 import { Badge } from "@/Components/ui/badge"
-import { Link } from "@inertiajs/react"
+import { WishlistButton } from "@/Components/wishlist-button"
+import { Link, usePage } from "@inertiajs/react"
+import { TimeSlotPicker } from "@/Components/time-slot-picker"
 import { Calendar as CalendarIcon, Clock, DollarSign, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
@@ -28,9 +30,15 @@ interface ProviderServicesProps {
 }
 
 export function ProviderServices({ services, currency = 'MWK', providerId }: ProviderServicesProps) {
+  const { auth } = usePage().props as any
+  const isAuthenticated = !!auth?.user
   const [selectedDates, setSelectedDates] = useState<{ [serviceId: number]: Date | undefined }>({})
   const [bookedDates, setBookedDates] = useState<Date[]>([])
+  const [bookedTimeSlots, setBookedTimeSlots] = useState<{ [serviceId: number]: string[] }>({})
+  const [selectedStartTimes, setSelectedStartTimes] = useState<{ [serviceId: number]: string | undefined }>({})
+  const [selectedEndTimes, setSelectedEndTimes] = useState<{ [serviceId: number]: string | undefined }>({})
   const [loadingAvailability, setLoadingAvailability] = useState(true)
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState<{ [serviceId: number]: boolean }>({})
 
   // Fetch provider's booked dates
   useEffect(() => {
@@ -40,8 +48,12 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
         const response = await fetch(`/api/providers/${providerId}/availability`)
         const data = await response.json()
 
-        // Convert string dates to Date objects
-        const booked = data.booked_dates.map((dateStr: string) => new Date(dateStr))
+        // Convert string dates to Date objects, ensuring we parse them in local timezone
+        const booked = data.booked_dates.map((dateStr: string) => {
+          // Parse date as local timezone by adding time component
+          const [year, month, day] = dateStr.split('-').map(Number)
+          return new Date(year, month - 1, day)
+        })
         setBookedDates(booked)
       } catch (error) {
         console.error('Failed to fetch availability:', error)
@@ -53,17 +65,45 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
     fetchAvailability()
   }, [providerId])
 
+  // Fetch booked time slots when a date is selected
+  useEffect(() => {
+    const fetchTimeSlotsForServices = async () => {
+      for (const serviceId in selectedDates) {
+        const selectedDate = selectedDates[serviceId]
+        if (!selectedDate) continue
+
+        try {
+          setLoadingTimeSlots(prev => ({ ...prev, [serviceId]: true }))
+          const dateStr = format(selectedDate, 'yyyy-MM-dd')
+          const response = await fetch(`/api/providers/${providerId}/availability?date=${dateStr}`)
+          const data = await response.json()
+
+          setBookedTimeSlots(prev => ({
+            ...prev,
+            [serviceId]: data.booked_time_slots || []
+          }))
+        } catch (error) {
+          console.error('Failed to fetch time slots:', error)
+        } finally {
+          setLoadingTimeSlots(prev => ({ ...prev, [serviceId]: false }))
+        }
+      }
+    }
+
+    fetchTimeSlotsForServices()
+  }, [selectedDates, providerId])
+
   const handleDateSelect = (serviceId: number, date: Date | undefined) => {
     setSelectedDates(prev => ({
       ...prev,
       [serviceId]: date
     }))
-  }
-
-  const isDateBooked = (date: Date) => {
-    return bookedDates.some(bookedDate =>
-      bookedDate.toDateString() === date.toDateString()
-    )
+    // Reset time selection when date changes
+    if (!date) {
+      setSelectedStartTimes(prev => ({ ...prev, [serviceId]: undefined }))
+      setSelectedEndTimes(prev => ({ ...prev, [serviceId]: undefined }))
+      setBookedTimeSlots(prev => ({ ...prev, [serviceId]: [] }))
+    }
   }
 
   if (services.length === 0) {
@@ -85,13 +125,20 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
   return (
     <div className="border-t pt-6">
       <h2 className="text-2xl font-bold font-heading mb-6">Available Services</h2>
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {services.map((service) => (
-          <Card key={service.id} className="hover:shadow-lg transition-shadow">
+          <Card key={service.id} className="hover:shadow-lg transition-shadow flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <CardTitle className="text-xl mb-2">{service.name}</CardTitle>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <CardTitle className="text-xl">{service.name}</CardTitle>
+                    <WishlistButton
+                      serviceId={service.id}
+                      isAuthenticated={isAuthenticated}
+                      variant="small"
+                    />
+                  </div>
                   <Badge variant="outline" className="mb-3">
                     {service.category}
                   </Badge>
@@ -110,8 +157,8 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="flex-1">
+              <div className="space-y-4 h-full flex flex-col">
                 {/* Service Details */}
                 {service.duration && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -135,11 +182,11 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                   </div>
                 )}
 
-                {/* Date Selection */}
+                {/* Date & Time Selection */}
                 <div className="border-t pt-4">
                   <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                     <CalendarIcon className="h-4 w-4" />
-                    Select Your Event Date
+                    Select Your Event Date & Time
                   </h4>
 
                   {loadingAvailability ? (
@@ -153,10 +200,22 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                           selected={selectedDates[service.id]}
                           onChange={(date: Date | null) => handleDateSelect(service.id, date || undefined)}
                           minDate={new Date()}
-                          excludeDates={bookedDates}
+                          dayClassName={(date) => {
+                            const isBooked = bookedDates.some(
+                              (bookedDate) => {
+                                // Compare year, month, and day directly to avoid timezone issues
+                                return (
+                                  bookedDate.getFullYear() === date.getFullYear() &&
+                                  bookedDate.getMonth() === date.getMonth() &&
+                                  bookedDate.getDate() === date.getDate()
+                                )
+                              }
+                            )
+                            return isBooked ? 'booked-date' : ''
+                          }}
                           placeholderText="Pick a date"
                           dateFormat="MMMM dd, yyyy"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                           calendarClassName="shadow-lg border rounded-lg"
                           wrapperClassName="w-full"
                           popperClassName="z-50"
@@ -165,19 +224,37 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                       </div>
 
                       {selectedDates[service.id] && (
-                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
-                          <p className="text-sm text-green-800">
-                            Selected Date: <strong>{format(selectedDates[service.id]!, 'MMMM dd, yyyy')}</strong>
-                          </p>
+                        <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
+                          Selected: <strong>{format(selectedDates[service.id]!, 'MMM dd, yyyy')}</strong>
                         </div>
                       )}
 
                       {bookedDates.length > 0 && (
-                        <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                          <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
-                          <p className="text-xs text-yellow-800">
-                            Grayed out dates are already booked and unavailable
+                        <div className="flex items-start gap-2 p-2 bg-teal-50 border border-teal-200 rounded mt-3">
+                          <AlertCircle className="h-3 w-3 text-teal-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-xs text-teal-800">
+                            Teal dates have bookings - check time slots
                           </p>
+                        </div>
+                      )}
+
+                      {selectedDates[service.id] && (
+                        <div className="border-t pt-4 mt-4">
+                          {loadingTimeSlots[service.id] ? (
+                            <div className="flex items-center justify-center py-4">
+                              <div className="text-sm text-muted-foreground">Loading times...</div>
+                            </div>
+                          ) : (
+                            <TimeSlotPicker
+                              bookedSlots={bookedTimeSlots[service.id] || []}
+                              onTimeRangeSelect={(start, end) => {
+                                setSelectedStartTimes(prev => ({ ...prev, [service.id]: start }))
+                                setSelectedEndTimes(prev => ({ ...prev, [service.id]: end }))
+                              }}
+                              selectedStartTime={selectedStartTimes[service.id]}
+                              selectedEndTime={selectedEndTimes[service.id]}
+                            />
+                          )}
                         </div>
                       )}
                     </>
@@ -185,23 +262,23 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-4 flex flex-wrap gap-3">
+                <div className="pt-4 flex flex-wrap gap-3 mt-auto">
                   <Button
-                    asChild={selectedDates[service.id] !== undefined}
-                    disabled={!selectedDates[service.id]}
+                    asChild={selectedDates[service.id] !== undefined && selectedStartTimes[service.id] !== undefined && selectedEndTimes[service.id] !== undefined}
+                    disabled={!selectedDates[service.id] || !selectedStartTimes[service.id] || !selectedEndTimes[service.id]}
                     className="flex-1 sm:flex-initial"
                   >
-                    {selectedDates[service.id] ? (
+                    {selectedDates[service.id] && selectedStartTimes[service.id] && selectedEndTimes[service.id] ? (
                       <Link
-                        href={`/bookings/create?service_id=${service.id}&event_date=${format(selectedDates[service.id]!, 'yyyy-MM-dd')}`}
+                        href={`/bookings/create?service_id=${service.id}&event_date=${format(selectedDates[service.id]!, 'yyyy-MM-dd')}&start_time=${selectedStartTimes[service.id]}&end_time=${selectedEndTimes[service.id]}`}
                       >
                         <CalendarIcon className="h-4 w-4 mr-2" />
-                        Book This Service
+                        Request Booking
                       </Link>
                     ) : (
                       <span>
                         <CalendarIcon className="h-4 w-4 mr-2" />
-                        Select a date to continue
+                        {!selectedDates[service.id] ? 'Select date' : 'Select time'}
                       </span>
                     )}
                   </Button>

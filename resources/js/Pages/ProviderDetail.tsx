@@ -1,12 +1,13 @@
 import { SearchHeader } from "@/Components/search-header"
-import { ProviderGallery } from "@/Components/provider-gallery"
-import { ProviderInfo } from "@/Components/provider-info"
+import { ProviderCover } from "@/Components/provider-cover"
+import { ProviderGalleryLightbox } from "@/Components/provider-gallery-lightbox"
 import { ProviderServices } from "@/Components/provider-services"
-import { ProviderBooking } from "@/Components/provider-booking"
 import { ProviderReviews } from "@/Components/provider-reviews"
 import { SimilarProviders } from "@/Components/similar-providers"
 import { Footer } from "@/Components/footer"
 import { Head } from '@inertiajs/react'
+import { Share2, Heart, MapPin } from "lucide-react"
+import { useState } from "react"
 
 interface ProviderData {
   id: string | number
@@ -23,7 +24,7 @@ interface ProviderData {
   totalBookings: number
   coverImage?: string
   logo?: string
-  isVerified: boolean
+  verificationStatus: string
   isFeatured: boolean
   images: string[]
 }
@@ -79,41 +80,76 @@ interface Props {
 }
 
 export default function ProviderDetail({ provider, services, reviews, similarProviders, categories = [], auth }: Props) {
-  // Get the first service for booking component
-  const firstService = services.length > 0 ? services[0] : null
-  const basePrice = firstService ? firstService.basePrice : 0
-  const serviceId = firstService ? firstService.id : undefined
-  const priceType = firstService ? firstService.priceType : 'event'
+  const [isFavorite, setIsFavorite] = useState(false)
 
   return (
     <>
       <Head title={`${provider.name} - EventHub`} />
       <div className="min-h-screen">
-        <SearchHeader categories={categories} user={auth?.user} />
-        <main className="pt-24">
-          <div className="container mx-auto px-6 lg:px-20 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              <ProviderGallery images={provider.images} />
-              <ProviderInfo provider={provider} />
+        <SearchHeader categories={categories} />
+        <main className="pt-16">
+          {/* Cover Image with Logo */}
+          <ProviderCover
+            coverImage={provider.coverImage || provider.images[0]}
+            logo={provider.logo}
+            name={provider.name}
+          />
+
+          {/* Provider Info Section */}
+          <div className="container mx-auto px-6 lg:px-20 mt-8 mb-8">
+            <div className="flex flex-col gap-6">
+              {/* Name and basic info */}
+              <div>
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <h1 className="text-4xl md:text-5xl font-bold font-heading text-balance">
+                    {provider.name}
+                  </h1>
+                  <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                    {provider.images && provider.images.length > 0 && (
+                      <ProviderGalleryLightbox images={provider.images} providerName={provider.name} />
+                    )}
+                    <button className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-accent transition-colors">
+                      <Share2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Share</span>
+                    </button>
+                    <button
+                      onClick={() => setIsFavorite(!isFavorite)}
+                      className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-accent transition-colors"
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
+                      <span className="hidden sm:inline">Save</span>
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-lg text-muted-foreground mb-4">{provider.description}</p>
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>{provider.location}</span>
+                  </div>
+                  {provider.verificationStatus === 'approved' && (
+                    <>
+                      <span>•</span>
+                      <span className="text-primary font-medium">Verified Provider</span>
+                    </>
+                  )}
+                  <span>•</span>
+                  <span>{provider.totalBookings} bookings</span>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-              <div className="lg:col-span-2 space-y-8">
-                {/* Services Section */}
-                <ProviderServices services={services} currency="MWK" providerId={provider.id} />
+          {/* Main content area */}
+          <div className="container mx-auto px-6 lg:px-20 py-8">
+            <div className="space-y-8 mb-12">
+              {/* Services Section */}
+              <ProviderServices services={services} currency="MWK" providerId={provider.id} />
 
-                {/* Reviews Section */}
-                <ProviderReviews rating={provider.rating} reviewCount={provider.totalReviews} />
-              </div>
-              <div className="lg:col-span-1">
-                <ProviderBooking
-                  price={basePrice}
-                  currency="MWK"
-                  priceType={priceType}
-                  serviceId={serviceId}
-                  cancellationPolicy="Flexible cancellation up to 24 hours before the event"
-                />
-              </div>
+              {/* Reviews Section */}
+              <ProviderReviews rating={provider.rating} reviewCount={provider.totalReviews} />
             </div>
 
             <SimilarProviders currentProviderId={provider.id.toString()} providers={similarProviders} />

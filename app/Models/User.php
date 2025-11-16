@@ -48,6 +48,12 @@ class User extends Authenticatable
         return $this->hasOne(ServiceProvider::class);
     }
 
+    // Alias for convenience
+    public function provider()
+    {
+        return $this->serviceProvider();
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);
@@ -61,6 +67,16 @@ class User extends Authenticatable
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function wishlistedServices()
+    {
+        return $this->belongsToMany(Service::class, 'wishlists')->withTimestamps();
     }
 
     public function adminLogs()

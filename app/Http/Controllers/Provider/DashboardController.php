@@ -96,6 +96,42 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Revenue trend data (last 6 months)
+        $revenueTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $revenue = $provider->bookings()
+                ->whereIn('payment_status', ['fully_paid', 'deposit_paid'])
+                ->whereMonth('created_at', $date->month)
+                ->whereYear('created_at', $date->year)
+                ->sum('total_amount');
+
+            $revenueTrend[] = [
+                'month' => $date->format('M Y'),
+                'revenue' => (float) $revenue,
+            ];
+        }
+
+        // Booking status distribution
+        $bookingDistribution = [
+            [
+                'status' => 'Pending',
+                'count' => $provider->bookings()->where('status', 'pending')->count(),
+            ],
+            [
+                'status' => 'Confirmed',
+                'count' => $provider->bookings()->where('status', 'confirmed')->count(),
+            ],
+            [
+                'status' => 'Completed',
+                'count' => $provider->bookings()->where('status', 'completed')->count(),
+            ],
+            [
+                'status' => 'Cancelled',
+                'count' => $provider->bookings()->where('status', 'cancelled')->count(),
+            ],
+        ];
+
         return Inertia::render('Provider/Dashboard', [
             'provider' => [
                 'id' => $provider->id,
@@ -109,6 +145,8 @@ class DashboardController extends Controller
             'stats' => $stats,
             'recent_bookings' => $recent_bookings,
             'upcoming_events' => $upcoming_events,
+            'revenue_trend' => $revenueTrend,
+            'booking_distribution' => $bookingDistribution,
         ]);
     }
 }

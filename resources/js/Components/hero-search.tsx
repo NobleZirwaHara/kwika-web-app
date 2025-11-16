@@ -108,10 +108,18 @@ export function HeroSearch({ categories = [] }: HeroSearchProps) {
       >
         <div className="absolute inset-0 z-0">
           <img src="./top-search-image.webp" alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-background/85"></div>
         </div>
 
-        <div className="container mx-auto px-6 lg:px-20 relative z-10">
+        <div className="container mx-auto px-6 lg:px-20 relative z-10 py-10
+        ">
           <div className="mx-auto max-w-4xl">
+            {/* Title */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground text-center mb-8">
+              {/* Everything events <br></br>in one place.. */}
+              Plan your events... kwika
+            </h1>
+
             {/* Mobile Search Button - Shows modal */}
             <button
               onClick={() => setIsMobileModalOpen(true)}

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/Components/ui/checkbox'
 import { Badge } from '@/Components/ui/badge'
 import { Plus, Trash2, X } from 'lucide-react'
+import { resizeImage, resizeImages, createImagePreview } from '@/lib/imageUtils'
 
 interface Catalogue {
   id: number
@@ -62,25 +63,39 @@ export default function ProductsCreate({ catalogues }: Props) {
     }
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, primary_image: e.target.files![0] }))
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const resizedFile = await resizeImage(file, 'product', 2)
+        setFormData(prev => ({ ...prev, primary_image: resizedFile }))
+      } catch (error) {
+        console.error('Error resizing primary image:', error)
+        setFormData(prev => ({ ...prev, primary_image: file }))
+      }
     }
   }
 
-  function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
       const files = Array.from(e.target.files)
-      setFormData(prev => ({ ...prev, gallery_images: [...prev.gallery_images, ...files] }))
 
-      // Create previews
-      files.forEach(file => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setGalleryPreviews(prev => [...prev, reader.result as string])
-        }
-        reader.readAsDataURL(file)
-      })
+      try {
+        // Resize all gallery images
+        const resizedFiles = await resizeImages(files, 'gallery', 2)
+        setFormData(prev => ({ ...prev, gallery_images: [...prev.gallery_images, ...resizedFiles] }))
+
+        // Create previews for resized images
+        const previews = await Promise.all(resizedFiles.map(file => createImagePreview(file)))
+        setGalleryPreviews(prev => [...prev, ...previews])
+      } catch (error) {
+        console.error('Error resizing gallery images:', error)
+        // Fallback to original files
+        setFormData(prev => ({ ...prev, gallery_images: [...prev.gallery_images, ...files] }))
+
+        const previews = await Promise.all(files.map(file => createImagePreview(file)))
+        setGalleryPreviews(prev => [...prev, ...previews])
+      }
     }
   }
 

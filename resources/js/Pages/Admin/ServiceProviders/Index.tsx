@@ -21,7 +21,9 @@ import {
   MessageSquare,
   Briefcase,
   TrendingUp,
-  Activity
+  Activity,
+  Clock,
+  AlertCircle
 } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -47,10 +49,10 @@ interface Provider {
   location: string
   email: string
   phone: string
-  is_verified: boolean
   is_featured: boolean
   is_active: boolean
   verification_status: string
+  status: string
   average_rating: number
   total_reviews: number
   total_bookings: number
@@ -136,6 +138,25 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
   function handleToggleFeatured(providerId: number) {
     if (confirm('Are you sure you want to change this provider\'s featured status?')) {
       router.put(route('admin.service-providers.toggle-featured', providerId), {}, {
+        preserveScroll: true,
+      })
+    }
+  }
+
+  function handleApprove(providerId: number) {
+    if (confirm('Are you sure you want to approve this service provider? This will allow them to access their provider dashboard.')) {
+      router.post(route('admin.verification-queue.approve', providerId), {}, {
+        preserveScroll: true,
+      })
+    }
+  }
+
+  function handleReject(providerId: number) {
+    const reason = prompt('Please provide a reason for rejecting this provider:')
+    if (reason) {
+      router.post(route('admin.verification-queue.reject', providerId), {
+        reason
+      }, {
         preserveScroll: true,
       })
     }
@@ -256,7 +277,7 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-lg font-semibold">{provider.business_name}</h3>
 
-                          {provider.is_verified && (
+                          {provider.verification_status === 'approved' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Verified
@@ -273,6 +294,27 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
                           <Badge variant={provider.is_active ? "default" : "secondary"}>
                             {provider.is_active ? 'Active' : 'Inactive'}
                           </Badge>
+
+                          {provider.status === 'pending' && (
+                            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pending Approval
+                            </Badge>
+                          )}
+
+                          {provider.status === 'rejected' && (
+                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              Rejected
+                            </Badge>
+                          )}
+
+                          {provider.status === 'approved' && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Approved
+                            </Badge>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -336,6 +378,29 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
 
                     {/* Actions */}
                     <div className="flex flex-col gap-2 min-w-[160px]">
+                      {provider.status === 'pending' && (
+                        <>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleApprove(provider.id)}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Approve
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleReject(provider.id)}
+                            className="border-red-600 text-red-600 hover:bg-red-50"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+
                       <Button variant="outline" size="sm" asChild>
                         <Link href={route('admin.service-providers.edit', provider.id)}>
                           <SquarePen className="h-4 w-4 mr-2" />
@@ -343,35 +408,39 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
                         </Link>
                       </Button>
 
-                      <Button
-                        variant={provider.is_active ? "outline" : "default"}
-                        size="sm"
-                        onClick={() => handleToggleActive(provider.id)}
-                      >
-                        {provider.is_active ? (
-                          <>
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Deactivate
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Activate
-                          </>
-                        )}
-                      </Button>
+                      {provider.status === 'approved' && (
+                        <>
+                          <Button
+                            variant={provider.is_active ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => handleToggleActive(provider.id)}
+                          >
+                            {provider.is_active ? (
+                              <>
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Deactivate
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Activate
+                              </>
+                            )}
+                          </Button>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleToggleFeatured(provider.id)}
-                      >
-                        <Star className={cn(
-                          "h-4 w-4 mr-2",
-                          provider.is_featured && "fill-purple-700 text-purple-700"
-                        )} />
-                        {provider.is_featured ? 'Unfeature' : 'Feature'}
-                      </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleFeatured(provider.id)}
+                          >
+                            <Star className={cn(
+                              "h-4 w-4 mr-2",
+                              provider.is_featured && "fill-purple-700 text-purple-700"
+                            )} />
+                            {provider.is_featured ? 'Unfeature' : 'Feature'}
+                          </Button>
+                        </>
+                      )}
 
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/providers/${provider.slug}`} target="_blank">

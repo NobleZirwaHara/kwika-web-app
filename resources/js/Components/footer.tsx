@@ -9,14 +9,11 @@ export function Footer() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-lg font-bold text-primary-foreground">K</span>
-              </div>
-              <span className="text-xl font-semibold font-heading">Kwika.Events</span>
+              <img src="/kwika-logo.png" alt="Logo" width={150} />
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            {/* <p className="text-sm text-muted-foreground leading-relaxed">
               Your trusted marketplace for event service providers. Making every event unforgettable.
-            </p>
+            </p> */}
           </div>
 
           <div>

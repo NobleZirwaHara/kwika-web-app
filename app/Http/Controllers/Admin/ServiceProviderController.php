@@ -18,6 +18,7 @@ class ServiceProviderController extends Controller
      */
     public function index(Request $request)
     {
+        //return ServiceProvider::all();
         $admin = Auth::user();
 
         if (!$admin->isAdmin()) {
@@ -53,9 +54,7 @@ class ServiceProviderController extends Controller
                     case 'inactive':
                         return $q->where('is_active', false);
                     case 'verified':
-                        return $q->where('is_verified', true);
-                    case 'unverified':
-                        return $q->where('is_verified', false);
+                        return $q->where('verification_status', 'approved');
                     case 'featured':
                         return $q->where('is_featured', true);
                 }
@@ -79,7 +78,6 @@ class ServiceProviderController extends Controller
                 'location' => $provider->location,
                 'email' => $provider->email,
                 'phone' => $provider->phone,
-                'is_verified' => $provider->is_verified,
                 'is_featured' => $provider->is_featured,
                 'is_active' => $provider->is_active,
                 'verification_status' => $provider->verification_status,
@@ -104,7 +102,7 @@ class ServiceProviderController extends Controller
             'total' => ServiceProvider::count(),
             'active' => ServiceProvider::where('is_active', true)->count(),
             'inactive' => ServiceProvider::where('is_active', false)->count(),
-            'verified' => ServiceProvider::where('is_verified', true)->count(),
+            'verified' => ServiceProvider::where('verification_status', 'approved')->count(),
             'featured' => ServiceProvider::where('is_featured', true)->count(),
         ];
 

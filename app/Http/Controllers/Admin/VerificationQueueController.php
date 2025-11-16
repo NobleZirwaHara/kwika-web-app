@@ -30,7 +30,7 @@ class VerificationQueueController extends Controller
         $sortOrder = $request->input('sort_order', 'asc');
 
         // Build query
-        $query = ServiceProvider::with(['user', 'services', 'media', 'logo', 'coverImage'])
+        $query = ServiceProvider::with(['user', 'services'])
             ->when($status !== 'all', function ($q) use ($status) {
                 return $q->where('verification_status', $status);
             })
@@ -70,12 +70,12 @@ class VerificationQueueController extends Controller
                 'website' => $provider->website,
                 'verification_status' => $provider->verification_status,
                 'rejection_reason' => $provider->rejection_reason,
-                'is_verified' => $provider->is_verified,
                 'is_featured' => $provider->is_featured,
                 'is_active' => $provider->is_active,
                 'verified_at' => $provider->verified_at?->format('M d, Y H:i'),
                 'created_at' => $provider->created_at->format('M d, Y H:i'),
                 'days_waiting' => $provider->created_at->diffInDays(now()),
+                'hours_waiting' => $provider->created_at->diffInHours(now()),
                 'user' => [
                     'id' => $provider->user->id,
                     'name' => $provider->user->name,
@@ -84,8 +84,8 @@ class VerificationQueueController extends Controller
                     'is_verified' => $provider->user->is_verified,
                 ],
                 'services_count' => $provider->services->count(),
-                'logo_url' => $provider->logo?->file_path,
-                'cover_image_url' => $provider->coverImage?->file_path,
+                'logo_url' => $provider->logo,
+                'cover_image_url' => $provider->cover_image,
                 'onboarding_completed' => $provider->onboarding_completed,
                 'onboarding_step' => $provider->onboarding_step,
             ];
@@ -131,9 +131,6 @@ class VerificationQueueController extends Controller
         $provider = ServiceProvider::with([
             'user',
             'services.category',
-            'media',
-            'logo',
-            'coverImage',
             'portfolioImages',
             'companies',
         ])->findOrFail($id);
@@ -159,12 +156,14 @@ class VerificationQueueController extends Controller
                 'social_links' => $provider->social_links,
                 'verification_status' => $provider->verification_status,
                 'rejection_reason' => $provider->rejection_reason,
-                'is_verified' => $provider->is_verified,
                 'is_featured' => $provider->is_featured,
                 'is_active' => $provider->is_active,
                 'verified_at' => $provider->verified_at?->format('M d, Y H:i'),
                 'created_at' => $provider->created_at->format('M d, Y H:i'),
                 'days_waiting' => $provider->created_at->diffInDays(now()),
+                'hours_waiting' => $provider->created_at->diffInHours(now()),
+                'onboarding_completed' => $provider->onboarding_completed,
+                'onboarding_step' => $provider->onboarding_step,
                 'onboarding_data' => $provider->onboarding_data,
                 'user' => [
                     'id' => $provider->user->id,
@@ -201,8 +200,8 @@ class VerificationQueueController extends Controller
                         'email' => $company->email,
                     ];
                 }),
-                'logo_url' => $provider->logo?->file_path,
-                'cover_image_url' => $provider->coverImage?->file_path,
+                'logo_url' => $provider->logo,
+                'cover_image_url' => $provider->cover_image,
                 'portfolio_images' => $provider->portfolioImages->map(function ($media) {
                     return [
                         'id' => $media->id,
@@ -229,7 +228,6 @@ class VerificationQueueController extends Controller
 
         $oldValues = [
             'verification_status' => $provider->verification_status,
-            'is_verified' => $provider->is_verified,
             'verified_at' => $provider->verified_at,
         ];
 
@@ -238,7 +236,6 @@ class VerificationQueueController extends Controller
             // Update provider
             $provider->update([
                 'verification_status' => 'approved',
-                'is_verified' => true,
                 'is_active' => true,
                 'verified_at' => now(),
                 'rejection_reason' => null,
@@ -252,7 +249,6 @@ class VerificationQueueController extends Controller
                 $oldValues,
                 [
                     'verification_status' => 'approved',
-                    'is_verified' => true,
                     'verified_at' => now()->toDateTimeString(),
                 ],
                 $request->input('notes', 'Provider approved via verification queue')
@@ -286,7 +282,6 @@ class VerificationQueueController extends Controller
 
         $oldValues = [
             'verification_status' => $provider->verification_status,
-            'is_verified' => $provider->is_verified,
             'rejection_reason' => $provider->rejection_reason,
         ];
 
@@ -295,7 +290,6 @@ class VerificationQueueController extends Controller
             // Update provider
             $provider->update([
                 'verification_status' => 'rejected',
-                'is_verified' => false,
                 'is_active' => false,
                 'rejection_reason' => $request->input('reason'),
             ]);
@@ -308,7 +302,6 @@ class VerificationQueueController extends Controller
                 $oldValues,
                 [
                     'verification_status' => 'rejected',
-                    'is_verified' => false,
                     'rejection_reason' => $request->input('reason'),
                 ],
                 $request->input('notes', 'Provider rejected via verification queue')

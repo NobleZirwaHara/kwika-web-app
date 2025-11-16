@@ -14,6 +14,7 @@ import {
   Clock
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface Props {
   provider: {
@@ -52,9 +53,35 @@ interface Props {
     event_time: string
     client_name: string
   }>
+  revenue_trend: Array<{
+    month: string
+    revenue: number
+  }>
+  booking_distribution: Array<{
+    status: string
+    count: number
+  }>
 }
 
-export default function Dashboard({ provider, stats, recent_bookings, upcoming_events }: Props) {
+// Chart colors matching design system
+const CHART_COLORS = {
+  primary: 'hsl(var(--primary))',
+  secondary: 'hsl(var(--secondary))',
+  success: 'rgb(34, 197, 94)', // green-500
+  warning: 'rgb(234, 179, 8)', // yellow-500
+  danger: 'rgb(239, 68, 68)', // red-500
+  info: 'rgb(59, 130, 246)', // blue-500
+  muted: 'hsl(var(--muted-foreground))',
+}
+
+const STATUS_COLORS = {
+  Pending: CHART_COLORS.warning,
+  Confirmed: CHART_COLORS.info,
+  Completed: CHART_COLORS.success,
+  Cancelled: CHART_COLORS.danger,
+}
+
+export default function Dashboard({ provider, stats, recent_bookings, upcoming_events, revenue_trend, booking_distribution }: Props) {
   const statCards = [
     {
       title: 'Total Revenue',
@@ -295,6 +322,116 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Revenue Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Trend</CardTitle>
+              <CardDescription>Your revenue over the last 6 months</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {revenue_trend && revenue_trend.length > 0 && revenue_trend.some(d => d.revenue > 0) ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={revenue_trend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="month"
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <YAxis
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      formatter={(value: number) => [`MWK ${value.toLocaleString()}`, 'Revenue']}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke={CHART_COLORS.success}
+                      strokeWidth={2}
+                      dot={{ fill: CHART_COLORS.success, r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  <div className="text-center">
+                    <DollarSign className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                    <p>No revenue data available yet</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Booking Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Booking Status Distribution</CardTitle>
+              <CardDescription>Breakdown of your bookings by status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {booking_distribution && booking_distribution.length > 0 && booking_distribution.some(d => d.count > 0) ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={booking_distribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ status, count, percent }) =>
+                        count > 0 ? `${status}: ${(percent * 100).toFixed(0)}%` : ''
+                      }
+                      outerRadius={80}
+                      fill={CHART_COLORS.primary}
+                      dataKey="count"
+                    >
+                      {booking_distribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={STATUS_COLORS[entry.status as keyof typeof STATUS_COLORS] || CHART_COLORS.muted}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={36}
+                      formatter={(value, entry: any) => {
+                        const item = booking_distribution.find(d => d.status === value)
+                        return `${value} (${item?.count || 0})`
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  <div className="text-center">
+                    <Calendar className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                    <p>No booking data available yet</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -28,7 +28,7 @@ export function BenefitsSection() {
 
   return (
     <section className="py-16">
-      <div className="container">
+      <div className="container mx-auto">
         <div className="bg-muted/50 rounded-3xl px-8 py-12 md:px-12 md:py-16 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {benefits.map((benefit) => (

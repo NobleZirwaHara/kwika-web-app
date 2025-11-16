@@ -7,7 +7,8 @@ import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
-import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle } from 'lucide-react'
+import { LocationPicker } from '@/Components/location-picker'
+import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface Service {
@@ -34,15 +35,21 @@ interface Props {
 }
 
 export default function CreateBooking({ service }: Props) {
-  // Get pre-selected date from URL query parameter
+  // Get pre-selected date and time from URL query parameters
   const urlParams = new URLSearchParams(window.location.search)
   const preSelectedDate = urlParams.get('event_date')
+  const preSelectedStartTime = urlParams.get('start_time')
+  const preSelectedEndTime = urlParams.get('end_time')
 
   const { data, setData, post, processing, errors } = useForm({
     service_id: service.id,
     event_date: preSelectedDate || '',
+    start_time: preSelectedStartTime || '',
+    end_time: preSelectedEndTime || '',
     event_end_date: '',
     event_location: '',
+    event_latitude: null as number | null,
+    event_longitude: null as number | null,
     attendees: '',
     special_requests: '',
   })
@@ -50,6 +57,16 @@ export default function CreateBooking({ service }: Props) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     post('/bookings')
+  }
+
+  // Format time from 24h to 12h format
+  const formatTime = (time: string) => {
+    if (!time) return ''
+    const [hour, minute] = time.split(':')
+    const hourNum = parseInt(hour)
+    const period = hourNum >= 12 ? 'PM' : 'AM'
+    const displayHour = hourNum > 12 ? hourNum - 12 : hourNum === 0 ? 12 : hourNum
+    return `${displayHour}:${minute} ${period}`
   }
 
   return (
@@ -68,19 +85,24 @@ export default function CreateBooking({ service }: Props) {
               </p>
             </div>
 
-            {/* Warning if no date selected */}
-            {!preSelectedDate && (
+            {/* Warning if no date or time selected */}
+            {(!preSelectedDate || !preSelectedStartTime || !preSelectedEndTime) && (
               <Card className="mb-6 border-yellow-200 bg-yellow-50">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
                     <div>
-                      <h3 className="font-semibold text-yellow-900 mb-1">No Date Selected</h3>
+                      <h3 className="font-semibold text-yellow-900 mb-1">
+                        {!preSelectedDate ? 'No Date Selected' : 'No Time Selected'}
+                      </h3>
                       <p className="text-sm text-yellow-800 mb-3">
-                        You haven't selected a date for your booking. Please select a date below or go back to the provider page to select an available date.
+                        {!preSelectedDate
+                          ? "You haven't selected a date for your booking. Please go back to the service page to select an available date and time."
+                          : "You haven't selected a time range for your booking. Please go back to the service page to select your preferred time."
+                        }
                       </p>
                       <Button variant="outline" size="sm" onClick={() => window.history.back()}>
-                        Go Back to Provider Page
+                        Go Back to Service Page
                       </Button>
                     </div>
                   </div>
@@ -138,6 +160,24 @@ export default function CreateBooking({ service }: Props) {
                         )}
                       </div>
 
+                      {/* Event Time Range - Display Only */}
+                      {(data.start_time && data.end_time) && (
+                        <div className="space-y-2">
+                          <Label>Event Time</Label>
+                          <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                            <Clock className="h-5 w-5 text-green-600" />
+                            <div>
+                              <p className="font-semibold text-green-900">
+                                {formatTime(data.start_time)} - {formatTime(data.end_time)}
+                              </p>
+                              <p className="text-sm text-green-700">
+                                Selected time range for your event
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Event End Date (Optional) */}
                       {service.price_type === 'daily' && (
                         <div className="space-y-2">
@@ -161,26 +201,21 @@ export default function CreateBooking({ service }: Props) {
                       )}
 
                       {/* Event Location */}
-                      <div className="space-y-2">
-                        <Label htmlFor="event_location">
-                          Event Location <span className="text-destructive">*</span>
-                        </Label>
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="event_location"
-                            type="text"
-                            value={data.event_location}
-                            onChange={(e) => setData('event_location', e.target.value)}
-                            placeholder="Enter full address of the event"
-                            className="pl-10"
-                            required
-                          />
-                        </div>
-                        {errors.event_location && (
-                          <p className="text-sm text-destructive">{errors.event_location}</p>
-                        )}
-                      </div>
+                      <LocationPicker
+                        label="Event Location"
+                        value={data.event_location}
+                        onChange={(location, coordinates) => {
+                          setData('event_location', location)
+                          if (coordinates) {
+                            setData('event_latitude', coordinates.lat)
+                            setData('event_longitude', coordinates.lng)
+                          }
+                        }}
+                        placeholder="Enter event address or use the map (optional)"
+                        error={errors.event_location}
+                        required={false}
+                        showCoordinates={false}
+                      />
 
                       {/* Number of Attendees */}
                       {service.max_attendees && (

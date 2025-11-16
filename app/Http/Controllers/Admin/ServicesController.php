@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Media;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -115,8 +117,7 @@ class ServicesController extends Controller
             ->get();
 
         // Get providers for filter
-        $providers = ServiceProvider::verified()
-            ->select('id', 'business_name', 'slug')
+        $providers = ServiceProvider::select('id', 'business_name', 'slug')
             ->orderBy('business_name')
             ->get();
 
@@ -228,6 +229,14 @@ class ServicesController extends Controller
 
         $service = Service::findOrFail($id);
 
+        // Debug logging
+        \Log::info('Service update request received', [
+            'service_id' => $id,
+            'has_deleted_media_ids' => $request->has('deleted_media_ids'),
+            'deleted_media_ids' => $request->deleted_media_ids,
+            'all_input' => $request->all(),
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -243,6 +252,8 @@ class ServicesController extends Controller
             'requires_deposit' => 'boolean',
             'deposit_percentage' => 'nullable|numeric|min:0|max:100',
             'cancellation_hours' => 'nullable|integer|min:0',
+            'deleted_media_ids' => 'nullable|array',
+            'deleted_media_ids.*' => 'integer|exists:media,id',
         ]);
 
         $oldValues = $service->only([
@@ -253,6 +264,47 @@ class ServicesController extends Controller
 
         DB::beginTransaction();
         try {
+            // Handle media deletion if requested
+            if ($request->has('deleted_media_ids') && !empty($request->deleted_media_ids)) {
+                $deletedIds = is_array($request->deleted_media_ids)
+                    ? $request->deleted_media_ids
+                    : json_decode($request->deleted_media_ids, true);
+
+                \Log::info('Processing media deletions', [
+                    'deletedIds' => $deletedIds,
+                    'is_array' => is_array($deletedIds),
+                ]);
+
+                if (is_array($deletedIds)) {
+                    foreach ($deletedIds as $mediaId) {
+                        $media = Media::where('id', $mediaId)
+                            ->where('mediable_type', Service::class)
+                            ->where('mediable_id', $service->id)
+                            ->first();
+
+                        if ($media) {
+                            \Log::info('Deleting media', [
+                                'media_id' => $media->id,
+                                'url' => $media->url,
+                            ]);
+
+                            // Delete file from storage
+                            if ($media->url && Storage::disk('public')->exists($media->url)) {
+                                Storage::disk('public')->delete($media->url);
+                            }
+
+                            // Delete media record
+                            $media->delete();
+                        } else {
+                            \Log::warning('Media not found or does not belong to service', [
+                                'media_id' => $mediaId,
+                                'service_id' => $service->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+
             // Update slug if name changed
             if ($validated['name'] !== $service->name) {
                 $validated['slug'] = Str::slug($validated['name']);

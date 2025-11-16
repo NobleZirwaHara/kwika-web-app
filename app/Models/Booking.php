@@ -12,10 +12,11 @@ class Booking extends Model
 
     protected $fillable = [
         'booking_number', 'user_id', 'service_id', 'service_provider_id',
-        'event_date', 'event_end_date', 'event_location', 'attendees',
-        'special_requests', 'total_amount', 'deposit_amount', 'remaining_amount',
-        'status', 'payment_status', 'cancellation_reason', 'cancelled_at',
-        'confirmed_at', 'completed_at',
+        'event_date', 'start_time', 'end_time', 'event_end_date', 'event_location',
+        'event_latitude', 'event_longitude',
+        'attendees', 'special_requests', 'total_amount', 'deposit_amount',
+        'remaining_amount', 'status', 'payment_status', 'cancellation_reason',
+        'cancelled_at', 'confirmed_at', 'completed_at',
     ];
 
     protected function casts(): array

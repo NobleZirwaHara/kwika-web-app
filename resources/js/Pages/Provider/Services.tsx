@@ -23,6 +23,8 @@ import {
   DialogTitle,
 } from '@/Components/ui/dialog'
 import { Plus, Edit, Trash2, Package, DollarSign, Clock, Image as ImageIcon, X } from 'lucide-react'
+import { processCroppedImage, createImagePreview } from '@/lib/imageUtils'
+import { ImageCropperDialog } from '@/Components/ImageCropperDialog'
 
 interface Service {
   id: number
@@ -69,6 +71,14 @@ export default function Services({ provider, services, categories }: Props) {
   const [galleryImages, setGalleryImages] = useState<File[]>([])
   const [primaryImagePreview, setPrimaryImagePreview] = useState<string | null>(null)
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+
+  // Cropper state
+  const [primaryCropperOpen, setPrimaryCropperOpen] = useState(false)
+  const [galleryCropperOpen, setGalleryCropperOpen] = useState(false)
+  const [primaryImageSrc, setPrimaryImageSrc] = useState<string>('')
+  const [galleryImageSrc, setGalleryImageSrc] = useState<string>('')
+  const [primaryFileName, setPrimaryFileName] = useState<string>('')
+  const [currentGalleryFileName, setCurrentGalleryFileName] = useState<string>('')
 
   const { data, setData, reset } = useForm({
     name: '',
@@ -119,31 +129,58 @@ export default function Services({ provider, services, categories }: Props) {
     setDialogOpen(true)
   }
 
-  function handlePrimaryImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      setPrimaryImage(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPrimaryImagePreview(reader.result as string)
+  async function handlePrimaryImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const imageSrc = await createImagePreview(file)
+        setPrimaryImageSrc(imageSrc)
+        setPrimaryFileName(file.name)
+        setPrimaryCropperOpen(true)
+      } catch (error) {
+        console.error('Error loading primary image:', error)
       }
-      reader.readAsDataURL(file)
     }
   }
 
-  function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files) {
-      const files = Array.from(e.target.files)
-      setGalleryImages(prev => [...prev, ...files])
+  async function handlePrimaryCropComplete(croppedBlob: Blob) {
+    try {
+      const processedFile = await processCroppedImage(croppedBlob, primaryFileName, 'service', 5)
+      setPrimaryImage(processedFile)
 
-      // Create previews
-      files.forEach(file => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setGalleryPreviews(prev => [...prev, reader.result as string])
-        }
-        reader.readAsDataURL(file)
-      })
+      const preview = await createImagePreview(processedFile)
+      setPrimaryImagePreview(preview)
+    } catch (error) {
+      console.error('Error processing cropped primary image:', error)
+    }
+  }
+
+  async function handleGalleryImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      // For simplicity, process first file with cropper
+      // TODO: Could enhance to queue multiple files for cropping
+      const file = files[0]
+      try {
+        const imageSrc = await createImagePreview(file)
+        setGalleryImageSrc(imageSrc)
+        setCurrentGalleryFileName(file.name)
+        setGalleryCropperOpen(true)
+      } catch (error) {
+        console.error('Error loading gallery image:', error)
+      }
+    }
+  }
+
+  async function handleGalleryCropComplete(croppedBlob: Blob) {
+    try {
+      const processedFile = await processCroppedImage(croppedBlob, currentGalleryFileName, 'gallery', 5)
+      setGalleryImages(prev => [...prev, processedFile])
+
+      const preview = await createImagePreview(processedFile)
+      setGalleryPreviews(prev => [...prev, preview])
+    } catch (error) {
+      console.error('Error processing cropped gallery image:', error)
     }
   }
 
@@ -623,6 +660,26 @@ export default function Services({ provider, services, categories }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Primary Image Cropper Dialog */}
+      <ImageCropperDialog
+        open={primaryCropperOpen}
+        onOpenChange={setPrimaryCropperOpen}
+        imageSrc={primaryImageSrc}
+        onCropComplete={handlePrimaryCropComplete}
+        imageType="service"
+        title="Crop Service Image"
+      />
+
+      {/* Gallery Image Cropper Dialog */}
+      <ImageCropperDialog
+        open={galleryCropperOpen}
+        onOpenChange={setGalleryCropperOpen}
+        imageSrc={galleryImageSrc}
+        onCropComplete={handleGalleryCropComplete}
+        imageType="gallery"
+        title="Crop Gallery Image"
+      />
     </ProviderLayout>
   )
 }

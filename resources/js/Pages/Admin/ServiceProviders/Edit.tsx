@@ -72,7 +72,6 @@ interface Provider {
   email: string
   website: string
   social_links: Record<string, string>
-  is_verified: boolean
   is_featured: boolean
   is_active: boolean
   verification_status: string
@@ -165,7 +164,7 @@ export default function ServiceProviderEdit({ admin, provider, categories }: Pro
           </div>
 
           <div className="flex items-center gap-2">
-            {provider.is_verified && (
+            {provider.verification_status === 'approved' && (
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Verified

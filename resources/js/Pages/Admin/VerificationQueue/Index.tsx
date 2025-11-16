@@ -58,6 +58,7 @@ interface Provider {
   verified_at: string | null
   created_at: string
   days_waiting: number
+  hours_waiting: number
   user: User
   services_count: number
   logo_url: string | null
@@ -157,15 +158,30 @@ export default function VerificationQueueIndex({ admin, providers, stats, filter
     }
   }
 
-  function getUrgencyIndicator(daysWaiting: number) {
+  function formatWaitingTime(hoursWaiting: number): string {
+    const days = Math.floor(hoursWaiting / 24)
+    const hours = Math.round(hoursWaiting % 24)
+
+    if (days === 0) {
+      return `${hours}h`
+    } else if (hours === 0) {
+      return `${days}d`
+    } else {
+      return `${days}d ${hours}h`
+    }
+  }
+
+  function getUrgencyIndicator(daysWaiting: number, hoursWaiting: number) {
+    const waitingText = formatWaitingTime(hoursWaiting)
+
     if (daysWaiting > 7) {
-      return <Badge variant="destructive" className="ml-2">Urgent - {daysWaiting}d</Badge>
+      return <Badge variant="destructive" className="ml-2">Urgent - {waitingText}</Badge>
     } else if (daysWaiting > 3) {
       return <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-200">
-        {daysWaiting}d waiting
+        {waitingText} waiting
       </Badge>
     }
-    return <span className="text-xs text-muted-foreground ml-2">{daysWaiting}d ago</span>
+    return <span className="text-xs text-muted-foreground ml-2">{waitingText} ago</span>
   }
 
   return (
@@ -305,7 +321,7 @@ export default function VerificationQueueIndex({ admin, providers, stats, filter
                                 Featured
                               </Badge>
                             )}
-                            {provider.verification_status === 'pending' && getUrgencyIndicator(provider.days_waiting)}
+                            {provider.verification_status === 'pending' && getUrgencyIndicator(provider.days_waiting, provider.hours_waiting)}
                           </div>
 
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">

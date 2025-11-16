@@ -26,6 +26,8 @@ interface Booking {
   remaining_amount: number
   currency: string
   event_date: string
+  start_time: string
+  end_time: string
   event_location: string
   attendees: number | null
   service: {
@@ -124,12 +126,22 @@ export default function Confirmation({ booking }: Props) {
                     </div>
 
                     <div className="flex gap-3">
-                      <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      <Clock className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Location</p>
-                        <p className="font-medium">{booking.event_location}</p>
+                        <p className="text-sm text-muted-foreground">Event Time</p>
+                        <p className="font-medium">{booking.start_time} - {booking.end_time}</p>
                       </div>
                     </div>
+
+                    {booking.event_location && (
+                      <div className="flex gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Location</p>
+                          <p className="font-medium">{booking.event_location}</p>
+                        </div>
+                      </div>
+                    )}
 
                     {booking.attendees && (
                       <div className="flex gap-3">

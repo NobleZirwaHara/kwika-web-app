@@ -146,7 +146,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
 
   function resetForm() {
     setFormData({
-      service_id: '',
+      service_id: 'none',
       date: '',
       start_time: '',
       end_time: '',
@@ -163,7 +163,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
   function handleEdit(slot: AvailabilitySlot) {
     setEditingSlot(slot)
     setFormData({
-      service_id: slot.service_id?.toString() || '',
+      service_id: slot.service_id?.toString() || 'none',
       date: slot.date,
       start_time: slot.start_time || '',
       end_time: slot.end_time || '',
@@ -270,7 +270,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
                           <SelectValue placeholder="All Services" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Services</SelectItem>
+                          <SelectItem value="none">All Services</SelectItem>
                           {services.map((service) => (
                             <SelectItem key={service.id} value={service.id.toString()}>
                               {service.name}

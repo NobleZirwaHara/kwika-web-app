@@ -98,7 +98,24 @@ interface Props {
   recent_payments: RecentPayment[]
 }
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(142, 71%, 45%)', 'hsl(346, 77%, 50%)']
+const CHART_COLORS = {
+  primary: 'hsl(var(--primary))',
+  secondary: 'hsl(var(--secondary))',
+  accent: 'hsl(var(--accent))',
+  success: 'rgb(34, 197, 94)', // green-500
+  warning: 'rgb(234, 179, 8)', // yellow-500
+  danger: 'rgb(239, 68, 68)', // red-500
+  info: 'rgb(59, 130, 246)', // blue-500
+  muted: 'hsl(var(--muted-foreground))',
+}
+
+const PIE_COLORS = [
+  CHART_COLORS.primary,
+  CHART_COLORS.info,
+  CHART_COLORS.success,
+  CHART_COLORS.warning,
+  CHART_COLORS.danger,
+]
 
 export default function AdminDashboard({
   admin,
@@ -111,6 +128,19 @@ export default function AdminDashboard({
   top_providers,
   recent_payments,
 }: Props) {
+  const formatWaitingTime = (decimalDays: number): string => {
+    const days = Math.floor(decimalDays)
+    const hours = Math.round((decimalDays - days) * 24)
+
+    if (days === 0) {
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+    } else if (hours === 0) {
+      return `${days} ${days === 1 ? 'day' : 'days'}`
+    } else {
+      return `${days} ${days === 1 ? 'day' : 'days'} ${hours} ${hours === 1 ? 'hour' : 'hours'}`
+    }
+  }
+
   return (
     <AdminLayout title="Admin Dashboard" admin={admin}>
       <Head title="Admin Dashboard" />
@@ -234,15 +264,43 @@ export default function AdminDashboard({
               <CardTitle>Revenue Trend (Last 30 Days)</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={revenue_trend}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="revenue" name="Revenue" stroke="hsl(var(--primary))" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              {revenue_trend && revenue_trend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={revenue_trend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fill: CHART_COLORS.muted, fontSize: 12 }}
+                      stroke="hsl(var(--border))"
+                    />
+                    <YAxis
+                      tick={{ fill: CHART_COLORS.muted, fontSize: 12 }}
+                      stroke="hsl(var(--border))"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      name="Revenue (MWK)"
+                      stroke={CHART_COLORS.primary}
+                      strokeWidth={3}
+                      dot={{ fill: CHART_COLORS.primary, r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[250px] text-muted-foreground">
+                  <p>No revenue data available</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -252,15 +310,40 @@ export default function AdminDashboard({
               <CardTitle>User Growth (Last 30 Days)</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={user_growth}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip />
-                  <Bar dataKey="count" name="New Users" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {user_growth && user_growth.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={user_growth}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fill: CHART_COLORS.muted, fontSize: 12 }}
+                      stroke="hsl(var(--border))"
+                    />
+                    <YAxis
+                      tick={{ fill: CHART_COLORS.muted, fontSize: 12 }}
+                      stroke="hsl(var(--border))"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    />
+                    <Bar
+                      dataKey="count"
+                      name="New Users"
+                      fill={CHART_COLORS.info}
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[250px] text-muted-foreground">
+                  <p>No user growth data available</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -270,17 +353,41 @@ export default function AdminDashboard({
               <CardTitle>Booking Status Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie data={booking_stats} dataKey="count" nameKey="status" cx="50%" cy="50%" outerRadius={80}>
-                    {booking_stats.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {booking_stats && booking_stats.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={booking_stats}
+                      dataKey="count"
+                      nameKey="status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {booking_stats.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={36}
+                      iconType="circle"
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[250px] text-muted-foreground">
+                  <p>No booking data available</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -337,7 +444,7 @@ export default function AdminDashboard({
                       <p className="text-sm text-muted-foreground">{provider.owner_name} • {provider.email}</p>
                     </div>
                     <div className="text-right">
-                      <Badge variant="secondary">{provider.days_waiting} days waiting</Badge>
+                      <Badge variant="secondary">{formatWaitingTime(provider.days_waiting)} waiting</Badge>
                       <p className="text-xs text-muted-foreground mt-1">Applied: {provider.created_at}</p>
                     </div>
                   </div>

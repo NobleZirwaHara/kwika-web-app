@@ -111,6 +111,7 @@ export default function BookingShow({ booking }: Props) {
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [proofImageOpen, setProofImageOpen] = useState(false)
   const [proofImageUrl, setProofImageUrl] = useState<string | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
 
   const cancelForm = useForm({
     cancellation_reason: '',
@@ -146,21 +147,44 @@ export default function BookingShow({ booking }: Props) {
   }
 
   function handleVerifyPayment(action: 'approve' | 'reject') {
-    if (!selectedPayment) return
+    if (!selectedPayment || isVerifying) return
 
-    verifyForm.data.action = action
-    verifyForm.post(`/provider/bookings/${booking.id}/payments/${selectedPayment.id}/verify`, {
+    // Prepare data to send - only include rejection_reason when rejecting
+    const data: { action: string; rejection_reason?: string } = {
+      action: action
+    }
+
+    if (action === 'reject') {
+      data.rejection_reason = verifyForm.data.rejection_reason
+    }
+
+    setIsVerifying(true)
+
+    // Use router.post directly instead of form
+    router.post(`/provider/bookings/${booking.id}/payments/${selectedPayment.id}/verify`, data, {
+      preserveScroll: true,
       onSuccess: () => {
-        setVerifyPaymentDialogOpen(false)
-        setSelectedPayment(null)
-        verifyForm.reset()
+        setIsVerifying(false)
+        closeVerifyDialog()
+      },
+      onError: (errors) => {
+        console.error('Payment verification failed:', errors)
+        setIsVerifying(false)
       }
     })
   }
 
   function openVerifyDialog(payment: Payment) {
     setSelectedPayment(payment)
+    verifyForm.reset() // Reset form when opening dialog
     setVerifyPaymentDialogOpen(true)
+  }
+
+  function closeVerifyDialog() {
+    setVerifyPaymentDialogOpen(false)
+    setSelectedPayment(null)
+    setIsVerifying(false)
+    verifyForm.reset()
   }
 
   function viewProofOfPayment(url: string) {
@@ -687,7 +711,7 @@ export default function BookingShow({ booking }: Props) {
       </Dialog>
 
       {/* Verify Payment Dialog */}
-      <Dialog open={verifyPaymentDialogOpen} onOpenChange={setVerifyPaymentDialogOpen}>
+      <Dialog open={verifyPaymentDialogOpen} onOpenChange={(open) => !open && closeVerifyDialog()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Verify Payment</DialogTitle>
@@ -738,33 +762,38 @@ export default function BookingShow({ booking }: Props) {
           <DialogFooter>
             {verifyForm.data.action === 'reject' ? (
               <>
-                <Button variant="outline" onClick={() => verifyForm.setData('action', '')}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    verifyForm.setData('action', '')
+                    verifyForm.setData('rejection_reason', '')
+                  }}
+                  disabled={isVerifying}
+                >
                   Back
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => handleVerifyPayment('reject')}
-                  disabled={verifyForm.processing || !verifyForm.data.rejection_reason}
+                  disabled={isVerifying || !verifyForm.data.rejection_reason}
                 >
-                  Reject Payment
+                  {isVerifying ? 'Rejecting...' : 'Reject Payment'}
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setVerifyPaymentDialogOpen(false)}>
+                <Button variant="outline" onClick={closeVerifyDialog} disabled={isVerifying}>
                   Close
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => verifyForm.setData('action', 'reject')}
+                  disabled={isVerifying}
                 >
                   Reject
                 </Button>
-                <Button
-                  onClick={() => handleVerifyPayment('approve')}
-                  disabled={verifyForm.processing}
-                >
-                  Approve Payment
+                <Button onClick={() => handleVerifyPayment('approve')} disabled={isVerifying}>
+                  {isVerifying ? 'Approving...' : 'Approve Payment'}
                 </Button>
               </>
             )}

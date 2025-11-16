@@ -15,7 +15,7 @@ use Inertia\Inertia;
 class BookingController extends Controller
 {
     /**
-     * Show booking form for a service
+     * Show booking form for a service (only for verified providers)
      */
     public function create(Request $request)
     {
@@ -28,6 +28,10 @@ class BookingController extends Controller
         $service = Service::with(['serviceProvider', 'category'])
             ->where('id', $serviceId)
             ->where('is_active', true)
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
             ->firstOrFail();
 
         return Inertia::render('Booking/Create', [
@@ -60,13 +64,23 @@ class BookingController extends Controller
         $validated = $request->validate([
             'service_id' => ['required', 'exists:services,id'],
             'event_date' => ['required', 'date', 'after:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'event_end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
-            'event_location' => ['required', 'string', 'max:500'],
+            'event_location' => ['nullable', 'string', 'max:500'],
+            'event_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'event_longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'attendees' => ['nullable', 'integer', 'min:1'],
             'special_requests' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $service = Service::with('serviceProvider')->findOrFail($validated['service_id']);
+        $service = Service::with('serviceProvider')
+            ->where('id', $validated['service_id'])
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
+            ->firstOrFail();
 
         // Calculate total amount
         $totalAmount = $this->calculateBookingAmount($service, $validated);
@@ -87,8 +101,12 @@ class BookingController extends Controller
             'service_id' => $service->id,
             'service_provider_id' => $service->service_provider_id,
             'event_date' => $validated['event_date'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
             'event_end_date' => $validated['event_end_date'] ?? null,
-            'event_location' => $validated['event_location'],
+            'event_location' => $validated['event_location'] ?? null,
+            'event_latitude' => $validated['event_latitude'] ?? null,
+            'event_longitude' => $validated['event_longitude'] ?? null,
             'attendees' => $validated['attendees'] ?? null,
             'special_requests' => $validated['special_requests'] ?? null,
             'total_amount' => $totalAmount,
@@ -346,7 +364,9 @@ class BookingController extends Controller
                 'deposit_amount' => $booking->deposit_amount,
                 'remaining_amount' => $booking->remaining_amount,
                 'currency' => 'MWK',
-                'event_date' => $booking->event_date->format('M d, Y g:i A'),
+                'event_date' => $booking->event_date->format('M d, Y'),
+                'start_time' => $booking->start_time,
+                'end_time' => $booking->end_time,
                 'event_location' => $booking->event_location,
                 'attendees' => $booking->attendees,
                 'service' => [
@@ -441,12 +461,44 @@ class BookingController extends Controller
     }
 
     /**
-     * Get provider availability (booked dates)
+     * Get provider availability (booked dates and time slots)
      */
     public function getProviderAvailability(Request $request, $providerId)
     {
         $startDate = $request->query('start_date', now()->format('Y-m-d'));
         $endDate = $request->query('end_date', now()->addMonths(3)->format('Y-m-d'));
+        $specificDate = $request->query('date'); // For getting time slots for a specific date
+
+        // If requesting time slots for a specific date
+        if ($specificDate) {
+            $bookedTimeSlots = Booking::where('service_provider_id', $providerId)
+                ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+                ->whereDate('event_date', $specificDate)
+                ->select('start_time', 'end_time')
+                ->get()
+                ->flatMap(function ($booking) {
+                    // Generate all time slots between start_time and end_time
+                    $slots = [];
+                    if ($booking->start_time && $booking->end_time) {
+                        $start = new \DateTime($booking->start_time);
+                        $end = new \DateTime($booking->end_time);
+
+                        // Add slots in 30-minute intervals
+                        $current = clone $start;
+                        while ($current <= $end) {
+                            $slots[] = $current->format('H:i');
+                            $current->modify('+30 minutes');
+                        }
+                    }
+                    return $slots;
+                })
+                ->unique()
+                ->values();
+
+            return response()->json([
+                'booked_time_slots' => $bookedTimeSlots,
+            ]);
+        }
 
         // Get all bookings for this provider that are confirmed or pending
         $bookedDates = Booking::where('service_provider_id', $providerId)

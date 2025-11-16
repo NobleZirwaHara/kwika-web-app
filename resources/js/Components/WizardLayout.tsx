@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import { ReactNode } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -50,10 +50,9 @@ export default function WizardLayout({ children, currentStep, title, description
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
-              <div className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2 cursor-pointer">
                 <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
-                <span className="text-xl font-bold">Kwika Events</span>
-              </div>
+              </Link>
               <div className="text-sm text-muted-foreground">
                 Need help? <a href="/support" className="text-primary hover:underline">Contact Support</a>
               </div>

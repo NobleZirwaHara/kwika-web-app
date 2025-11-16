@@ -151,7 +151,7 @@ class UserController extends Controller
                     'id' => $user->serviceProvider->id,
                     'business_name' => $user->serviceProvider->business_name,
                     'slug' => $user->serviceProvider->slug,
-                    'is_verified' => $user->serviceProvider->is_verified,
+                    'verification_status' => $user->serviceProvider->verification_status,
                     'is_active' => $user->serviceProvider->is_active,
                 ] : null,
                 'recent_bookings' => $user->bookings->take(5)->map(function ($booking) {

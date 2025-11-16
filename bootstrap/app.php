@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register custom middleware aliases
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+            'provider' => \App\Http\Middleware\IsProvider::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

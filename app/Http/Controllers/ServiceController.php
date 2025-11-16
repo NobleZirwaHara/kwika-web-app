@@ -10,12 +10,16 @@ use Inertia\Inertia;
 class ServiceController extends Controller
 {
     /**
-     * Display a listing of services
+     * Display a listing of services (only from verified providers)
      */
     public function index()
     {
         $services = Service::with(['serviceProvider', 'category'])
             ->where('is_active', true)
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
             ->paginate(12);
 
         return Inertia::render('Services/Index', [
@@ -42,7 +46,7 @@ class ServiceController extends Controller
                         'business_name' => $service->serviceProvider->business_name,
                         'city' => $service->serviceProvider->city,
                         'rating' => $service->serviceProvider->rating ?? 0,
-                        'is_verified' => $service->serviceProvider->is_verified,
+                        'verification_status' => $service->serviceProvider->verification_status,
                     ],
                 ];
             }),
@@ -50,7 +54,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Display the specified service
+     * Display the specified service (only if provider is verified)
      */
     public function show($slug)
     {
@@ -61,6 +65,10 @@ class ServiceController extends Controller
         ])
             ->where('slug', $slug)
             ->where('is_active', true)
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
             ->firstOrFail();
 
         // Get provider's other services
@@ -82,11 +90,15 @@ class ServiceController extends Controller
                 ];
             });
 
-        // Get similar services from other providers in the same category
+        // Get similar services from other providers in the same category (only verified providers)
         $similarServices = Service::with('serviceProvider')
             ->where('service_category_id', $service->service_category_id)
             ->where('service_provider_id', '!=', $service->service_provider_id)
             ->where('is_active', true)
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
             ->inRandomOrder()
             ->limit(4)
             ->get()
@@ -156,7 +168,7 @@ class ServiceController extends Controller
                     'email' => $service->serviceProvider->email,
                     'rating' => $service->serviceProvider->rating ?? 0,
                     'total_reviews' => $service->serviceProvider->reviews_count ?? 0,
-                    'is_verified' => $service->serviceProvider->is_verified,
+                    'verification_status' => $service->serviceProvider->verification_status,
                     'is_featured' => $service->serviceProvider->is_featured,
                     'logo' => $service->serviceProvider->logo ? asset('storage/' . $service->serviceProvider->logo) : null,
                 ],

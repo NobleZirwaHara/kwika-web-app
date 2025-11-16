@@ -84,9 +84,9 @@ export default function ProviderLayout({ children, title, provider }: ProviderLa
             <div className="flex h-full flex-col">
               {/* Mobile Header */}
               <div className="flex h-16 items-center px-4 border-b relative">
-                <div className="flex items-center justify-center gap-2 flex-1">
+                <Link href="/" className="flex items-center justify-center gap-2 flex-1 cursor-pointer">
                   <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
-                </div>
+                </Link>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -144,9 +144,9 @@ export default function ProviderLayout({ children, title, provider }: ProviderLa
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-card px-6">
             {/* Logo */}
-            <div className="flex h-16 shrink-0 items-center justify-center gap-2 border-b -mx-6 px-6">
+            <Link href="/" className="flex h-16 shrink-0 items-center justify-center gap-2 border-b -mx-6 px-6 cursor-pointer">
               <img src="/kwika-logo.png" alt="Logo" className="h-8 w-auto" />
-            </div>
+            </Link>
 
             {/* Provider Info */}
             {provider && (

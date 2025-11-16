@@ -29,7 +29,6 @@ class ServiceProvider extends Model
         'average_rating',
         'total_reviews',
         'total_bookings',
-        'is_verified',
         'is_featured',
         'is_active',
         'verification_status',
@@ -47,7 +46,6 @@ class ServiceProvider extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'average_rating' => 'decimal:2',
-            'is_verified' => 'boolean',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'verified_at' => 'datetime',
@@ -123,7 +121,7 @@ class ServiceProvider extends Model
     // Scopes
     public function scopeVerified($query)
     {
-        return $query->where('is_verified', true);
+        return $query->where('verification_status', 'approved');
     }
 
     public function scopeFeatured($query)

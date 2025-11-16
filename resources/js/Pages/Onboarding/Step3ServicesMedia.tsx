@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import { FormEvent, useState, ChangeEvent } from 'react'
 import WizardLayout from '@/Components/WizardLayout'
 import { Button } from '@/Components/ui/button'
@@ -307,8 +307,8 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
-            onClick={() => window.history.back()}
+            className="flex-1 cursor-pointer"
+            onClick={() => router.visit('/onboarding/step2')}
           >
             Back
           </Button>

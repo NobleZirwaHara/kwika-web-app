@@ -26,7 +26,7 @@ class HomeController extends Controller
 
         // Get featured providers with their details
         $featuredProviders = ServiceProvider::with(['user'])
-            // ->verified()
+            ->verified()
             ->active()
             ->featured()
             ->get()
@@ -38,8 +38,8 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image,
-                    'logo' => $provider->logo,
+                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
                     'description' => $provider->description,
                     'featured' => true,
                 ];
@@ -47,7 +47,7 @@ class HomeController extends Controller
 
         // Get all top-rated providers (for the second section)
         $topProviders = ServiceProvider::with(['user'])
-            // ->verified()
+            ->verified()
             ->active()
             ->orderBy('average_rating', 'desc')
             ->orderBy('total_reviews', 'desc')
@@ -61,15 +61,18 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image,
-                    'logo' => $provider->logo,
+                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
                     'featured' => $provider->is_featured,
                 ];
             });
 
-        // Get featured services with their images
+        // Get featured services with their images (only from verified providers)
         $featuredServices = Service::with(['serviceProvider', 'category'])
             ->active()
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved');
+            })
             ->whereNotNull('primary_image')
             ->latest()
             ->limit(8)
@@ -83,7 +86,7 @@ class HomeController extends Controller
                     'price' => $service->getFormattedPrice(),
                     'base_price' => (float) $service->base_price,
                     'currency' => $service->currency,
-                    'image' => $service->primary_image,
+                    'image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
                     'category' => $service->category->name ?? null,
                     'provider' => [
                         'id' => $service->serviceProvider->id,
@@ -94,11 +97,14 @@ class HomeController extends Controller
                 ];
             });
 
-        // Get featured products with their images
+        // Get featured products with their images (only from verified providers)
         $featuredProducts = Product::with(['serviceProvider', 'catalogue'])
             ->active()
             ->featured()
             ->inStock()
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved');
+            })
             ->whereNotNull('primary_image')
             ->latest()
             ->limit(8)
@@ -113,7 +119,7 @@ class HomeController extends Controller
                     'regular_price' => (float) $product->price,
                     'sale_price' => $product->sale_price ? (float) $product->sale_price : null,
                     'currency' => $product->currency,
-                    'image' => $product->primary_image,
+                    'image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
                     'is_on_sale' => $product->is_on_sale,
                     'in_stock' => $product->is_in_stock,
                     'provider' => [

@@ -1,11 +1,12 @@
-import { useForm } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
 import WizardLayout from '@/Components/WizardLayout'
 import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
-import { Building2, FileText, MapPin, Phone, Mail, Globe, Hash } from 'lucide-react'
+import { LocationPicker } from '@/Components/location-picker'
+import { Building2, FileText, Phone, Mail, Globe, Hash } from 'lucide-react'
 
 interface Props {
   provider: {
@@ -39,6 +40,8 @@ export default function Step2BusinessInfo({ provider, categories }: Props) {
     business_registration_number: provider.business_registration_number || '',
     location: provider.location || '',
     city: provider.city || '',
+    latitude: null as number | null,
+    longitude: null as number | null,
     phone: provider.phone || '',
     email: provider.email || '',
     website: provider.website || '',
@@ -126,25 +129,22 @@ export default function Step2BusinessInfo({ provider, categories }: Props) {
         </div>
 
         {/* Location & City */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="location">
-              Street Address <span className="text-destructive">*</span>
-            </Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="location"
-                type="text"
-                value={data.location}
-                onChange={(e) => setData('location', e.target.value)}
-                placeholder="123 Main Street"
-                className="pl-10"
-                required
-              />
-            </div>
-            {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
-          </div>
+        <div className="space-y-4">
+          <LocationPicker
+            label="Business Location"
+            value={data.location}
+            onChange={(location, coordinates) => {
+              setData('location', location)
+              if (coordinates) {
+                setData('latitude', coordinates.lat)
+                setData('longitude', coordinates.lng)
+              }
+            }}
+            placeholder="Enter your business address or use the map"
+            error={errors.location}
+            required
+            showCoordinates={true}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="city">
@@ -285,8 +285,8 @@ export default function Step2BusinessInfo({ provider, categories }: Props) {
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
-            onClick={() => window.history.back()}
+            className="flex-1 cursor-pointer"
+            onClick={() => router.visit('/onboarding/step1')}
           >
             Back
           </Button>

@@ -1,4 +1,4 @@
-import { useForm, Link } from '@inertiajs/react'
+import { useForm, Link, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
 import WizardLayout from '@/Components/WizardLayout'
 import { Button } from '@/Components/ui/button'
@@ -74,8 +74,8 @@ export default function Step4Review({ user, provider, categories, portfolioImage
               <User className="h-5 w-5 text-primary" />
               Personal Information
             </h2>
-            <Link href="/onboarding/step1">
-              <Button variant="ghost" size="sm">
+            <Link href="/onboarding/step1" className="cursor-pointer">
+              <Button variant="ghost" size="sm" className="cursor-pointer">
                 <Edit2 className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -111,8 +111,8 @@ export default function Step4Review({ user, provider, categories, portfolioImage
               <Building2 className="h-5 w-5 text-primary" />
               Business Information
             </h2>
-            <Link href="/onboarding/step2">
-              <Button variant="ghost" size="sm">
+            <Link href="/onboarding/step2" className="cursor-pointer">
+              <Button variant="ghost" size="sm" className="cursor-pointer">
                 <Edit2 className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -169,7 +169,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
                   href={provider.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-primary hover:underline flex items-center gap-2"
+                  className="font-medium text-primary hover:underline flex items-center gap-2 cursor-pointer"
                 >
                   <Globe className="h-4 w-4" />
                   {provider.website}
@@ -186,7 +186,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
                       href={provider.social_links.facebook}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
                     >
                       <Facebook className="h-4 w-4" />
                       <span className="text-sm">Facebook</span>
@@ -197,7 +197,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
                       href={provider.social_links.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
                     >
                       <Instagram className="h-4 w-4" />
                       <span className="text-sm">Instagram</span>
@@ -208,7 +208,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
                       href={provider.social_links.twitter}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
                     >
                       <Twitter className="h-4 w-4" />
                       <span className="text-sm">Twitter</span>
@@ -219,7 +219,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
                       href={provider.social_links.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
                     >
                       <Linkedin className="h-4 w-4" />
                       <span className="text-sm">LinkedIn</span>
@@ -235,8 +235,8 @@ export default function Step4Review({ user, provider, categories, portfolioImage
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Services & Media</h2>
-            <Link href="/onboarding/step3">
-              <Button variant="ghost" size="sm">
+            <Link href="/onboarding/step3" className="cursor-pointer">
+              <Button variant="ghost" size="sm" className="cursor-pointer">
                 <Edit2 className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -324,8 +324,8 @@ export default function Step4Review({ user, provider, categories, portfolioImage
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
-              onClick={() => window.history.back()}
+              className="flex-1 cursor-pointer"
+              onClick={() => router.visit('/onboarding/step3')}
             >
               Back
             </Button>

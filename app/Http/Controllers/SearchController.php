@@ -21,7 +21,7 @@ class SearchController extends Controller
         ]);
 
         $query = ServiceProvider::with(['user', 'services'])
-            // ->verified()
+            ->verified()
             ->active();
 
         // Search by query (business name or description)

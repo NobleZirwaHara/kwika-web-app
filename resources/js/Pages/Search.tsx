@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/react'
 import { Star, Heart, MapPin } from "lucide-react"
 import { Badge } from "@/Components/ui/badge"
 import { useState } from "react"
+import { SearchHeader } from "@/Components/search-header"
 
 interface Provider {
   id: number
@@ -83,7 +84,7 @@ export default function Search({ providers, categories, searchParams, totalResul
     <>
       <Head title={getSearchTitle()} />
       <div className="min-h-screen">
-        <Header />
+        <SearchHeader />
         <main className="pt-24">
           <div className="container mx-auto px-6 lg:px-20 py-8">
             {/* Search header */}

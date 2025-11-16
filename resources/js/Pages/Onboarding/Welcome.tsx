@@ -37,13 +37,13 @@ export default function Welcome() {
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2 cursor-pointer">
                 <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
               </Link>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-muted-foreground">Already have an account?</span>
-                <Link href="/login">
-                  <Button variant="outline">Sign In</Button>
+                <Link href="/login" className="cursor-pointer">
+                  <Button variant="outline" className="hover:bg-primary/10 cursor-pointer">Sign In</Button>
                 </Link>
               </div>
             </div>
@@ -87,17 +87,17 @@ export default function Welcome() {
                   <div className="bg-card/95 backdrop-blur border rounded-2xl p-6 sm:p-8 shadow-lg">
                     <h2 className="text-xl font-semibold mb-4">What would you like to list?</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <Link href="/onboarding/step1">
-                        <Button variant="outline" className="w-full h-20 justify-start gap-3">
+                      <Link href="/onboarding/step1" className="cursor-pointer">
+                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer">
                           <Building2 className="h-5 w-5 text-primary" />
                           <div className="text-left">
                             <p className="font-medium">Event Services</p>
-                            <p className="text-xs text-muted-foreground">Vendors, planners, DJs, decor, etc.</p>
+                            <p className="text-xs text-muted-foreground">Vendors, DJs, decor, etc.</p>
                           </div>
                         </Button>
                       </Link>
-                      <a href="#" onClick={(e) => e.preventDefault()}>
-                        <Button variant="outline" className="w-full h-20 justify-start gap-3">
+                      <a href="#" onClick={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer">
                           <Home className="h-5 w-5 text-primary" />
                           <div className="text-left">
                             <p className="font-medium">Venues</p>
@@ -153,7 +153,7 @@ export default function Welcome() {
               <div>
                 <h3 className="text-2xl font-bold mb-2">Drive demand like our partners</h3>
                 <p className="text-muted-foreground mb-4">Hear how providers grow with Kwika Events—more visibility, better bookings, and streamlined communication.</p>
-                <a href="/provider-stories" className="text-primary hover:underline font-medium">See success stories</a>
+                <a href="/provider-stories" className="text-primary hover:underline font-medium cursor-pointer">See success stories</a>
               </div>
               <div className="relative aspect-video rounded-lg overflow-hidden border">
                 <img src="https://images.unsplash.com/photo-1551836022-4c4c79ecde51?q=80&w=1600&auto=format&fit=crop" alt="Provider story" className="h-full w-full object-cover" />
@@ -170,13 +170,13 @@ export default function Welcome() {
             <div className="max-w-3xl mx-auto text-center bg-card border rounded-xl p-6 sm:p-10 shadow-sm">
               <h4 className="text-xl font-semibold mb-2">Already a partner with Kwika Events?</h4>
               <p className="text-muted-foreground mb-4">Log in to your provider account to manage your profile and bookings.</p>
-              <Link href="/login">
-                <Button className="px-6">Log in to your account</Button>
+              <Link href="/login" className="cursor-pointer">
+                <Button className="px-6 cursor-pointer">Log in to your account</Button>
               </Link>
             </div>
             <div className="text-center mt-6">
               <p className="text-muted-foreground">
-                FAQs • <a href="/support" className="text-primary hover:underline font-medium">Support</a> • <a href="/provider-faq" className="text-primary hover:underline font-medium">Learn more</a>
+                FAQs • <a href="/support" className="text-primary hover:underline font-medium cursor-pointer">Support</a> • <a href="/provider-faq" className="text-primary hover:underline font-medium cursor-pointer">Learn more</a>
               </p>
             </div>
           </section>
@@ -187,11 +187,11 @@ export default function Welcome() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-center text-sm text-muted-foreground">
               By continuing, you agree to our{' '}
-              <a href="/terms" className="text-primary hover:underline">
+              <a href="/terms" className="text-primary hover:underline cursor-pointer">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="/privacy" className="text-primary hover:underline">
+              <a href="/privacy" className="text-primary hover:underline cursor-pointer">
                 Privacy Policy
               </a>
             </p>

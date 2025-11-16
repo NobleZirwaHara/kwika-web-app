@@ -45,7 +45,7 @@ interface ServiceProvider {
   id: number
   business_name: string
   slug: string
-  is_verified: boolean
+  verification_status: string
   is_active: boolean
 }
 
@@ -312,7 +312,7 @@ export default function UserEdit({ admin, user }: Props) {
                           <Badge variant={user.service_provider.is_active ? 'default' : 'secondary'}>
                             {user.service_provider.is_active ? 'Active' : 'Inactive'}
                           </Badge>
-                          {user.service_provider.is_verified && (
+                          {user.service_provider.verification_status === 'approved' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                               Verified
                             </Badge>

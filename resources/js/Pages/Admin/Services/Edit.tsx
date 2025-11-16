@@ -25,6 +25,7 @@ import {
   CheckCircle,
   XCircle,
   Image as ImageIcon,
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -108,10 +109,39 @@ export default function ServicesEdit({ admin, service, categories }: Props) {
 
   const [inclusionInput, setInclusionInput] = useState('')
   const [requirementInput, setRequirementInput] = useState('')
+  const [deletedMediaIds, setDeletedMediaIds] = useState<number[]>([])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    put(route('admin.services.update', service.id))
+
+    const submitData = {
+      ...data,
+      deleted_media_ids: deletedMediaIds,
+    }
+
+    console.log('Submitting with deleted media IDs:', deletedMediaIds)
+    console.log('Full submit data:', submitData)
+
+    // Include deleted media IDs in the submission
+    put(route('admin.services.update', service.id), {
+      data: submitData,
+      onSuccess: () => {
+        console.log('Update successful')
+      },
+      onError: (errors) => {
+        console.error('Update errors:', errors)
+      },
+    })
+  }
+
+  function handleDeleteMedia(mediaId: number) {
+    if (confirm('Are you sure you want to remove this image?')) {
+      setDeletedMediaIds(prev => [...prev, mediaId])
+    }
+  }
+
+  function isMediaDeleted(mediaId: number): boolean {
+    return deletedMediaIds.includes(mediaId)
   }
 
   function addInclusion() {
@@ -537,23 +567,53 @@ export default function ServicesEdit({ admin, service, categories }: Props) {
             {service.media.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Media ({service.media.length})</CardTitle>
+                  <CardTitle>
+                    Media ({service.media.filter(m => !isMediaDeleted(m.id)).length})
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Click X to remove images
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-2">
-                    {service.media.slice(0, 4).map((media) => (
-                      <div key={media.id} className="aspect-square rounded-lg overflow-hidden bg-muted">
+                    {service.media.slice(0, 8).map((media) => (
+                      <div
+                        key={media.id}
+                        className={`relative aspect-square rounded-lg overflow-hidden bg-muted group ${
+                          isMediaDeleted(media.id) ? 'opacity-30' : ''
+                        }`}
+                      >
                         <img
                           src={media.url}
                           alt=""
                           className="w-full h-full object-cover"
                         />
+                        {!isMediaDeleted(media.id) && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMedia(media.id)}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90"
+                            title="Remove image"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
+                        {isMediaDeleted(media.id) && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                            <p className="text-white text-xs font-medium">Will be removed</p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
-                  {service.media.length > 4 && (
+                  {service.media.length > 8 && (
                     <p className="text-xs text-muted-foreground mt-2 text-center">
-                      +{service.media.length - 4} more
+                      +{service.media.length - 8} more
+                    </p>
+                  )}
+                  {deletedMediaIds.length > 0 && (
+                    <p className="text-xs text-destructive mt-2 text-center">
+                      {deletedMediaIds.length} image(s) marked for deletion
                     </p>
                   )}
                 </CardContent>

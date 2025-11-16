@@ -15,7 +15,7 @@ class ProviderController extends Controller
     public function index(Request $request)
     {
         $query = ServiceProvider::with(['user'])
-            // ->verified()
+            ->verified()
             ->active();
 
         // Filter by category
@@ -59,8 +59,8 @@ class ProviderController extends Controller
                 'city' => $provider->city,
                 'rating' => (float) $provider->average_rating,
                 'reviews' => $provider->total_reviews,
-                'image' => $provider->cover_image,
-                'logo' => $provider->logo,
+                'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
                 'featured' => $provider->is_featured,
             ];
         });
@@ -137,7 +137,7 @@ class ProviderController extends Controller
                     'location' => $similar->city,
                     'rating' => (float) $similar->average_rating,
                     'reviews' => $similar->total_reviews,
-                    'image' => $similar->cover_image,
+                    'image' => $similar->cover_image ? asset('storage/' . $similar->cover_image) : null,
                 ];
             });
 
@@ -183,9 +183,9 @@ class ProviderController extends Controller
                 'rating' => (float) $provider->average_rating,
                 'totalReviews' => $provider->total_reviews,
                 'totalBookings' => $provider->total_bookings,
-                'coverImage' => $provider->cover_image,
-                'logo' => $provider->logo,
-                'isVerified' => $provider->is_verified,
+                'coverImage' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                'verificationStatus' => $provider->verification_status,
                 'isFeatured' => $provider->is_featured,
                 'images' => $portfolioImages,
             ],

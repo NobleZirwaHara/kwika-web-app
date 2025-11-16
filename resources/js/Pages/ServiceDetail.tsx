@@ -1,6 +1,8 @@
 import { Head, Link } from '@inertiajs/react'
 import { SearchHeader } from '@/Components/search-header'
 import { Footer } from '@/Components/footer'
+import { TimeSlotPicker } from '@/Components/time-slot-picker'
+import { WishlistButton } from '@/Components/wishlist-button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
@@ -59,7 +61,7 @@ interface Service {
     email: string
     rating: number
     total_reviews: number
-    is_verified: boolean
+    verification_status: string
     is_featured: boolean
     logo: string | null
   }
@@ -105,8 +107,12 @@ interface Props {
 export default function ServiceDetail({ service, relatedServices, similarServices, categories = [], auth }: Props) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [bookedDates, setBookedDates] = useState<Date[]>([])
+  const [bookedTimeSlots, setBookedTimeSlots] = useState<string[]>([])
   const [loadingAvailability, setLoadingAvailability] = useState(true)
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false)
   const [showAllPhotos, setShowAllPhotos] = useState(false)
+  const [selectedStartTime, setSelectedStartTime] = useState<string>()
+  const [selectedEndTime, setSelectedEndTime] = useState<string>()
 
   // Combine primary image and gallery images
   const allImages = [
@@ -122,8 +128,12 @@ export default function ServiceDetail({ service, relatedServices, similarService
         const response = await fetch(`/api/providers/${service.provider.id}/availability`)
         const data = await response.json()
 
-        // Convert string dates to Date objects
-        const booked = data.booked_dates.map((dateStr: string) => new Date(dateStr))
+        // Convert string dates to Date objects, ensuring we parse them in local timezone
+        const booked = data.booked_dates.map((dateStr: string) => {
+          // Parse date as local timezone by adding time component
+          const [year, month, day] = dateStr.split('-').map(Number)
+          return new Date(year, month - 1, day)
+        })
         setBookedDates(booked)
       } catch (error) {
         console.error('Failed to fetch availability:', error)
@@ -135,11 +145,32 @@ export default function ServiceDetail({ service, relatedServices, similarService
     fetchAvailability()
   }, [service.provider.id])
 
-  const isDateBooked = (date: Date) => {
-    return bookedDates.some(bookedDate =>
-      bookedDate.toDateString() === date.toDateString()
-    )
-  }
+  // Fetch booked time slots when a date is selected
+  useEffect(() => {
+    if (!selectedDate) {
+      setBookedTimeSlots([])
+      setSelectedStartTime(undefined)
+      setSelectedEndTime(undefined)
+      return
+    }
+
+    const fetchTimeSlots = async () => {
+      try {
+        setLoadingTimeSlots(true)
+        const dateStr = format(selectedDate, 'yyyy-MM-dd')
+        const response = await fetch(`/api/providers/${service.provider.id}/availability?date=${dateStr}`)
+        const data = await response.json()
+
+        setBookedTimeSlots(data.booked_time_slots || [])
+      } catch (error) {
+        console.error('Failed to fetch time slots:', error)
+      } finally {
+        setLoadingTimeSlots(false)
+      }
+    }
+
+    fetchTimeSlots()
+  }, [selectedDate, service.provider.id])
 
   const formatPrice = () => {
     if (service.max_price) {
@@ -151,7 +182,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
   return (
     <>
       <Head title={`${service.name} - ${service.provider.business_name}`} />
-      <SearchHeader categories={categories} user={auth?.user} />
+      <SearchHeader categories={categories} />
 
       <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-24 pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -294,7 +325,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
                   onClick={() => setShowAllPhotos(true)}
                   variant="outline"
                   size="sm"
-                  className="absolute bottom-4 right-4 bg-white hover:bg-white/90"
+                  className="absolute bottom-4 right-4 bg-white hover:bg-white/90 cursor-pointer"
                 >
                   Show all photos
                 </Button>
@@ -313,7 +344,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="outline">{service.category.name}</Badge>
-                        {service.provider.is_verified && (
+                        {service.provider.verification_status === 'approved' && (
                           <Badge variant="default" className="gap-1">
                             <BadgeCheck className="h-3 w-3" />
                             Verified Provider
@@ -322,9 +353,21 @@ export default function ServiceDetail({ service, relatedServices, similarService
                       </div>
                       <CardTitle className="text-3xl mb-2">{service.name}</CardTitle>
                     </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold">{formatPrice()}</div>
-                      <p className="text-sm text-muted-foreground">per {service.price_type}</p>
+                    <div className="flex flex-col items-end gap-3">
+                      <WishlistButton
+                        serviceId={service.id}
+                        isAuthenticated={!!auth?.user}
+                        variant="detail"
+                      />
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">{formatPrice()}</div>
+                        <p className="text-sm text-muted-foreground">per {service.price_type}</p>
+                        {service.requires_deposit && service.deposit_percentage && (
+                          <p className="text-sm text-primary mt-2">
+                            {service.deposit_percentage}% deposit required at booking
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardHeader>
@@ -430,7 +473,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     About the Provider
-                    {service.provider.is_verified && (
+                    {service.provider.verification_status === 'approved' && (
                       <BadgeCheck className="h-5 w-5 text-primary" />
                     )}
                   </CardTitle>
@@ -536,25 +579,11 @@ export default function ServiceDetail({ service, relatedServices, similarService
                   <CardDescription>Select a date to continue with booking</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Price Summary */}
-                  <div className="p-4 bg-primary/5 rounded-lg">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <DollarSign className="h-5 w-5 text-primary" />
-                      <span className="text-2xl font-bold">{formatPrice()}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">per {service.price_type}</p>
-                    {service.requires_deposit && service.deposit_percentage && (
-                      <p className="text-sm text-primary mt-2">
-                        {service.deposit_percentage}% deposit required at booking
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Date Selection */}
-                  <div>
+                  {/* Date and Time Selection */}
+                  <div className="space-y-4">
                     <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4" />
-                      Select Your Event Date
+                      Select Your Event Date & Time
                     </h4>
 
                     {loadingAvailability ? (
@@ -568,7 +597,19 @@ export default function ServiceDetail({ service, relatedServices, similarService
                             selected={selectedDate}
                             onChange={(date: Date | null) => setSelectedDate(date || undefined)}
                             minDate={new Date()}
-                            excludeDates={bookedDates}
+                            dayClassName={(date) => {
+                              const isBooked = bookedDates.some(
+                                (bookedDate) => {
+                                  // Compare year, month, and day directly to avoid timezone issues
+                                  return (
+                                    bookedDate.getFullYear() === date.getFullYear() &&
+                                    bookedDate.getMonth() === date.getMonth() &&
+                                    bookedDate.getDate() === date.getDate()
+                                  )
+                                }
+                              )
+                              return isBooked ? 'booked-date' : ''
+                            }}
                             placeholderText="Pick a date"
                             dateFormat="MMMM dd, yyyy"
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -588,11 +629,32 @@ export default function ServiceDetail({ service, relatedServices, similarService
                         )}
 
                         {bookedDates.length > 0 && (
-                          <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                            <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-xs text-yellow-800">
-                              Grayed out dates are already booked
+                          <div className="mt-3 flex items-start gap-2 p-3 bg-teal-50 border border-teal-200 rounded-md">
+                            <AlertCircle className="h-4 w-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-teal-800">
+                              Dates highlighted in teal have some bookings - check available time slots
                             </p>
+                          </div>
+                        )}
+
+                        {/* Time Slot Picker */}
+                        {selectedDate && (
+                          <div className="border-t pt-4">
+                            {loadingTimeSlots ? (
+                              <div className="flex items-center justify-center py-8">
+                                <div className="text-sm text-muted-foreground">Loading time slots...</div>
+                              </div>
+                            ) : (
+                              <TimeSlotPicker
+                                bookedSlots={bookedTimeSlots}
+                                onTimeRangeSelect={(start, end) => {
+                                  setSelectedStartTime(start)
+                                  setSelectedEndTime(end)
+                                }}
+                                selectedStartTime={selectedStartTime}
+                                selectedEndTime={selectedEndTime}
+                              />
+                            )}
                           </div>
                         )}
                       </>
@@ -601,19 +663,21 @@ export default function ServiceDetail({ service, relatedServices, similarService
 
                   {/* Book Button */}
                   <Button
-                    asChild={selectedDate !== undefined}
-                    disabled={!selectedDate}
+                    asChild={selectedDate !== undefined && selectedStartTime !== undefined && selectedEndTime !== undefined}
+                    disabled={!selectedDate || !selectedStartTime || !selectedEndTime}
                     className="w-full"
                     size="lg"
                   >
-                    {selectedDate ? (
+                    {selectedDate && selectedStartTime && selectedEndTime ? (
                       <Link
-                        href={`/bookings/create?service_id=${service.id}&event_date=${format(selectedDate, 'yyyy-MM-dd')}`}
+                        href={`/bookings/create?service_id=${service.id}&event_date=${format(selectedDate, 'yyyy-MM-dd')}&start_time=${selectedStartTime}&end_time=${selectedEndTime}`}
                       >
                         Continue to Booking
                       </Link>
                     ) : (
-                      <span>Select a date to continue</span>
+                      <span>
+                        {!selectedDate ? 'Select a date to continue' : 'Select time range to continue'}
+                      </span>
                     )}
                   </Button>
 

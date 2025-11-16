@@ -9,6 +9,7 @@ import { Textarea } from '@/Components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import { Checkbox } from '@/Components/ui/checkbox'
 import { FolderOpen, Upload, X, ArrowLeft, Building2 } from 'lucide-react'
+import { resizeImage, createImagePreview } from '@/lib/imageUtils'
 
 interface Company {
   id: number
@@ -46,15 +47,22 @@ export default function EditServiceCatalogue({ catalogue, companies }: Props) {
     _method: 'PUT',
   })
 
-  function handleCoverChange(e: ChangeEvent<HTMLInputElement>) {
+  async function handleCoverChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
-      setData('cover_image', file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setCoverPreview(reader.result as string)
+      try {
+        const resizedFile = await resizeImage(file, 'cover', 5)
+        setData('cover_image', resizedFile)
+
+        const preview = await createImagePreview(resizedFile)
+        setCoverPreview(preview)
+      } catch (error) {
+        console.error('Error resizing cover image:', error)
+        setData('cover_image', file)
+
+        const preview = await createImagePreview(file)
+        setCoverPreview(preview)
       }
-      reader.readAsDataURL(file)
     }
   }
 

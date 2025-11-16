@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -21,8 +20,8 @@
   --muted: oklch(0.94 0.01 240);
   --muted-foreground: oklch(0.48 0.06 215);
   /* Accent: energetic orange */
-  --accent: oklch(0.75 0.15 60);
-  --accent-foreground: oklch(0.22 0.08 215);
+  --accent: oklch(0.48 0.09 224.41);
+  --accent-foreground: oklch(0.95 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.99 0.005 85);
   --border: oklch(0.86 0.02 240);
@@ -42,6 +41,9 @@
   --sidebar-accent-foreground: oklch(0.22 0.08 215);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 .dark {
@@ -83,7 +85,7 @@
 
 @theme inline {
   /* Updated font configuration with Plus Jakarta Sans for headings and Inter for body */
-  --font-sans: var(--font-body), "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-body), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-heading: var(--font-heading), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback"; /* Kept existing mono font */
   --color-background: var(--background);

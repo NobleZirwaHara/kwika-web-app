@@ -17,16 +17,15 @@ import {
   X,
   LogOut,
   Bell,
-  Search,
   BarChart,
   Tag,
   Crown,
   Shield,
-  Activity
+  Activity,
+  Layers
 } from 'lucide-react'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
-import { Input } from '@/Components/ui/input'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -51,8 +50,9 @@ const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Service Providers', href: '/admin/service-providers', icon: Building2 },
-  { name: 'Verification Queue', href: '/admin/service-providers/verification-queue', icon: ShieldCheck },
+  { name: 'Verification Queue', href: '/admin/verification-queue', icon: ShieldCheck },
   { name: 'Services', href: '/admin/services', icon: Briefcase },
+  { name: 'Categories', href: '/admin/categories', icon: Layers },
   { name: 'Products', href: '/admin/products', icon: ShoppingBag },
   { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Bookings', href: '/admin/bookings', icon: FileText },
@@ -95,10 +95,9 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
             <div className="flex h-full flex-col">
               {/* Mobile Header */}
               <div className="flex h-16 items-center px-4 border-b relative">
-                <div className="flex items-center gap-2 flex-1 justify-center">
-                  <Shield className="h-5 w-5 text-primary" />
-                  <span className="font-semibold">Admin Panel</span>
-                </div>
+                <Link href="/" className="flex items-center justify-center gap-2 flex-1 cursor-pointer">
+                  <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
+                </Link>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -151,7 +150,7 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4 mr-2" />
@@ -167,10 +166,9 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
         <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
           <div className="flex flex-col flex-1 min-h-0 bg-card border-r">
             {/* Logo */}
-            <div className="flex h-16 items-center justify-center gap-2 px-4 border-b">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="font-semibold">Admin Panel</span>
-            </div>
+            <Link href="/" className="flex h-16 items-center justify-center gap-2 px-4 border-b cursor-pointer">
+              <img src="/kwika-logo.png" alt="Logo" className="h-8 w-auto" />
+            </Link>
 
             {/* Navigation */}
             <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
@@ -214,7 +212,7 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full"
+                  className="w-full cursor-pointer"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -228,33 +226,36 @@ export default function AdminLayout({ children, title, admin }: AdminLayoutProps
         {/* Main content */}
         <div className="lg:pl-64">
           {/* Top bar */}
-          <div className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 lg:px-8">
+          <div className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
             <Button
               variant="ghost"
               size="icon"
               className="lg:hidden"
               onClick={() => setSidebarOpen(true)}
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-6 w-6" />
             </Button>
 
-            <div className="flex-1">
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-9"
-                />
+            {/* Breadcrumb or Title */}
+            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+              <div className="flex items-center gap-x-4 lg:gap-x-6">
+                <h1 className="text-lg font-semibold">{title}</h1>
               </div>
             </div>
 
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            {/* Right side actions */}
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+              </Button>
+
+              <Link href="/" className="hidden sm:block">
+                <Button variant="outline" size="sm">
+                  View Site
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Page content */}

@@ -101,7 +101,7 @@ export default function Login() {
                   </Link> */}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full cursor-pointer" disabled={processing}>
                   <LogIn className="h-4 w-4 mr-2" />
                   {processing ? 'Signing in...' : 'Sign In'}
                 </Button>

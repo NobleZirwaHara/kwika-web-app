@@ -1,8 +1,9 @@
 import { Badge } from "@/Components/ui/badge"
 import { Button } from "@/Components/ui/button"
+import { WishlistButton } from "@/Components/wishlist-button"
 import { MapPin, ArrowRight, Heart, Star } from "lucide-react"
 import { Link } from "@inertiajs/react"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
 interface Service {
   id: number
@@ -24,23 +25,11 @@ interface Service {
 
 interface FeaturedServicesProps {
   services: Service[]
+  isAuthenticated?: boolean
 }
 
-export function FeaturedServices({ services }: FeaturedServicesProps) {
+export function FeaturedServices({ services, isAuthenticated = false }: FeaturedServicesProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [favorites, setFavorites] = useState<Set<number>>(new Set())
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
-  }
 
   if (!services || services.length === 0) {
     return null
@@ -89,18 +78,13 @@ export function FeaturedServices({ services }: FeaturedServicesProps) {
                     {service.category}
                   </Badge>
                 )}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    toggleFavorite(service.id)
-                  }}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-background/90 hover:bg-background transition-colors"
-                >
-                  <Heart
-                    className={`h-4 w-4 ${favorites.has(service.id) ? "fill-primary text-primary" : "text-foreground/70"}`}
+                <div className="absolute top-3 right-3">
+                  <WishlistButton
+                    serviceId={service.id}
+                    isAuthenticated={isAuthenticated}
+                    variant="default"
                   />
-                </button>
+                </div>
               </div>
 
               <div className="space-y-1">

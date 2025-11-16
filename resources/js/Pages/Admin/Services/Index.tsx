@@ -196,10 +196,13 @@ export default function ServicesIndex({ admin, services, stats, categories, prov
   }
 
   function formatPrice(service: Service): string {
-    if (service.price_type === 'custom' && service.max_price) {
-      return `${service.currency} ${service.base_price.toFixed(2)} - ${service.max_price.toFixed(2)}`
+    const basePrice = Number(service.base_price)
+    const maxPrice = service.max_price ? Number(service.max_price) : null
+
+    if (service.price_type === 'custom' && maxPrice) {
+      return `${service.currency} ${basePrice.toFixed(2)} - ${maxPrice.toFixed(2)}`
     }
-    return `${service.currency} ${service.base_price.toFixed(2)} per ${service.price_type}`
+    return `${service.currency} ${basePrice.toFixed(2)} per ${service.price_type}`
   }
 
   return (
@@ -279,13 +282,17 @@ export default function ServicesIndex({ admin, services, stats, categories, prov
                     <SelectTrigger>
                       <SelectValue placeholder="All Providers" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[300px]">
                       <SelectItem value="all">All Providers</SelectItem>
-                      {providers.map((provider) => (
-                        <SelectItem key={provider.id} value={provider.id.toString()}>
-                          {provider.business_name}
-                        </SelectItem>
-                      ))}
+                      {providers && providers.length > 0 ? (
+                        providers.map((provider) => (
+                          <SelectItem key={provider.id} value={provider.id.toString()}>
+                            {provider.business_name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-providers" disabled>No providers available</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -296,13 +303,17 @@ export default function ServicesIndex({ admin, services, stats, categories, prov
                     <SelectTrigger>
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[300px]">
                       <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id.toString()}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
+                      {categories && categories.length > 0 ? (
+                        categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-categories" disabled>No categories available</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

@@ -14,6 +14,8 @@ import {
 } from '@/Components/ui/dialog'
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { resizeImage, resizeImages, createImagePreview, processCroppedImage } from '@/lib/imageUtils'
+import { ImageCropperDialog } from '@/Components/ImageCropperDialog'
 
 interface Props {
   provider: {
@@ -42,6 +44,14 @@ export default function Media({ provider, portfolio_images }: Props) {
     provider.cover_image ? `/storage/${provider.cover_image}` : null
   )
 
+  // Cropper state
+  const [logoCropperOpen, setLogoCropperOpen] = useState(false)
+  const [coverCropperOpen, setCoverCropperOpen] = useState(false)
+  const [logoImageSrc, setLogoImageSrc] = useState<string>('')
+  const [coverImageSrc, setCoverImageSrc] = useState<string>('')
+  const [logoFileName, setLogoFileName] = useState<string>('')
+  const [coverFileName, setCoverFileName] = useState<string>('')
+
   const logoForm = useForm({
     logo: null as File | null,
   })
@@ -56,34 +66,68 @@ export default function Media({ provider, portfolio_images }: Props) {
 
   const deleteForm = useForm({})
 
-  function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
+  async function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
-      logoForm.setData('logo', file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string)
+      try {
+        const imageSrc = await createImagePreview(file)
+        setLogoImageSrc(imageSrc)
+        setLogoFileName(file.name)
+        setLogoCropperOpen(true)
+      } catch (error) {
+        console.error('Error loading logo:', error)
       }
-      reader.readAsDataURL(file)
     }
   }
 
-  function handleCoverChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) {
-      coverForm.setData('cover_image', file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setCoverPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+  async function handleLogoCropComplete(croppedBlob: Blob) {
+    try {
+      const processedFile = await processCroppedImage(croppedBlob, logoFileName, 'logo', 2)
+      logoForm.setData('logo', processedFile)
+
+      const preview = await createImagePreview(processedFile)
+      setLogoPreview(preview)
+    } catch (error) {
+      console.error('Error processing cropped logo:', error)
     }
   }
 
-  function handlePortfolioChange(e: ChangeEvent<HTMLInputElement>) {
+  async function handleCoverChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const imageSrc = await createImagePreview(file)
+        setCoverImageSrc(imageSrc)
+        setCoverFileName(file.name)
+        setCoverCropperOpen(true)
+      } catch (error) {
+        console.error('Error loading cover image:', error)
+      }
+    }
+  }
+
+  async function handleCoverCropComplete(croppedBlob: Blob) {
+    try {
+      const processedFile = await processCroppedImage(croppedBlob, coverFileName, 'cover', 5)
+      coverForm.setData('cover_image', processedFile)
+
+      const preview = await createImagePreview(processedFile)
+      setCoverPreview(preview)
+    } catch (error) {
+      console.error('Error processing cropped cover:', error)
+    }
+  }
+
+  async function handlePortfolioChange(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
     if (files.length > 0) {
-      portfolioForm.setData('portfolio_images', files)
+      try {
+        const resizedFiles = await resizeImages(files, 'portfolio', 5)
+        portfolioForm.setData('portfolio_images', resizedFiles)
+      } catch (error) {
+        console.error('Error resizing portfolio images:', error)
+        portfolioForm.setData('portfolio_images', files)
+      }
     }
   }
 
@@ -403,6 +447,26 @@ export default function Media({ provider, portfolio_images }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Logo Cropper Dialog */}
+      <ImageCropperDialog
+        open={logoCropperOpen}
+        onOpenChange={setLogoCropperOpen}
+        imageSrc={logoImageSrc}
+        onCropComplete={handleLogoCropComplete}
+        imageType="logo"
+        title="Crop Logo"
+      />
+
+      {/* Cover Image Cropper Dialog */}
+      <ImageCropperDialog
+        open={coverCropperOpen}
+        onOpenChange={setCoverCropperOpen}
+        imageSrc={coverImageSrc}
+        onCropComplete={handleCoverCropComplete}
+        imageType="cover"
+        title="Crop Cover Image"
+      />
     </ProviderLayout>
   )
 }

@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
 import WizardLayout from '@/Components/WizardLayout'
 import { Button } from '@/Components/ui/button'
@@ -172,10 +172,10 @@ export default function Step1PersonalDetails({ user }: Props) {
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
-            onClick={() => window.history.back()}
+            className="flex-1 cursor-pointer"
+            onClick={() => router.visit('/onboarding/welcome')}
           >
-            Cancel
+            Back
           </Button>
           <Button
             type="submit"
@@ -189,7 +189,7 @@ export default function Step1PersonalDetails({ user }: Props) {
         {/* Already have an account */}
         <div className="text-center text-sm text-muted-foreground pt-4 border-t">
           Already have an account?{' '}
-          <a href="/login" className="text-primary hover:underline font-medium">
+          <a href="/login" className="text-primary hover:underline font-medium cursor-pointer">
             Sign in
           </a>
         </div>

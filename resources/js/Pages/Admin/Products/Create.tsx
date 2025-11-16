@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/Components/ui/badge'
 import { ArrowLeft, Save, Plus, X, Upload } from 'lucide-react'
 import { useState, useRef } from 'react'
+import { resizeImage, createImagePreview } from '@/lib/imageUtils'
 
 interface Admin {
   id: number
@@ -95,17 +96,22 @@ export default function ProductsCreate({ admin, catalogues, providers }: Props) 
     setData('features', data.features.filter((_, i) => i !== index))
   }
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
-      setData('primary_image', file)
+      try {
+        const resizedFile = await resizeImage(file, 'product', 2)
+        setData('primary_image', resizedFile)
 
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        const preview = await createImagePreview(resizedFile)
+        setImagePreview(preview)
+      } catch (error) {
+        console.error('Error resizing product image:', error)
+        setData('primary_image', file)
+
+        const preview = await createImagePreview(file)
+        setImagePreview(preview)
       }
-      reader.readAsDataURL(file)
     }
   }
 

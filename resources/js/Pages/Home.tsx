@@ -8,7 +8,7 @@ import { BenefitsSection } from "@/Components/benefits-section"
 import { PromotionsSection } from "@/Components/promotions-section"
 import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
-import { Head } from '@inertiajs/react'
+import { Head, usePage } from '@inertiajs/react'
 
 interface Category {
   id: number
@@ -78,6 +78,9 @@ interface HomeProps {
 }
 
 export default function Home({ categories, featuredProviders, topProviders, featuredServices, featuredProducts }: HomeProps) {
+  const { auth } = usePage().props as any
+  const isAuthenticated = !!auth?.user
+
   return (
     <>
       <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
@@ -86,7 +89,7 @@ export default function Home({ categories, featuredProviders, topProviders, feat
         <main>
           <HeroSearch categories={categories} />
           <ServiceCategories categories={categories} />
-          <FeaturedServices services={featuredServices} />
+          <FeaturedServices services={featuredServices} isAuthenticated={isAuthenticated} />
           <FeaturedProducts products={featuredProducts} />
           <FeaturedProviders providers={topProviders} title="Top Service Providers" />
           <BenefitsSection />

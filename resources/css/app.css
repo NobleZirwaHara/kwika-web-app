@@ -1,10 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100..400&display=swap');
+
+/*family=Inter:wght@100;200;300;400;500;600;700;800;900&*/
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
+/* :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -39,9 +41,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Font variables */
-  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
 }
 
 .dark {
@@ -77,7 +76,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
-}
+} */
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -234,4 +233,42 @@
 
 .react-datepicker__navigation:hover *::before {
   border-color: hsl(var(--primary));
+}
+
+/* Custom styling for dates with bookings - highlighted in teal */
+.react-datepicker__day.booked-date,
+.react-datepicker .booked-date {
+  background-color: #ccfbf1 !important; /* teal-100 */
+  color: #134e4a !important; /* teal-900 */
+  font-weight: 600 !important;
+  border: 1px solid #5eead4 !important; /* teal-300 */
+}
+
+.dark .react-datepicker__day.booked-date,
+.dark .react-datepicker .booked-date {
+  background-color: rgba(19, 78, 74, 0.4) !important; /* teal-900/40 for dark mode */
+  color: #99f6e4 !important; /* teal-300 */
+  border: 1px solid #2dd4bf !important; /* teal-400 */
+}
+
+.react-datepicker__day.booked-date:hover,
+.react-datepicker .booked-date:hover {
+  background-color: #99f6e4 !important; /* teal-200 */
+  color: #134e4a !important;
+  border: 1px solid #14b8a6 !important; /* teal-500 */
+}
+
+.dark .react-datepicker__day.booked-date:hover,
+.dark .react-datepicker .booked-date:hover {
+  background-color: rgba(19, 78, 74, 0.6) !important;
+  color: #ccfbf1 !important; /* teal-100 */
+}
+
+/* Selected booked date should show primary color with teal indicator */
+.react-datepicker__day.booked-date.react-datepicker__day--selected,
+.react-datepicker__day--selected.booked-date {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  box-shadow: 0 0 0 3px #14b8a6 !important; /* teal-500 ring */
+  border: 2px solid #14b8a6 !important;
 }
