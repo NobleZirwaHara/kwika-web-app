@@ -131,9 +131,17 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  a,
+  a[href],
+  button[type="button"],
+  [role="button"],
+  [role="link"] {
+    cursor: pointer;
   }
 }
+
 
 /* Custom z-index utilities for proper layering */
 @layer utilities {
