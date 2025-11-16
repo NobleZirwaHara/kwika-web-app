@@ -1,0 +1,30 @@
+
+Add payment breakdown setting in provider panel and admin panel.. and show the breakdown in pages
+Similar service providers and reviews
+Users panel
+Redesign service provider panel
+Restyle onboarding service providers
+
+Add sub categories to system
+Add subcategory selection to onboarding
+Adding email notifications
+When users request booking, its pending 
+
+Add service preview, service provider preview
+
+Add integration with Paychangu
+
+Provider Dashboard Transformation
+============
+
+Companies will be in sidebar
+Promotions will be in sidebar
+Profile settings will be in sidebar
+Analytics will be included on dashboard page
+Reviews will be on dashboard page.. dashboard should be renamed to overview or something like that
+
+Events will come later
+Pricing is not necessary
+Availability is not necessary
+
+Media Gallery will not be moved for now
