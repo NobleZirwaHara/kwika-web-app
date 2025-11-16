@@ -1,7 +1,7 @@
 {
-    "name": "eventhub/laravel-inertia",
+    "name": "noblehara/kwika-events",
     "type": "project",
-    "description": "EventHub - Find Perfect Event Service Providers - Laravel Inertia Application",
+    "description": "Kwika Events - Find Perfect Event Service Providers",
     "keywords": ["laravel", "inertia", "react", "eventhub"],
     "license": "MIT",
     "require": {

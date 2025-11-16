@@ -15,8 +15,7 @@ Add service preview, service provider preview
 Add integration with Paychangu
 
 Provider Dashboard Transformation
-============
-
+========================================
 Companies will be in sidebar
 Promotions will be in sidebar
 Profile settings will be in sidebar
