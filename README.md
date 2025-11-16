@@ -1,4 +1,4 @@
-# EventHub - Laravel Inertia
+# Kwika Events - Laravel Inertia
 
 A modern event service provider platform built with Laravel, Inertia.js, React, and TypeScript. This project was converted from Next.js to Laravel Inertia while maintaining the complete UI design.
 
