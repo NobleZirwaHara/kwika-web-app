@@ -1,0 +1,111 @@
+Kwika Events: Concept Note
+
+and Business Outline
+
+1. Overview
+Kwika Events is a digital marketplace designed to revolutionise the events industry in Malawi
+by providing an end-to-end platform where users can discover, compare, book, and review
+event service providers seamlessly. The platform serves as an integrated web-based and
+mobile-friendly system that connects event planners, vendors, and customers through
+verified listings, transparent pricing, and a smart booking system.
+Inspired by platforms like Airbnb, Kwika Events aims to bring structure, trust, and visibility to
+a fragmented market currently driven by informal word-of-mouth referrals.
+
+2. Problem Statement
+The Malawian events industry faces several pain points that limit its growth and
+professionalisation:
+1. Informality &amp; Limited Visibility – Most service providers (decorators,
+photographers, venues, caterers, etc.) rely on word-of-mouth, making it hard for
+customers to discover and compare options.
+2. Time-Consuming Search Process – Customers spend excessive time finding and
+vetting providers due to the absence of a centralised digital directory.
+3. Lack of Verified Information – There’s no standardised platform where service
+quality, pricing, and availability are transparent or verified.
+4. Fragmented Customer Experience – Booking, payment, and feedback are handled
+separately, leading to inefficiency and trust gaps.
+
+3. The Kwika Solution
+Kwika Events addresses these gaps by offering a digital ecosystem for event planning,
+discovery, and booking.
+
+Core Offerings
+ Comprehensive Directory
+A centralised listing of event service providers, including detailed business profiles,
+portfolios, prices, and contact information.
+ Smart Search &amp; Filters
+Advanced search functionality allowing users to find providers by location, service
+type, budget range, and availability.
+ Booking &amp; Scheduling System
+Real-time calendar visibility and booking integration that reflects service provider
+availability and prevents double-booking.
+ Secure Payment Gateway
+Integrated online payments
+ Ticketing &amp; Event Management
+Built-in tools for ticket sales, attendee registration, and event analytics.
+ Customer Reviews &amp; Ratings
+Verified feedback to help users make informed decisions while promoting
+accountability among service providers.
+ Checklists &amp; Workflow Tools
+Custom checklists for both clients and service providers to streamline planning,
+logistics, and post-event tasks.
+
+4. Business Model
+Kwika Events will generate revenue through multiple channels:
+Stream Description
+Commission on
+Bookings
+
+Percentage charged on each successful booking or ticket sale.
+
+Subscription Plans Premium listing tiers for businesses (Basic, Standard, Featured)
+
+with enhanced visibility and analytics.
+
+Advertising Sponsored placements and banner ads for brands targeting
+
+event audiences.
+
+Transaction Fees Small service charge on payments processed via the platform.
+Data Insights Aggregated insights for corporate clients (e.g., trends in events,
+
+pricing, demand).
+
+5. Value Proposition
+ For Customers: Save time, compare options easily, and book confidently
+through verified listings and transparent reviews.
+ For Service Providers: Gain visibility, increase bookings, and manage clients
+efficiently via a digital portfolio and booking dashboard.
+ For the Industry: Formalise and professionalise the events ecosystem by
+promoting digital adoption, accountability, and data-driven growth.
+
+6. Competitive Advantage
+ First mover advantage in a growing digital marketplace for Malawi’s events
+sector.
+ Trusted KYC-verified ecosystem.
+ Seamless booking and payment integration.
+ Clean, modern user experience inspired by Airbnb.
+ Continuous feedback and customer insights loop for business improvement.
+
+7. Technology &amp; Platform Design
+ Platform: Web-based with mobile-responsive design
+ Core Features:
+o Robust search engine and categorisation algorithm.
+o Image compression technology that preserves quality while optimising load
+speed.
+o Real-time calendar sync for bookings and availability.
+
+o KYC Verification Module (via National ID, phone number, business
+registration).
+o User feedback loop integrated into service workflows.
+o Generic cancellation policies per service category for consistency.
+o Data analytics dashboard for both customers and service providers.
+8. Onboarding &amp; Reputation Management
+Service Provider Onboarding
+ Step 1: Sign-up and profile creation.
+ Step 2: Document verification (National ID, Business Registration).
+ Step 3: Upload of service portfolio and pricing.
+ Step 4: Approval after due diligence check.
+User Onboarding
+ Step 1: Quick sign-up (email/phone).
+ Step 2: Optional identity verification for booking privileges.
+ Step 3: Guided browsing and secure payment process.
