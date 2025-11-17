@@ -9,6 +9,7 @@ import { PromotionsSection } from "@/Components/promotions-section"
 import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
 import { Head, usePage } from '@inertiajs/react'
+import { EventHighlight } from "@/Components/event-highlight"
 
 interface Category {
   id: number
@@ -16,6 +17,10 @@ interface Category {
   slug: string
   description: string
   icon: string
+  subcategories: {
+    id: number
+    name: string
+  }[]
 }
 
 interface Provider {
@@ -94,6 +99,20 @@ export default function Home({ categories, featuredProviders, topProviders, feat
           <FeaturedProviders providers={topProviders} title="Top Service Providers" />
           <BenefitsSection />
           <PromotionsSection />
+          <EventHighlight
+            eyebrowLabel="Kwika"
+            eyebrowText="Service Partner Series"
+            title="Lunch Tasting for Culinary Creators"
+            description="We're hosting an intimate lunch tasting that brings together every Kwika food service provider—chefs, caterers, bakers, and mixologists—to co-create 2025 menu inspirations and collaborate on premium event experiences."
+            details={[
+              { label: "Date", value: "Friday, 12 Dec · 11:30-15:00" },
+              { label: "Venue", value: "Kwika Test Kitchen, Lilongwe" },
+              { label: "Focus", value: "Curated tasting · Supplier showcases" },
+            ]}
+            ctaLabel="RSVP to Attend"
+            imageSrc="/elegant-catering-food-display.jpg"
+            imageAlt="Kwika lunch tasting setup"
+          />
           <Testimonials />
         </main>
         <Footer />

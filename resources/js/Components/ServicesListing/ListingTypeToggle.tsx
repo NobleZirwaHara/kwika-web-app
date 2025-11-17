@@ -16,8 +16,8 @@ export function ListingTypeToggle({
   className
 }: ListingTypeToggleProps) {
   const options = [
-    { type: 'providers' as ListingType, icon: Building2, label: 'Providers', description: 'Browse service providers' },
     { type: 'services' as ListingType, icon: Package, label: 'Services', description: 'Browse individual services' },
+    { type: 'providers' as ListingType, icon: Building2, label: 'Providers', description: 'Browse service providers' },
   ]
 
   const activeIndex = options.findIndex(opt => opt.type === value)

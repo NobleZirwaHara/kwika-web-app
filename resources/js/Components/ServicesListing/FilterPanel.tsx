@@ -179,13 +179,28 @@ export function FilterPanel({
 
         {/* Category */}
         <div className="space-y-3">
-          <Label>Category</Label>
-          <Select value={selectedParentCategory?.toString() || ''} onValueChange={handleParentCategoryChange}>
+          <div className="flex items-center justify-between">
+            <Label>Category</Label>
+            {selectedParentCategory && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedParentCategory(null)
+                  onFilterChange({ category: undefined })
+                }}
+                className="h-auto py-1 px-2 text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear
+              </Button>
+            )}
+          </div>
+          <Select value={selectedParentCategory?.toString()} onValueChange={handleParentCategoryChange}>
             <SelectTrigger>
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All categories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.id.toString()}>
                   {category.name}
@@ -195,22 +210,37 @@ export function FilterPanel({
           </Select>
 
           {selectedSubcategories.length > 0 && (
-            <Select
-              value={filters.category?.toString() || ''}
-              onValueChange={handleSubcategoryChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select subcategory" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All subcategories</SelectItem>
-                {selectedSubcategories.map((subcategory) => (
-                  <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
-                    {subcategory.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm text-muted-foreground">Subcategory</Label>
+                {filters.category && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onFilterChange({ category: undefined })}
+                    className="h-auto py-1 px-2 text-xs"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                )}
+              </div>
+              <Select
+                value={filters.category?.toString()}
+                onValueChange={handleSubcategoryChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedSubcategories.map((subcategory) => (
+                    <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                      {subcategory.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
           )}
         </div>
 
@@ -218,13 +248,25 @@ export function FilterPanel({
 
         {/* Location */}
         <div className="space-y-2">
-          <Label htmlFor="city">Location</Label>
-          <Select value={filters.city || ''} onValueChange={(value) => onFilterChange({ city: value || undefined })}>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="city">Location</Label>
+            {filters.city && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onFilterChange({ city: undefined })}
+                className="h-auto py-1 px-2 text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear
+              </Button>
+            )}
+          </div>
+          <Select value={filters.city} onValueChange={(value) => onFilterChange({ city: value || undefined })}>
             <SelectTrigger id="city">
               <SelectValue placeholder="All locations" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All locations</SelectItem>
               {cities.map((city) => (
                 <SelectItem key={city} value={city}>
                   {city}

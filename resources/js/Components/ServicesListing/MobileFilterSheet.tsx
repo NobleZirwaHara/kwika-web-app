@@ -202,12 +202,28 @@ export function MobileFilterSheet({
             <AccordionItem value="category">
               <AccordionTrigger>Category</AccordionTrigger>
               <AccordionContent className="space-y-3">
-                <Select value={selectedParentCategory?.toString() || ''} onValueChange={handleParentCategoryChange}>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Main Category</Label>
+                  {selectedParentCategory && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedParentCategory(null)
+                        onFilterChange({ category: undefined })
+                      }}
+                      className="h-auto py-1 px-2 text-xs"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                <Select value={selectedParentCategory?.toString()} onValueChange={handleParentCategoryChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All categories</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()}>
                         {category.name}
@@ -217,22 +233,37 @@ export function MobileFilterSheet({
                 </Select>
 
                 {selectedSubcategories.length > 0 && (
-                  <Select
-                    value={filters.category?.toString() || ''}
-                    onValueChange={handleSubcategoryChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select subcategory" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All subcategories</SelectItem>
-                      {selectedSubcategories.map((subcategory) => (
-                        <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
-                          {subcategory.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Subcategory</Label>
+                      {filters.category && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onFilterChange({ category: undefined })}
+                          className="h-auto py-1 px-2 text-xs"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    <Select
+                      value={filters.category?.toString()}
+                      onValueChange={handleSubcategoryChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select subcategory" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedSubcategories.map((subcategory) => (
+                          <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                            {subcategory.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
                 )}
               </AccordionContent>
             </AccordionItem>
@@ -241,12 +272,25 @@ export function MobileFilterSheet({
             <AccordionItem value="location">
               <AccordionTrigger>Location</AccordionTrigger>
               <AccordionContent>
-                <Select value={filters.city || ''} onValueChange={(value) => onFilterChange({ city: value || undefined })}>
+                <div className="flex items-center justify-between mb-3">
+                  <Label className="text-sm">City</Label>
+                  {filters.city && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onFilterChange({ city: undefined })}
+                      className="h-auto py-1 px-2 text-xs"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                </div>
+                <Select value={filters.city} onValueChange={(value) => onFilterChange({ city: value || undefined })}>
                   <SelectTrigger>
                     <SelectValue placeholder="All locations" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All locations</SelectItem>
                     {cities.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}

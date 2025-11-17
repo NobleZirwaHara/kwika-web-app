@@ -1,5 +1,5 @@
-Add seeding for booking
-Create sections from trip advisor
+
+Update categories with images from a folder and remove that icon next to category name
 Check on wishlist functionality and implementation
 Restyle onboarding
 Similar service providers and reviews

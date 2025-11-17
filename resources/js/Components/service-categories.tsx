@@ -69,7 +69,7 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-foreground" />
+                  {/* <Icon className="h-4 w-4 text-foreground" /> */}
                   <h3 className="font-medium text-foreground">{category.name}</h3>
                 </div>
               </Link>

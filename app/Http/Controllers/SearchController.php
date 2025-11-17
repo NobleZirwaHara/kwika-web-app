@@ -30,7 +30,7 @@ class SearchController extends Controller
             'listing_type' => 'nullable|in:providers,services',
         ]);
 
-        $listingType = $request->get('listing_type', 'providers');
+        $listingType = $request->get('listing_type', 'services');
 
         // Route to appropriate method based on listing type
         if ($listingType === 'services') {

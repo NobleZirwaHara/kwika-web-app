@@ -131,17 +131,17 @@ class ServiceProvider extends Model
     // Scopes
     public function scopeVerified($query)
     {
-        return $query->where('verification_status', 'approved');
+        return $query->where('service_providers.verification_status', 'approved');
     }
 
     public function scopeFeatured($query)
     {
-        return $query->where('is_featured', true);
+        return $query->where('service_providers.is_featured', true);
     }
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('service_providers.is_active', true);
     }
 
     public function scopeInCity($query, $city)
