@@ -341,7 +341,7 @@ export default function PaymentsIndex({ admin, payments, stats, filters }: Props
                 <DollarSign className="h-5 w-5 text-blue-600" />
               </div>
               <p className="text-3xl font-bold text-blue-600">
-                UGX {stats.total_amount.toLocaleString()}
+                MWK {stats.total_amount.toLocaleString()}
               </p>
             </CardContent>
           </Card>

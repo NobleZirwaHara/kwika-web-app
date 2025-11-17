@@ -3,8 +3,22 @@ import { FormEvent, useState, ChangeEvent } from 'react'
 import WizardLayout from '@/Components/WizardLayout'
 import { Button } from '@/Components/ui/button'
 import { Label } from '@/Components/ui/label'
-import { Upload, Image as ImageIcon, X, Check } from 'lucide-react'
+import { Upload, Image as ImageIcon, X, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+interface Subcategory {
+  id: number
+  name: string
+  slug: string
+}
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  icon: string | null
+  subcategories: Subcategory[]
+}
 
 interface Props {
   provider: {
@@ -12,12 +26,7 @@ interface Props {
     logo: string | null
     cover_image: string | null
   }
-  categories: Array<{
-    id: number
-    name: string
-    slug: string
-    icon: string | null
-  }>
+  categories: Category[]
 }
 
 export default function Step3ServicesMedia({ provider, categories }: Props) {
@@ -35,13 +44,30 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
     provider.cover_image ? `/storage/${provider.cover_image}` : null
   )
   const [portfolioPreviews, setPortfolioPreviews] = useState<string[]>([])
+  const [expandedCategories, setExpandedCategories] = useState<number[]>([])
 
-  function handleCategoryToggle(categoryId: number) {
-    if (data.category_ids.includes(categoryId)) {
-      setData('category_ids', data.category_ids.filter(id => id !== categoryId))
+  function toggleCategoryExpansion(categoryId: number) {
+    if (expandedCategories.includes(categoryId)) {
+      setExpandedCategories(expandedCategories.filter(id => id !== categoryId))
     } else {
-      setData('category_ids', [...data.category_ids, categoryId])
+      setExpandedCategories([...expandedCategories, categoryId])
     }
+  }
+
+  function handleSubcategoryToggle(subcategoryId: number) {
+    if (data.category_ids.includes(subcategoryId)) {
+      setData('category_ids', data.category_ids.filter(id => id !== subcategoryId))
+    } else {
+      setData('category_ids', [...data.category_ids, subcategoryId])
+    }
+  }
+
+  function getCategorySelectionCount(category: Category): number {
+    return category.subcategories.filter(sub => data.category_ids.includes(sub.id)).length
+  }
+
+  function hasAnySelections(category: Category): boolean {
+    return getCategorySelectionCount(category) > 0
   }
 
   function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
@@ -133,42 +159,90 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
               Select Service Categories <span className="text-destructive">*</span>
             </Label>
             <p className="text-sm text-muted-foreground mt-1">
-              Choose the categories that best describe your services
+              Choose the parent categories, then select specific subcategories that describe your services
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {categories.map((category) => {
-              const isChecked = data.category_ids.includes(category.id)
+              const isExpanded = expandedCategories.includes(category.id)
+              const selectedCount = getCategorySelectionCount(category)
+              const hasSelections = hasAnySelections(category)
+
               return (
                 <div
                   key={category.id}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg border-2 p-4 cursor-pointer transition-all",
-                    isChecked
+                    "rounded-lg border-2 transition-all overflow-hidden",
+                    hasSelections
                       ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
+                      : "border-border hover:border-primary/30"
                   )}
-                  onClick={() => handleCategoryToggle(category.id)}
                 >
+                  {/* Parent Category Header */}
                   <div
-                    className={cn(
-                      "h-5 w-5 shrink-0 rounded border-2 flex items-center justify-center transition-all",
-                      isChecked
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-input bg-background"
-                    )}
+                    className="flex items-center gap-3 p-4 cursor-pointer"
+                    onClick={() => toggleCategoryExpansion(category.id)}
                   >
-                    {isChecked && <Check className="h-4 w-4" />}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{category.name}</p>
+                        {selectedCount > 0 && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary text-primary-foreground">
+                            {selectedCount}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {category.subcategories.length} subcategories
+                      </p>
+                    </div>
+                    {isExpanded ? (
+                      <ChevronUp className="h-5 w-5 text-muted-foreground shrink-0" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{category.name}</p>
-                  </div>
+
+                  {/* Subcategories (shown when expanded) */}
+                  {isExpanded && (
+                    <div className="border-t border-border bg-background/50 p-3 space-y-2">
+                      {category.subcategories.map((subcategory) => {
+                        const isChecked = data.category_ids.includes(subcategory.id)
+                        return (
+                          <div
+                            key={subcategory.id}
+                            className={cn(
+                              "flex items-center gap-3 rounded-md border p-3 cursor-pointer transition-all",
+                              isChecked
+                                ? "border-primary bg-primary/10"
+                                : "border-border hover:border-primary/50 hover:bg-accent/50"
+                            )}
+                            onClick={() => handleSubcategoryToggle(subcategory.id)}
+                          >
+                            <div
+                              className={cn(
+                                "h-4 w-4 shrink-0 rounded border-2 flex items-center justify-center transition-all",
+                                isChecked
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-input bg-background"
+                              )}
+                            >
+                              {isChecked && <Check className="h-3 w-3" />}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{subcategory.name}</p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
-          {errors.category_ids && <p className="text-sm text-destructive">{errors.category_ids}</p>}
+          {errors.category_ids && <p className="text-sm text-destructive mt-2">{errors.category_ids}</p>}
         </div>
 
         {/* Logo Upload */}

@@ -125,7 +125,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
   }
 
   return (
-    <ProviderLayout title="Dashboard" provider={provider}>
+    <ProviderLayout title="Overview" provider={provider}>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div>
@@ -196,31 +196,13 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
             <CardDescription>Common tasks to manage your business</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Link href="/provider/services">
                 <Button variant="outline" className="w-full justify-start h-auto py-4">
                   <Package className="h-5 w-5 mr-3" />
                   <div className="text-left">
                     <p className="font-medium">Add Service</p>
                     <p className="text-xs text-muted-foreground">Create new offering</p>
-                  </div>
-                </Button>
-              </Link>
-              <Link href="/provider/media">
-                <Button variant="outline" className="w-full justify-start h-auto py-4">
-                  <Eye className="h-5 w-5 mr-3" />
-                  <div className="text-left">
-                    <p className="font-medium">Upload Media</p>
-                    <p className="text-xs text-muted-foreground">Add portfolio images</p>
-                  </div>
-                </Button>
-              </Link>
-              <Link href="/provider/availability">
-                <Button variant="outline" className="w-full justify-start h-auto py-4">
-                  <Calendar className="h-5 w-5 mr-3" />
-                  <div className="text-left">
-                    <p className="font-medium">Set Availability</p>
-                    <p className="text-xs text-muted-foreground">Manage your schedule</p>
                   </div>
                 </Button>
               </Link>
@@ -238,7 +220,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
         </Card>
 
         {/* Two Column Layout */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className={`grid gap-6${upcoming_events.length > 0 ? ' lg:grid-cols-2' : ''}`}>
           {/* Recent Bookings */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -287,16 +269,16 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
             </CardContent>
           </Card>
 
-          {/* Upcoming Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Events</CardTitle>
-              <CardDescription>Your scheduled events</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {upcoming_events.length > 0 ? (
-                  upcoming_events.map((event) => (
+          {/* Upcoming Events - Only show if there are events */}
+          {upcoming_events.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Events</CardTitle>
+                <CardDescription>Your scheduled events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {upcoming_events.map((event) => (
                     <div
                       key={event.id}
                       className="flex items-start gap-4 p-4 rounded-lg border"
@@ -314,16 +296,11 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                         </p>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Clock className="h-12 w-12 mx-auto mb-3 opacity-20" />
-                    <p>No upcoming events</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Charts */}

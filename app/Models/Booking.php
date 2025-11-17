@@ -58,6 +58,11 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function conversation()
+    {
+        return $this->hasOne(Conversation::class);
+    }
+
     public function scopeUpcoming($query)
     {
         return $query->where('event_date', '>', now())

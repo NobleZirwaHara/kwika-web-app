@@ -1,4 +1,5 @@
 import { Button } from "@/Components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
 import { Menu, User, Heart, Calendar, MessageCircle, UserCircle, Settings, Globe, HelpCircle, LogOut, LayoutDashboard } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { Link } from "@inertiajs/react"
@@ -12,6 +13,16 @@ interface UserMenuProps {
 export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Get user initials for avatar fallback
+  const getInitials = (name: string) => {
+    if (!name) return 'U'
+    const names = name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+    }
+    return name.substring(0, 2).toUpperCase()
+  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -34,23 +45,23 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
       <Button
         onClick={() => setIsOpen(!isOpen)}
         variant="outline"
-        className="gap-2 rounded-full border-border pl-3 pr-3 py-2 bg-transparent hover:shadow-md hover:bg-primary transition-shadow cursor-pointer"
+        className="group gap-2 rounded-full border-border pl-3 pr-3 py-2 bg-transparent hover:shadow-md hover:bg-primary transition-shadow cursor-pointer"
       >
-        <Menu className="h-4 w-4" />
-        <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+        <Menu className="h-4 w-4 group-hover:text-primary-foreground transition-colors" />
+        <Avatar className="h-7 w-7 group-hover:ring-2 group-hover:ring-primary-foreground transition-all">
           {user ? (
-            <img
-              src={user.avatar || "/default-avatar.png"}
-              alt={user.name}
-              className="w-full h-full rounded-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-                e.currentTarget.nextElementSibling?.classList.remove('hidden')
-              }}
-            />
-          ) : null}
-          <User className={`h-4 w-4 ${user ? 'hidden' : ''}`} />
-        </div>
+            <>
+              <AvatarImage src={user.avatar || undefined} alt={user.name} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs group-hover:bg-primary-foreground group-hover:text-primary transition-colors">
+                {getInitials(user.name)}
+              </AvatarFallback>
+            </>
+          ) : (
+            <AvatarFallback className="bg-muted group-hover:bg-primary-foreground/20 transition-colors">
+              <User className="h-4 w-4 group-hover:text-primary-foreground transition-colors" />
+            </AvatarFallback>
+          )}
+        </Avatar>
       </Button>
 
       {isOpen && (

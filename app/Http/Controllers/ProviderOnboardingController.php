@@ -199,7 +199,26 @@ class ProviderOnboardingController extends Controller
             return redirect()->route('onboarding.step2');
         }
 
-        $categories = ServiceCategory::active()->get(['id', 'name', 'slug', 'icon']);
+        // Get parent categories with their subcategories
+        $parentCategories = ServiceCategory::with('children')
+            ->parents()
+            ->active()
+            ->get(['id', 'name', 'slug', 'icon'])
+            ->map(function ($parent) {
+                return [
+                    'id' => $parent->id,
+                    'name' => $parent->name,
+                    'slug' => $parent->slug,
+                    'icon' => $parent->icon,
+                    'subcategories' => $parent->children->map(function ($child) {
+                        return [
+                            'id' => $child->id,
+                            'name' => $child->name,
+                            'slug' => $child->slug,
+                        ];
+                    }),
+                ];
+            });
 
         return Inertia::render('Onboarding/Step3ServicesMedia', [
             'provider' => [
@@ -207,7 +226,7 @@ class ProviderOnboardingController extends Controller
                 'logo' => $provider->logo,
                 'cover_image' => $provider->cover_image,
             ],
-            'categories' => $categories,
+            'categories' => $parentCategories,
         ]);
     }
 
@@ -326,6 +345,21 @@ class ProviderOnboardingController extends Controller
 
         if (! $provider || $provider->onboarding_step < 4) {
             return back()->withErrors(['error' => 'Please complete all onboarding steps.']);
+        }
+
+        // Sync categories from onboarding_data to pivot table
+        $onboardingData = $provider->onboarding_data ?? [];
+        if (isset($onboardingData['category_ids']) && !empty($onboardingData['category_ids'])) {
+            // Validate that all selected categories are subcategories
+            $categoryIds = $onboardingData['category_ids'];
+            $validCategories = ServiceCategory::whereIn('id', $categoryIds)
+                ->whereNotNull('parent_id') // Only subcategories
+                ->pluck('id')
+                ->toArray();
+
+            if (!empty($validCategories)) {
+                $provider->categories()->sync($validCategories);
+            }
         }
 
         $provider->update([

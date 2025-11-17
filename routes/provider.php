@@ -20,6 +20,13 @@ Route::middleware(['auth', 'provider'])->prefix('provider')->name('provider.')->
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Listings - Combined view for services and products
+    Route::get('/listings', fn () => inertia('Provider/Listings'))->name('listings');
+
+    // Messages - Provider messaging
+    Route::get('/messages', fn () => inertia('Provider/Messages'))->name('messages');
+    Route::get('/messages/{id}', fn ($id) => inertia('Provider/Messages', ['conversationId' => $id]))->name('messages.show');
+
     // Company Management
     Route::resource('companies', \App\Http\Controllers\Provider\CompanyController::class);
 

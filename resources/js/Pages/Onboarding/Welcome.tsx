@@ -88,7 +88,7 @@ export default function Welcome() {
                     <h2 className="text-xl font-semibold mb-4">What would you like to list?</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Link href="/onboarding/step1" className="cursor-pointer">
-                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer">
+                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
                           <Building2 className="h-5 w-5 text-primary" />
                           <div className="text-left">
                             <p className="font-medium">Event Services</p>
@@ -97,7 +97,7 @@ export default function Welcome() {
                         </Button>
                       </Link>
                       <a href="#" onClick={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer">
+                        <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
                           <Home className="h-5 w-5 text-primary" />
                           <div className="text-left">
                             <p className="font-medium">Venues</p>
@@ -137,7 +137,7 @@ export default function Welcome() {
               </div>
             </div>
             {/* Logos grid */}
-            <div className="max-w-6xl mx-auto mt-10 sm:mt-14">
+            {/* <div className="max-w-6xl mx-auto mt-10 sm:mt-14">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {["wotif","trivago","stayz","hotels","expedia","orbitz"].map((brand) => (
                   <div key={brand} className="rounded-lg border bg-card p-4 text-center text-sm text-muted-foreground">
@@ -145,7 +145,7 @@ export default function Welcome() {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </section>
           {/* Insight / video */}
           <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-20">

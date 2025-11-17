@@ -84,6 +84,21 @@ class User extends Authenticatable
         return $this->hasMany(AdminLog::class, 'admin_id');
     }
 
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function conversationParticipations()
+    {
+        return $this->hasMany(ConversationParticipant::class);
+    }
+
     // Helper methods
     public function isProvider(): bool
     {

@@ -32,6 +32,13 @@ interface Category {
   slug: string
   description: string | null
   icon: string | null
+  parent_id: number | null
+  is_parent: boolean
+  parent: {
+    id: number
+    name: string
+  } | null
+  children_count: number
   is_active: boolean
   sort_order: number
   services_count: number
@@ -227,7 +234,11 @@ export default function CategoriesIndex({ admin, categories, stats, filters }: P
                     <div className="flex-1 space-y-3">
                       {/* Header */}
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className={cn("flex items-center gap-2 mb-1", category.parent && "ml-8")}>
+                          {category.parent && (
+                            <div className="h-px w-4 bg-border" />
+                          )}
+
                           <GripVertical className="h-5 w-5 text-muted-foreground" />
 
                           {category.icon && (
@@ -235,6 +246,18 @@ export default function CategoriesIndex({ admin, categories, stats, filters }: P
                           )}
 
                           <h3 className="text-lg font-semibold">{category.name}</h3>
+
+                          {category.is_parent && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                              Parent
+                            </Badge>
+                          )}
+
+                          {category.parent && (
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                              Subcategory of: {category.parent.name}
+                            </Badge>
+                          )}
 
                           {category.is_active ? (
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -254,15 +277,20 @@ export default function CategoriesIndex({ admin, categories, stats, filters }: P
                         </div>
 
                         {category.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-2 ml-10">
+                          <p className={cn("text-sm text-muted-foreground line-clamp-2 mb-2 ml-10", category.parent && "ml-18")}>
                             {category.description}
                           </p>
                         )}
 
-                        <div className="flex items-center gap-4 text-sm ml-10">
+                        <div className={cn("flex items-center gap-4 text-sm ml-10", category.parent && "ml-18")}>
                           <span className="text-muted-foreground">
                             Slug: <code className="bg-gray-100 px-1.5 py-0.5 rounded">{category.slug}</code>
                           </span>
+                          {category.is_parent && category.children_count > 0 && (
+                            <span className="text-muted-foreground">
+                              {category.children_count} {category.children_count === 1 ? 'subcategory' : 'subcategories'}
+                            </span>
+                          )}
                           <span className="text-muted-foreground">
                             {category.services_count} {category.services_count === 1 ? 'service' : 'services'}
                           </span>

@@ -50,7 +50,23 @@ class ServiceController extends Controller
                 ];
             });
 
-        $categories = ServiceCategory::active()->get(['id', 'name']);
+        // Get parent categories with their subcategories for hierarchical selection
+        $categories = ServiceCategory::with('children')
+            ->parents()
+            ->active()
+            ->get(['id', 'name'])
+            ->map(function ($parent) {
+                return [
+                    'id' => $parent->id,
+                    'name' => $parent->name,
+                    'subcategories' => $parent->children->where('is_active', true)->map(function ($child) {
+                        return [
+                            'id' => $child->id,
+                            'name' => $child->name,
+                        ];
+                    })->values(),
+                ];
+            });
 
         return Inertia::render('Provider/Services', [
             'provider' => [
@@ -90,6 +106,14 @@ class ServiceController extends Controller
             'gallery_images' => ['nullable', 'array'],
             'gallery_images.*' => ['image', 'max:5120'],
         ]);
+
+        // Validate that the selected category is a subcategory (not a parent)
+        $selectedCategory = ServiceCategory::find($validated['service_category_id']);
+        if ($selectedCategory && $selectedCategory->isParent()) {
+            return redirect()->back()->withErrors([
+                'service_category_id' => 'Please select a specific subcategory, not a parent category.'
+            ])->withInput();
+        }
 
         // Generate slug
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
@@ -146,6 +170,14 @@ class ServiceController extends Controller
             'gallery_images' => ['nullable', 'array'],
             'gallery_images.*' => ['image', 'max:5120'],
         ]);
+
+        // Validate that the selected category is a subcategory (not a parent)
+        $selectedCategory = ServiceCategory::find($validated['service_category_id']);
+        if ($selectedCategory && $selectedCategory->isParent()) {
+            return redirect()->back()->withErrors([
+                'service_category_id' => 'Please select a specific subcategory, not a parent category.'
+            ])->withInput();
+        }
 
         // Update slug if name changed
         if ($validated['name'] !== $service->name) {

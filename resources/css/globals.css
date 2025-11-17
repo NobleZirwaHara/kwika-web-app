@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant hover (&:hover);
 
 :root {
   /* Enhanced coastal palette with more saturated, punchy colors while maintaining the same theme */
@@ -135,6 +136,7 @@
   }
   a,
   a[href],
+  button,
   button[type="button"],
   [role="button"],
   [role="link"] {

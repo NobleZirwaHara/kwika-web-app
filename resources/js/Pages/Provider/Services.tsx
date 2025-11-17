@@ -44,9 +44,15 @@ interface Service {
   gallery_images: string[]
 }
 
+interface Subcategory {
+  id: number
+  name: string
+}
+
 interface Category {
   id: number
   name: string
+  subcategories: Subcategory[]
 }
 
 interface Props {
@@ -71,6 +77,7 @@ export default function Services({ provider, services, categories }: Props) {
   const [galleryImages, setGalleryImages] = useState<File[]>([])
   const [primaryImagePreview, setPrimaryImagePreview] = useState<string | null>(null)
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+  const [selectedParentCategory, setSelectedParentCategory] = useState<number | null>(null)
 
   // Cropper state
   const [primaryCropperOpen, setPrimaryCropperOpen] = useState(false)
@@ -98,6 +105,7 @@ export default function Services({ provider, services, categories }: Props) {
   function openCreateDialog() {
     reset()
     setEditingService(null)
+    setSelectedParentCategory(null)
     setPrimaryImage(null)
     setGalleryImages([])
     setPrimaryImagePreview(null)
@@ -108,9 +116,24 @@ export default function Services({ provider, services, categories }: Props) {
 
   function openEditDialog(service: Service) {
     setEditingService(service)
+
+    // Find the subcategory and its parent
+    let foundSubcategoryId = ''
+    let foundParentId: number | null = null
+
+    for (const parent of categories) {
+      const subcategory = parent.subcategories.find(sub => sub.name === service.category_name)
+      if (subcategory) {
+        foundSubcategoryId = subcategory.id.toString()
+        foundParentId = parent.id
+        break
+      }
+    }
+
+    setSelectedParentCategory(foundParentId)
     setData({
       name: service.name,
-      service_category_id: categories.find(c => c.name === service.category_name)?.id.toString() || '',
+      service_category_id: foundSubcategoryId,
       description: service.description || '',
       base_price: service.base_price.toString(),
       price_type: service.price_type,
@@ -422,28 +445,60 @@ export default function Services({ provider, services, categories }: Props) {
               {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
             </div>
 
-            {/* Category */}
-            <div className="space-y-2">
-              <Label htmlFor="category">
-                Category <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={data.service_category_id}
-                onValueChange={(value) => setData('service_category_id', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.service_category_id && (
-                <p className="text-sm text-destructive">{errors.service_category_id}</p>
+            {/* Category - Two-step selection */}
+            <div className="space-y-4">
+              {/* Parent Category */}
+              <div className="space-y-2">
+                <Label htmlFor="parent-category">
+                  Category <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={selectedParentCategory?.toString() ?? ''}
+                  onValueChange={(value) => {
+                    setSelectedParentCategory(value ? parseInt(value) : null)
+                    setData('service_category_id', '') // Reset subcategory when parent changes
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Subcategory */}
+              {selectedParentCategory && (
+                <div className="space-y-2">
+                  <Label htmlFor="subcategory">
+                    Subcategory <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={data.service_category_id}
+                    onValueChange={(value) => setData('service_category_id', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a subcategory" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories
+                        .find(c => c.id === selectedParentCategory)
+                        ?.subcategories.map((subcategory) => (
+                          <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                            {subcategory.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.service_category_id && (
+                    <p className="text-sm text-destructive">{errors.service_category_id}</p>
+                  )}
+                </div>
               )}
             </div>
 

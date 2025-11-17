@@ -22,7 +22,9 @@ import {
   Crown,
   Shield,
   Activity,
-  Layers
+  Layers,
+  Mail,
+  Server
 } from 'lucide-react'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
@@ -56,6 +58,7 @@ const navigation: NavItem[] = [
   { name: 'Products', href: '/admin/products', icon: ShoppingBag },
   { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Bookings', href: '/admin/bookings', icon: FileText },
+  { name: 'Messages', href: '/admin/messages', icon: Mail },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard },
   { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
   { name: 'Companies', href: '/admin/companies', icon: Building2 },
@@ -64,6 +67,7 @@ const navigation: NavItem[] = [
   { name: 'Reports', href: '/admin/reports', icon: BarChart },
   { name: 'Admin Users', href: '/admin/admin-users', icon: Shield },
   { name: 'Audit Logs', href: '/admin/audit-logs', icon: Activity },
+  { name: 'Third Party Services', href: '/admin/third-party-services', icon: Server },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 

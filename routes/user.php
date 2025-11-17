@@ -8,27 +8,72 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | These routes are for authenticated user functionality such as profile
-| management, bookings history, saved providers, etc.
+| management, bookings history, messages, etc.
 | All routes require 'auth' middleware and are prefixed with '/user'.
-|
-| Note: This file is prepared for future implementation.
 |
 */
 
-// Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
-//     // User dashboard
-//     // Route::get('/dashboard', [\App\Http\Controllers\User\DashboardController::class, 'index'])->name('dashboard');
-//
-//     // Profile management
-//     // Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'index'])->name('profile');
-//     // Route::put('/profile', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
-//
-//     // Booking history
-//     // Route::get('/bookings', [\App\Http\Controllers\User\BookingController::class, 'index'])->name('bookings');
-//
-//     // Saved providers/favorites
-//     // Route::get('/favorites', [\App\Http\Controllers\User\FavoriteController::class, 'index'])->name('favorites');
-//
-//     // Reviews
-//     // Route::get('/reviews', [\App\Http\Controllers\User\ReviewController::class, 'index'])->name('reviews');
-// });
+use Inertia\Inertia;
+
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // User dashboard
+    Route::get('/dashboard', function () {
+        return Inertia::render('User/Dashboard', [
+            'user' => auth()->user(),
+            'stats' => [
+                'total_bookings' => 0,
+                'upcoming_bookings' => 0,
+                'wishlist_items' => 0,
+                'total_spent' => 0,
+            ],
+            'upcoming_bookings' => [],
+            'recent_bookings' => [],
+        ]);
+    })->name('dashboard');
+
+    // Bookings
+    Route::get('/bookings', function () {
+        return Inertia::render('User/Bookings', [
+            'bookings' => [],
+            'filters' => [
+                'status' => request('status'),
+                'date_from' => request('date_from'),
+                'date_to' => request('date_to'),
+            ],
+        ]);
+    })->name('bookings');
+
+    // Profile management
+    Route::get('/profile', function () {
+        return Inertia::render('User/Profile', [
+            'user' => auth()->user(),
+            'settings' => [
+                'email_notifications' => true,
+                'sms_notifications' => true,
+                'marketing_emails' => false,
+            ],
+        ]);
+    })->name('profile');
+
+    Route::post('/profile', function () {
+        // Handle profile update
+        return back()->with('success', 'Profile updated successfully');
+    })->name('profile.update');
+
+    Route::post('/password', function () {
+        // Handle password update
+        return back()->with('success', 'Password updated successfully');
+    })->name('password.update');
+
+    Route::post('/notifications', function () {
+        // Handle notification settings update
+        return back()->with('success', 'Notification preferences updated');
+    })->name('notifications.update');
+
+    // Messages
+    Route::get('/messages', function () {
+        return Inertia::render('User/Messages', [
+            'conversations' => [],
+        ]);
+    })->name('messages');
+});

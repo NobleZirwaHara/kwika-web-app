@@ -56,9 +56,9 @@ export function Header() {
             <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            {/* <div className="md:hidden">
               <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

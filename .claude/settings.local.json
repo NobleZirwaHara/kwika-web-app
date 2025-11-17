@@ -14,7 +14,9 @@
       "Bash(do sed -i 's/namespace App;/namespace App\\\\Models;/' \"$file\")",
       "Bash(done)",
       "Bash(for file in app/Http/Controllers/*.php app/Http/Controllers/Provider/*.php)",
-      "Bash(do)"
+      "Bash(do)",
+      "Bash(cat:*)",
+      "Bash(composer require:*)"
     ],
     "deny": [],
     "ask": []

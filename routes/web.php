@@ -40,6 +40,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/api/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
 
+// Listings route (browse all providers/services with filters)
+Route::get('/listings', [SearchController::class, 'search'])->name('listings');
+
 // Provider routes (public viewing)
 Route::get('/providers', [ProviderController::class, 'index'])->name('providers.index');
 Route::get('/providers/{slug}', [ProviderController::class, 'show'])->name('providers.show');

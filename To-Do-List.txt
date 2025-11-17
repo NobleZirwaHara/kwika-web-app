@@ -1,20 +1,26 @@
-
-Add payment breakdown setting in provider panel and admin panel.. and show the breakdown in pages
+Add seeding for booking
+Create sections from trip advisor
+Check on wishlist functionality and implementation
+Restyle onboarding
 Similar service providers and reviews
-Users panel
-Redesign service provider panel
-Restyle onboarding service providers
 
-Add sub categories to system
-Add subcategory selection to onboarding
-Adding email notifications
+Restyle service view
+
+Email notifications
 When users request booking, its pending 
 
 Add service preview, service provider preview
 
 Add integration with Paychangu
 
-Provider Dashboard Transformation
+Add Ably as a realtime driver and alternative to Supabase
+
+
+
+Add payment breakdown setting in provider panel and admin panel.. and show the breakdown in pages
+
+
+Provider Dashboard Transformation notes
 ========================================
 Companies will be in sidebar
 Promotions will be in sidebar
@@ -26,4 +32,4 @@ Events will come later
 Pricing is not necessary
 Availability is not necessary
 
-Media Gallery will not be moved for now
+Media Gallery will not be shown for now

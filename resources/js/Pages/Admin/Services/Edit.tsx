@@ -302,7 +302,7 @@ export default function ServicesEdit({ admin, service, categories }: Props) {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="UGX">UGX</SelectItem>
+                          <SelectItem value="MWK">MWK</SelectItem>
                           <SelectItem value="USD">USD</SelectItem>
                           <SelectItem value="EUR">EUR</SelectItem>
                           <SelectItem value="GBP">GBP</SelectItem>

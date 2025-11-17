@@ -13,16 +13,26 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Get active service categories ordered by sort_order
-        $categories = ServiceCategory::active()->get()->map(function ($category) {
-            return [
-                'id' => $category->id,
-                'name' => $category->name,
-                'slug' => $category->slug,
-                'description' => $category->description,
-                'icon' => $category->icon,
-            ];
-        });
+        // Get parent categories with their subcategories
+        $categories = ServiceCategory::with('children')
+            ->parents()
+            ->active()
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'description' => $category->description,
+                    'icon' => $category->icon,
+                    'subcategories' => $category->children->where('is_active', true)->map(function ($child) {
+                        return [
+                            'id' => $child->id,
+                            'name' => $child->name,
+                        ];
+                    })->values(),
+                ];
+            });
 
         // Get featured providers with their details
         $featuredProviders = ServiceProvider::with(['user'])

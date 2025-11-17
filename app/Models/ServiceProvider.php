@@ -98,6 +98,11 @@ class ServiceProvider extends Model
         return $this->morphMany(Media::class, 'mediable');
     }
 
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
     public function logo()
     {
         return $this->morphOne(Media::class, 'mediable')->where('collection', 'logo');
@@ -116,6 +121,11 @@ class ServiceProvider extends Model
     public function companies()
     {
         return $this->hasMany(Company::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'category_service_provider');
     }
 
     // Scopes

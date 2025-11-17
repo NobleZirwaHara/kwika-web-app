@@ -1,36 +1,26 @@
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, Link, usePage } from '@inertiajs/react'
 import { ReactNode, useState } from 'react'
 import {
   LayoutDashboard,
   Package,
-  Images,
-  DollarSign,
-  Calendar,
-  MessageSquare,
   Settings,
   Menu,
-  X,
   LogOut,
-  User,
-  Bell,
   Building2,
-  FolderOpen,
-  ShoppingBag,
-  Briefcase,
-  Box,
-  ClipboardList,
-  BarChart
+  HelpCircle,
+  Calendar,
+  MessageSquare,
+  ListChecks
 } from 'lucide-react'
 import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/Components/ui/sheet'
 import { cn } from '@/lib/utils'
-
-interface NavItem {
-  name: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  badge?: number
-}
 
 interface ProviderLayoutProps {
   children: ReactNode
@@ -42,231 +32,224 @@ interface ProviderLayoutProps {
   }
 }
 
-const navigation: NavItem[] = [
-  { name: 'Dashboard', href: '/provider/dashboard', icon: LayoutDashboard },
+const primaryNavigation = [
+  { name: 'Overview', href: '/provider/dashboard', icon: LayoutDashboard },
+  { name: 'Listings', href: '/provider/listings', icon: ListChecks },
+  { name: 'Bookings', href: '/provider/bookings', icon: Calendar },
+  { name: 'Messages', href: '/provider/messages', icon: MessageSquare },
+]
+
+const menuNavigation = [
   { name: 'Companies', href: '/provider/companies', icon: Building2 },
-  { name: 'Service Catalogues', href: '/provider/service-catalogues', icon: FolderOpen },
-  { name: 'Product Catalogues', href: '/provider/product-catalogues', icon: ShoppingBag },
-  { name: 'Products', href: '/provider/products', icon: Box },
-  { name: 'Services', href: '/provider/services', icon: Briefcase },
   { name: 'Promotions', href: '/provider/promotions', icon: Package },
-  { name: 'Events', href: '/provider/events', icon: Calendar },
-  { name: 'Media Gallery', href: '/provider/media', icon: Images },
-  { name: 'Pricing', href: '/provider/pricing', icon: DollarSign },
-  { name: 'Availability', href: '/provider/availability', icon: Calendar },
-  { name: 'Bookings', href: '/provider/bookings', icon: ClipboardList },
-  { name: 'Analytics', href: '/provider/analytics', icon: BarChart },
-  { name: 'Reviews', href: '/provider/reviews', icon: MessageSquare },
   { name: 'Profile Settings', href: '/provider/settings', icon: Settings },
 ]
 
 export default function ProviderLayout({ children, title, provider }: ProviderLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : ''
+  const { auth } = usePage().props as any
+  const user = auth?.user
+
+  // Get user initials for avatar fallback
+  const getInitials = (name: string) => {
+    const names = name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+    }
+    return name.substring(0, 2).toUpperCase()
+  }
+
+  const isActive = (href: string) => {
+    if (href === '/provider/dashboard') {
+      return currentPath === href
+    }
+    return currentPath.startsWith(href)
+  }
 
   return (
     <>
       <Head title={title} />
 
       <div className="min-h-screen bg-background">
-        {/* Mobile sidebar */}
-        <div
-          className={cn(
-            "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden",
-            sidebarOpen ? "block" : "hidden"
-          )}
-          onClick={() => setSidebarOpen(false)}
-        >
-          <div
-            className="fixed inset-y-0 left-0 w-64 bg-card border-r shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex h-full flex-col">
-              {/* Mobile Header */}
-              <div className="flex h-16 items-center px-4 border-b relative">
-                <Link href="/" className="flex items-center justify-center gap-2 flex-1 cursor-pointer">
-                  <img src="/kwika-logo.png" alt="Kwika Events" className="h-8 w-auto" />
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-4"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
+        {/* Header Navigation */}
+        <header className="sticky top-0 z-40 w-full border-b bg-background">
+          <div className="container mx-auto px-6 lg:px-12">
+            <div className="flex h-20 items-center justify-between">
+              {/* Left: Logo */}
+              <Link href="/provider/dashboard" className="flex items-center cursor-pointer">
+                <img src="/kwika-logo.png" alt="Kwika Events" className="h-10 w-auto" />
+              </Link>
 
-              {/* Navigation */}
-              <nav className="flex-1 space-y-1 p-4">
-                {navigation.map((item) => {
+              {/* Center: Primary Navigation (Desktop) */}
+              <nav className="hidden md:flex items-center gap-1">
+                {primaryNavigation.map((item) => {
                   const Icon = item.icon
-                  const isActive = currentPath.startsWith(item.href)
+                  const active = isActive(item.href)
 
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        "relative px-4 py-2 text-sm font-semibold transition-colors hover:text-foreground cursor-pointer",
+                        active ? "text-foreground" : "text-muted-foreground"
                       )}
                     >
-                      <Icon className="h-5 w-5" />
-                      {item.name}
-                      {item.badge !== undefined && item.badge > 0 && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {item.badge}
-                        </Badge>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        {item.name}
+                      </div>
+                      {active && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                       )}
                     </Link>
                   )
                 })}
               </nav>
 
-              {/* Mobile Footer */}
-              <div className="border-t p-4">
-                <button
-                  onClick={() => router.post('/logout')}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              {/* Right: User Controls */}
+              <div className="flex items-center gap-4">
+                {/* Switch to Customer Link */}
+                <Link
+                  href="/"
+                  className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
                 >
-                  <LogOut className="h-5 w-5" />
-                  Logout
-                </button>
+                  Switch to Customer
+                </Link>
+
+                {/* User Avatar */}
+                <Avatar className="h-10 w-10 cursor-pointer border-2 border-border">
+                  <AvatarImage src={user?.avatar || provider?.logo || undefined} alt={user?.name || provider?.business_name} />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {user?.name ? getInitials(user.name) : provider?.business_name ? getInitials(provider.business_name) : 'PR'}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Menu Button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMenuOpen(true)}
+                  className="cursor-pointer"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Desktop Sidebar */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-card px-6">
-            {/* Logo */}
-            <Link href="/" className="flex h-16 shrink-0 items-center justify-center gap-2 border-b -mx-6 px-6 cursor-pointer">
-              <img src="/kwika-logo.png" alt="Logo" className="h-8 w-auto" />
-            </Link>
+            {/* Mobile Navigation */}
+            <nav className="md:hidden flex items-center gap-1 overflow-x-auto pb-2 -mx-2 px-2">
+              {primaryNavigation.map((item) => {
+                const Icon = item.icon
+                const active = isActive(item.href)
 
-            {/* Provider Info */}
-            {provider && (
-              <div className="flex items-center gap-3 -mx-2 px-2 py-3 rounded-lg bg-muted/50">
-                {provider.logo ? (
-                  <img
-                    src={`/storage/${provider.logo}`}
-                    alt="Business logo"
-                    className="h-10 w-10 rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{provider.business_name}</p>
-                  <Badge
-                    variant={
-                      provider.verification_status === 'approved'
-                        ? 'default'
-                        : provider.verification_status === 'pending'
-                        ? 'secondary'
-                        : 'destructive'
-                    }
-                    className="text-xs"
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "relative flex-shrink-0 px-3 py-2 text-sm font-semibold transition-colors cursor-pointer",
+                      active ? "text-foreground" : "text-muted-foreground"
+                    )}
                   >
-                    {provider.verification_status}
-                  </Badge>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <nav className="flex flex-1 flex-col">
-              <ul role="list" className="flex flex-1 flex-col gap-y-1">
-                {navigation.map((item) => {
-                  const Icon = item.icon
-                  const isActive = currentPath.startsWith(item.href)
-
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                          isActive
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        )}
-                      >
-                        <Icon className="h-5 w-5" />
-                        {item.name}
-                        {item.badge !== undefined && item.badge > 0 && (
-                          <Badge variant="secondary" className="ml-auto">
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      <Icon className="h-4 w-4" />
+                      {item.name}
+                    </div>
+                    {active && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                    )}
+                  </Link>
+                )
+              })}
             </nav>
-
-            {/* Logout */}
-            <div className="border-t -mx-6 px-6 py-4">
-              <button
-                onClick={() => router.post('/logout')}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                <LogOut className="h-5 w-5" />
-                Logout
-              </button>
-            </div>
           </div>
-        </div>
+        </header>
 
         {/* Main Content */}
-        <div className="lg:pl-64">
-          {/* Top bar */}
-          <div className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
+        <main className="container mx-auto px-6 lg:px-12 py-8">
+          {children}
+        </main>
 
-            {/* Breadcrumb or Title */}
-            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <div className="flex items-center gap-x-4 lg:gap-x-6">
-                <h1 className="text-lg font-semibold">{title}</h1>
+        {/* Slide-out Menu */}
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+          <SheetContent side="right" className="w-[400px] sm:w-[400px] rounded-l-2xl">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="text-2xl font-bold">Menu</SheetTitle>
+            </SheetHeader>
+
+            {/* Featured Card - Optional promotional content */}
+            <div className="mb-6 rounded-xl bg-muted p-4">
+              <div className="flex gap-3 mb-3">
+                <div className="w-20 h-20 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Package className="h-10 w-10 text-primary" />
+                </div>
+                <div className="w-20 h-20 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <LayoutDashboard className="h-10 w-10 text-accent" />
+                </div>
               </div>
+              <h3 className="font-semibold mb-1">New to Kwika?</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Discover tips and best practices to grow your business.
+              </p>
+              <Button variant="outline" size="sm" className="w-full">
+                Get started
+              </Button>
             </div>
 
-            {/* Right side actions */}
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
-              </Button>
+            {/* Menu Items */}
+            <div className="space-y-1">
+              {menuNavigation.map((item) => {
+                const Icon = item.icon
 
-              <Link href="/" className="hidden sm:block">
-                <Button variant="outline" size="sm">
-                  View Site
-                </Button>
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Icon className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-semibold">{item.name}</span>
+                  </Link>
+                )
+              })}
+
+              {/* Additional Menu Items */}
+              <Link
+                href="/provider/settings"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                onClick={() => setMenuOpen(false)}
+              >
+                <Settings className="h-5 w-5 text-muted-foreground" />
+                <span className="font-semibold">Account settings</span>
+              </Link>
+
+              <Link
+                href="/help"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                onClick={() => setMenuOpen(false)}
+              >
+                <HelpCircle className="h-5 w-5 text-muted-foreground" />
+                <span className="font-semibold">Get help</span>
+              </Link>
+
+              <div className="border-t border-border my-4" />
+
+              <Link
+                href="/logout"
+                method="post"
+                as="button"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-muted transition-colors cursor-pointer w-full text-left"
+                onClick={() => setMenuOpen(false)}
+              >
+                <LogOut className="h-5 w-5 text-muted-foreground" />
+                <span className="font-semibold">Log out</span>
               </Link>
             </div>
-          </div>
-
-          {/* Page Content */}
-          <main className="py-6 sm:py-8">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              {children}
-            </div>
-          </main>
-        </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </>
   )

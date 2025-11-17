@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
 import { Switch } from '@/Components/ui/switch'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import { ArrowLeft, Save } from 'lucide-react'
 import { FormEvent } from 'react'
 
@@ -16,16 +17,23 @@ interface Admin {
   admin_role: string
 }
 
+interface ParentCategory {
+  id: number
+  name: string
+}
+
 interface Props {
   admin: Admin
   nextSortOrder: number
+  parentCategories: ParentCategory[]
 }
 
-export default function CategoriesCreate({ admin, nextSortOrder }: Props) {
+export default function CategoriesCreate({ admin, nextSortOrder, parentCategories }: Props) {
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     description: '',
     icon: '',
+    parent_id: null as number | null,
     sort_order: nextSortOrder,
     is_active: true,
   })
@@ -112,6 +120,35 @@ export default function CategoriesCreate({ admin, nextSortOrder }: Props) {
                 </p>
                 {errors.icon && (
                   <p className="text-sm text-red-500">{errors.icon}</p>
+                )}
+              </div>
+
+              {/* Parent Category */}
+              <div className="space-y-2">
+                <Label htmlFor="parent_id">
+                  Parent Category (Optional)
+                </Label>
+                <Select
+                  value={data.parent_id?.toString() ?? ''}
+                  onValueChange={(value) => setData('parent_id', value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className={errors.parent_id ? 'border-red-500' : ''}>
+                    <SelectValue placeholder="None - This is a parent category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None - This is a parent category</SelectItem>
+                    {parentCategories.map((parent) => (
+                      <SelectItem key={parent.id} value={parent.id.toString()}>
+                        {parent.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select a parent category to make this a subcategory, or leave blank to create a parent category
+                </p>
+                {errors.parent_id && (
+                  <p className="text-sm text-red-500">{errors.parent_id}</p>
                 )}
               </div>
 

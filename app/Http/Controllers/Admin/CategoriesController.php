@@ -30,7 +30,8 @@ class CategoriesController extends Controller
         $sortOrder = $request->input('sort_order', 'asc');
 
         // Build query
-        $query = ServiceCategory::withCount(['services'])
+        $query = ServiceCategory::with(['parent', 'children'])
+            ->withCount(['services', 'children'])
             ->when($search, function ($q) use ($search) {
                 return $q->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -59,6 +60,13 @@ class CategoriesController extends Controller
                 'slug' => $category->slug,
                 'description' => $category->description,
                 'icon' => $category->icon,
+                'parent_id' => $category->parent_id,
+                'is_parent' => $category->isParent(),
+                'parent' => $category->parent ? [
+                    'id' => $category->parent->id,
+                    'name' => $category->parent->name,
+                ] : null,
+                'children_count' => $category->children_count,
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,
                 'services_count' => $category->services_count,
@@ -107,6 +115,12 @@ class CategoriesController extends Controller
         // Get the next sort order
         $nextSortOrder = ServiceCategory::max('sort_order') + 1;
 
+        // Get all parent categories for selection
+        $parentCategories = ServiceCategory::parents()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('Admin/Categories/Create', [
             'admin' => [
                 'id' => $admin->id,
@@ -115,6 +129,7 @@ class CategoriesController extends Controller
                 'admin_role' => $admin->admin_role,
             ],
             'nextSortOrder' => $nextSortOrder,
+            'parentCategories' => $parentCategories,
         ]);
     }
 
@@ -133,6 +148,7 @@ class CategoriesController extends Controller
             'name' => 'required|string|max:255|unique:service_categories,name',
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
+            'parent_id' => 'nullable|exists:service_categories,id',
             'sort_order' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ]);
@@ -184,7 +200,14 @@ class CategoriesController extends Controller
             return back()->with('error', 'You do not have permission to edit categories.');
         }
 
-        $category = ServiceCategory::withCount(['services'])->findOrFail($id);
+        $category = ServiceCategory::with(['parent'])->withCount(['services', 'children'])->findOrFail($id);
+
+        // Get all parent categories for selection (excluding current category and its children)
+        $parentCategories = ServiceCategory::parents()
+            ->where('id', '!=', $id)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Admin/Categories/Edit', [
             'admin' => [
@@ -199,12 +222,19 @@ class CategoriesController extends Controller
                 'slug' => $category->slug,
                 'description' => $category->description,
                 'icon' => $category->icon,
+                'parent_id' => $category->parent_id,
+                'parent' => $category->parent ? [
+                    'id' => $category->parent->id,
+                    'name' => $category->parent->name,
+                ] : null,
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,
                 'services_count' => $category->services_count,
+                'children_count' => $category->children_count,
                 'created_at' => $category->created_at->format('M d, Y H:i'),
                 'updated_at' => $category->updated_at->format('M d, Y H:i'),
             ],
+            'parentCategories' => $parentCategories,
         ]);
     }
 
@@ -225,9 +255,23 @@ class CategoriesController extends Controller
             'name' => 'required|string|max:255|unique:service_categories,name,' . $id,
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
+            'parent_id' => 'nullable|exists:service_categories,id',
             'sort_order' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ]);
+
+        // Prevent circular reference: category cannot be its own parent
+        if (isset($validated['parent_id']) && $validated['parent_id'] == $id) {
+            return back()->with('error', 'A category cannot be its own parent.');
+        }
+
+        // Prevent setting a subcategory as parent (only parent categories can be parents)
+        if (isset($validated['parent_id'])) {
+            $parentCategory = ServiceCategory::find($validated['parent_id']);
+            if ($parentCategory && $parentCategory->parent_id !== null) {
+                return back()->with('error', 'You can only select a parent category (not a subcategory) as parent.');
+            }
+        }
 
         $oldValues = $category->only([
             'name', 'description', 'icon', 'sort_order', 'is_active'

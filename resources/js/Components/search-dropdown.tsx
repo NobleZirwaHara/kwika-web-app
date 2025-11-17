@@ -2,12 +2,18 @@ import { Camera, Video, Palette, Music, UtensilsCrossed, Navigation, Building2, 
 import { Input } from "@/Components/ui/input"
 import { useMemo } from "react"
 
+interface Subcategory {
+  id: number
+  name: string
+}
+
 interface Category {
   id: number
   name: string
   slug: string
   description: string
   icon: string
+  subcategories?: Subcategory[]
 }
 
 interface SearchDropdownProps {
@@ -48,20 +54,26 @@ const locationOptions = [
 ]
 
 export function SearchDropdown({ activeField, onClose, onSelect, searchValue, categories = [] }: SearchDropdownProps) {
-  const serviceOptions = useMemo(() => {
-    return categories.map((category, index) => ({
-      id: category.id,
-      icon: iconMap[category.icon] || Camera,
-      name: category.name,
-      description: category.description || `Find ${category.name.toLowerCase()} for your event`,
-      color: colorMap[index % colorMap.length],
-    }))
-  }, [categories])
+  const filteredCategories = useMemo(() => {
+    if (!searchValue) return categories
 
-  const filteredServices = useMemo(() => {
-    if (!searchValue) return serviceOptions
-    return serviceOptions.filter((service) => service.name.toLowerCase().includes(searchValue.toLowerCase()))
-  }, [searchValue, serviceOptions])
+    // Filter categories and subcategories based on search
+    return categories
+      .map(category => {
+        const matchingSubcategories = (category.subcategories || []).filter(sub =>
+          sub.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+
+        if (category.name.toLowerCase().includes(searchValue.toLowerCase()) || matchingSubcategories.length > 0) {
+          return {
+            ...category,
+            subcategories: matchingSubcategories.length > 0 ? matchingSubcategories : category.subcategories
+          }
+        }
+        return null
+      })
+      .filter(Boolean) as Category[]
+  }, [searchValue, categories])
 
   const filteredLocations = useMemo(() => {
     if (!searchValue) return locationOptions
@@ -76,23 +88,39 @@ export function SearchDropdown({ activeField, onClose, onSelect, searchValue, ca
         <div className="p-6 max-h-[400px] overflow-y-auto">
           {activeField === "service" && (
             <div>
-              <h3 className="text-sm font-semibold mb-4">Popular services</h3>
-              <div className="space-y-2">
-                {filteredServices.map((service) => (
-                  <button
-                    key={service.name}
-                    onClick={() => onSelect(service.name, service.id)}
-                    className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
-                  >
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-muted ${service.color}`}>
-                      <service.icon className="h-6 w-6" />
+              <h3 className="text-sm font-semibold mb-4">Browse by category</h3>
+              <div className="space-y-4">
+                {filteredCategories.map((category, categoryIndex) => {
+                  const Icon = iconMap[category.icon] || Camera
+                  const color = colorMap[categoryIndex % colorMap.length]
+
+                  return (
+                    <div key={category.id}>
+                      {/* Parent Category Header */}
+                      <div className="flex items-center gap-2 mb-2 px-2">
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-muted ${color}`}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <h4 className="font-semibold text-sm">{category.name}</h4>
+                      </div>
+
+                      {/* Subcategories */}
+                      {category.subcategories && category.subcategories.length > 0 && (
+                        <div className="ml-10 space-y-1">
+                          {category.subcategories.map((subcategory) => (
+                            <button
+                              key={subcategory.id}
+                              onClick={() => onSelect(subcategory.name, subcategory.id)}
+                              className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted/50 transition-colors text-sm"
+                            >
+                              {subcategory.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium">{service.name}</div>
-                      <div className="text-sm text-muted-foreground">{service.description}</div>
-                    </div>
-                  </button>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}

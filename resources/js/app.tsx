@@ -1,12 +1,16 @@
+//import { configureEcho } from '@laravel/echo-react';
+
+// configureEcho({
+//     broadcaster: 'reverb',
+// });
 import './bootstrap';
-import '../css/globals.css';
 
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { route as ziggyRoute } from 'ziggy-js';
 
-const appName = import.meta.env.VITE_APP_NAME || 'EventHub';
+const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
 
 // Make route helper available globally
 declare global {

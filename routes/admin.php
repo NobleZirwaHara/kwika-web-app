@@ -105,6 +105,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/{id}/refund', [\App\Http\Controllers\Admin\PaymentsController::class, 'refund'])->name('refund');
     });
 
+    // Bookings Management
+    Route::prefix('bookings')->name('bookings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\BookingsController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\BookingsController::class, 'show'])->name('show');
+        Route::put('/{id}/update-status', [\App\Http\Controllers\Admin\BookingsController::class, 'updateStatus'])->name('update-status');
+        Route::put('/{id}/update-payment-status', [\App\Http\Controllers\Admin\BookingsController::class, 'updatePaymentStatus'])->name('update-payment-status');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\BookingsController::class, 'destroy'])->name('destroy');
+    });
+
     // Subscription Plans Management
     Route::prefix('subscription-plans')->name('subscription-plans.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\SubscriptionPlansController::class, 'index'])->name('index');
@@ -146,7 +155,64 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/{id}', [\App\Http\Controllers\Admin\AuditLogsController::class, 'show'])->name('show');
     });
 
-    // Content Management: Events (Phase 3)
-    // Promotions (Phase 5)
-    // Settings, Reports (Phase 8)
+    // Messaging
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MessageController::class, 'index'])->name('index');
+        Route::post('/search-users', [\App\Http\Controllers\Admin\MessageController::class, 'searchUsers'])->name('search-users');
+        Route::post('/start-conversation', [\App\Http\Controllers\Admin\MessageController::class, 'startConversation'])->name('start-conversation');
+        Route::post('/send', [\App\Http\Controllers\Admin\MessageController::class, 'sendAdminMessage'])->name('send');
+    });
+
+    // Third Party Services
+    Route::prefix('third-party-services')->name('third-party-services.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'index'])->name('index');
+        Route::get('/{serviceId}/config', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'getConfig'])->name('get-config');
+        Route::post('/update-config', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'updateConfig'])->name('update-config');
+        Route::post('/test-supabase', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'testSupabase'])->name('test-supabase');
+        Route::post('/test-supabase-realtime', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'testSupabaseRealtime'])->name('test-supabase-realtime');
+        Route::post('/test-mail', [\App\Http\Controllers\Admin\ThirdPartyServiceController::class, 'testMail'])->name('test-mail');
+    });
+
+    // Events Management
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EventsController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\EventsController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\EventsController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\EventsController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\EventsController::class, 'update'])->name('update');
+        Route::put('/{id}/toggle-featured', [\App\Http\Controllers\Admin\EventsController::class, 'toggleFeatured'])->name('toggle-featured');
+        Route::put('/{id}/update-status', [\App\Http\Controllers\Admin\EventsController::class, 'updateStatus'])->name('update-status');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\EventsController::class, 'destroy'])->name('destroy');
+    });
+
+    // Promotions Management
+    Route::prefix('promotions')->name('promotions.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PromotionsController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\PromotionsController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\PromotionsController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\PromotionsController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\PromotionsController::class, 'update'])->name('update');
+        Route::put('/{id}/toggle-active', [\App\Http\Controllers\Admin\PromotionsController::class, 'toggleActive'])->name('toggle-active');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\PromotionsController::class, 'destroy'])->name('destroy');
+    });
+
+    // Reports & Analytics
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('index');
+        Route::get('/revenue', [\App\Http\Controllers\Admin\ReportsController::class, 'revenue'])->name('revenue');
+        Route::get('/bookings', [\App\Http\Controllers\Admin\ReportsController::class, 'bookings'])->name('bookings');
+        Route::get('/users', [\App\Http\Controllers\Admin\ReportsController::class, 'users'])->name('users');
+        Route::get('/providers', [\App\Http\Controllers\Admin\ReportsController::class, 'providers'])->name('providers');
+        Route::get('/products', [\App\Http\Controllers\Admin\ReportsController::class, 'products'])->name('products');
+        Route::get('/promotions-analytics', [\App\Http\Controllers\Admin\ReportsController::class, 'promotionsAnalytics'])->name('promotions-analytics');
+        Route::post('/export/excel', [\App\Http\Controllers\Admin\ReportsController::class, 'exportExcel'])->name('export.excel');
+        Route::post('/export/pdf', [\App\Http\Controllers\Admin\ReportsController::class, 'exportPdf'])->name('export.pdf');
+    });
+
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('update');
+        Route::post('/clear-cache', [\App\Http\Controllers\Admin\SettingsController::class, 'clearCache'])->name('clear-cache');
+    });
 });

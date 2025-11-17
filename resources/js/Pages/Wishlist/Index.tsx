@@ -1,20 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react'
-import { SearchHeader } from '@/Components/search-header'
-import { Footer } from '@/Components/footer'
+import CustomerLayout from '@/Components/CustomerLayout'
 import { Card, CardContent } from '@/Components/ui/card'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
 import { Heart, Star, MapPin, Trash2, ShoppingBag, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-
-interface Category {
-  id: number
-  name: string
-  slug: string
-  description: string
-  icon: string
-}
 
 interface Service {
   id: number
@@ -44,7 +35,6 @@ interface Service {
 
 interface Props {
   services: Service[]
-  categories: Category[]
   auth: {
     user?: {
       id: number
@@ -54,7 +44,7 @@ interface Props {
   }
 }
 
-export default function WishlistIndex({ services, categories, auth }: Props) {
+export default function WishlistIndex({ services, auth }: Props) {
   const [removingId, setRemovingId] = useState<number | null>(null)
 
   const handleRemoveFromWishlist = async (serviceId: number) => {
@@ -88,14 +78,10 @@ export default function WishlistIndex({ services, categories, auth }: Props) {
   }
 
   return (
-    <>
-      <Head title="My Wishlist" />
-      <SearchHeader categories={categories} />
-
-      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-24 pb-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <CustomerLayout title="My Wishlist">
+      <div className="space-y-6">
           {/* Header */}
-          <div className="mb-8">
+          <div>
             <div className="flex items-center gap-3 mb-2">
               <div className="h-12 w-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
                 <Heart className="h-6 w-6 text-white fill-white" />
@@ -262,10 +248,7 @@ export default function WishlistIndex({ services, categories, auth }: Props) {
               </CardContent>
             </Card>
           )}
-        </div>
-      </main>
-
-      <Footer />
-    </>
+      </div>
+    </CustomerLayout>
   )
 }

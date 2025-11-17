@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Broadcasting\RealtimeMessenger;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Service;
+use App\Services\MessageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,15 @@ use Inertia\Inertia;
 
 class BookingController extends Controller
 {
+    protected MessageService $messageService;
+    protected RealtimeMessenger $messenger;
+
+    public function __construct(MessageService $messageService, RealtimeMessenger $messenger)
+    {
+        $this->messageService = $messageService;
+        $this->messenger = $messenger;
+    }
+
     /**
      * Show booking form for a service (only for verified providers)
      */
@@ -115,6 +126,21 @@ class BookingController extends Controller
             'status' => 'pending',
             'payment_status' => 'pending',
         ]);
+
+        // Load the service relationship for the message
+        $booking->load('service');
+
+        // Create conversation and send booking request message
+        try {
+            $message = $this->messageService->sendBookingRequestMessage($booking);
+            $this->messenger->broadcastMessage($message);
+        } catch (\Exception $e) {
+            // Log error but don't fail the booking creation
+            \Log::error('Failed to send booking request message', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()->route('bookings.payment.select', $booking->id);
     }

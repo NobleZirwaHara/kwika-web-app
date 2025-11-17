@@ -71,9 +71,9 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* <div className="md:hidden">
             <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
-          </div>
+          </div> */}
         </div>
       </div>
     </header>

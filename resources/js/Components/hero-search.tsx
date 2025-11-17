@@ -5,12 +5,18 @@ import { SearchDropdown } from "./search-dropdown"
 import { router } from "@inertiajs/react"
 import { Dialog, DialogContent } from "@/Components/ui/dialog"
 
+interface Subcategory {
+  id: number
+  name: string
+}
+
 interface Category {
   id: number
   name: string
   slug: string
   description: string
   icon: string
+  subcategories: Subcategory[]
 }
 
 interface HeroSearchProps {
@@ -24,6 +30,7 @@ export function HeroSearch({ categories = [] }: HeroSearchProps) {
   const [serviceValue, setServiceValue] = useState("")
   const [locationValue, setLocationValue] = useState("")
   const [dateValue, setDateValue] = useState("")
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,9 +44,9 @@ export function HeroSearch({ categories = [] }: HeroSearchProps) {
   const handleSelect = (value: string, categoryId?: number) => {
     if (activeField === "service") {
       setServiceValue(value)
-      // If a category ID is provided, perform search immediately
+      // Store the category ID for later use when search is submitted
       if (categoryId) {
-        performSearch(value, locationValue, categoryId)
+        setSelectedCategoryId(categoryId)
       }
     }
     if (activeField === "location") setLocationValue(value)
@@ -47,33 +54,45 @@ export function HeroSearch({ categories = [] }: HeroSearchProps) {
     setActiveField(null)
   }
 
-  const performSearch = (service?: string, location?: string, categoryId?: number) => {
+  const performSearch = () => {
     const params: any = {}
 
-    // Build search query from service value or passed service
-    const searchService = service || serviceValue
-    const searchLocation = location || locationValue
+    // Use the stored category ID if available
+    if (selectedCategoryId) {
+      params.category = selectedCategoryId
+    } else if (serviceValue) {
+      // If no category ID stored, try to match the service value to a category/subcategory
+      let matchedId = null
 
-    if (searchService) {
-      // Check if the service matches a category name
-      const matchedCategory = categories.find(
-        cat => cat.name.toLowerCase() === searchService.toLowerCase()
+      // First check parent categories
+      const matchedParent = categories.find(
+        cat => cat.name.toLowerCase() === serviceValue.toLowerCase()
       )
 
-      if (matchedCategory) {
-        params.category = matchedCategory.id
+      if (matchedParent) {
+        matchedId = matchedParent.id
       } else {
-        params.query = searchService
+        // Check subcategories
+        for (const category of categories) {
+          const matchedSubcategory = category.subcategories?.find(
+            sub => sub.name.toLowerCase() === serviceValue.toLowerCase()
+          )
+          if (matchedSubcategory) {
+            matchedId = matchedSubcategory.id
+            break
+          }
+        }
+      }
+
+      if (matchedId) {
+        params.category = matchedId
+      } else {
+        params.query = serviceValue
       }
     }
 
-    // Use categoryId if provided directly
-    if (categoryId) {
-      params.category = categoryId
-    }
-
-    if (searchLocation) {
-      params.city = searchLocation
+    if (locationValue) {
+      params.city = locationValue
     }
 
     // Navigate to search page with parameters

@@ -7,6 +7,7 @@ import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
 import { Switch } from '@/Components/ui/switch'
 import { Badge } from '@/Components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import { ArrowLeft, Save, Tag } from 'lucide-react'
 import { FormEvent } from 'react'
 
@@ -17,12 +18,23 @@ interface Admin {
   admin_role: string
 }
 
+interface ParentCategory {
+  id: number
+  name: string
+}
+
 interface Category {
   id: number
   name: string
   slug: string
   description: string | null
   icon: string | null
+  parent_id: number | null
+  parent: {
+    id: number
+    name: string
+  } | null
+  children_count: number
   is_active: boolean
   sort_order: number
   services_count: number
@@ -33,13 +45,15 @@ interface Category {
 interface Props {
   admin: Admin
   category: Category
+  parentCategories: ParentCategory[]
 }
 
-export default function CategoriesEdit({ admin, category }: Props) {
+export default function CategoriesEdit({ admin, category, parentCategories }: Props) {
   const { data, setData, put, processing, errors } = useForm({
     name: category.name,
     description: category.description || '',
     icon: category.icon || '',
+    parent_id: category.parent_id,
     sort_order: category.sort_order,
     is_active: category.is_active,
   })
@@ -170,6 +184,40 @@ export default function CategoriesEdit({ admin, category }: Props) {
                 </p>
                 {errors.icon && (
                   <p className="text-sm text-red-500">{errors.icon}</p>
+                )}
+              </div>
+
+              {/* Parent Category */}
+              <div className="space-y-2">
+                <Label htmlFor="parent_id">
+                  Parent Category (Optional)
+                </Label>
+                <Select
+                  value={data.parent_id?.toString() ?? ''}
+                  onValueChange={(value) => setData('parent_id', value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className={errors.parent_id ? 'border-red-500' : ''}>
+                    <SelectValue placeholder="None - This is a parent category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None - This is a parent category</SelectItem>
+                    {parentCategories.map((parent) => (
+                      <SelectItem key={parent.id} value={parent.id.toString()}>
+                        {parent.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select a parent category to make this a subcategory, or leave blank for a parent category
+                </p>
+                {category.children_count > 0 && (
+                  <p className="text-sm text-amber-600">
+                    Warning: This category has {category.children_count} subcategories. Converting to a subcategory may affect the hierarchy.
+                  </p>
+                )}
+                {errors.parent_id && (
+                  <p className="text-sm text-red-500">{errors.parent_id}</p>
                 )}
               </div>
 
