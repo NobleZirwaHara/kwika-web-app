@@ -13,13 +13,12 @@ class DatabaseSeeder extends Seeder
     {
         // Seed in the correct order due to foreign key constraints
         $this->call([
-            ServiceCategorySeeder::class,
             SubscriptionPlanSeeder::class,
             UserSeeder::class,              // Creates customer users
             ServiceProviderSeeder::class,   // Creates provider users and their business profiles
-            // ServiceSeeder::class,        // TODO: Add when services are created
-            // ReviewSeeder::class,          // TODO: Add when reviews are created
-            // BookingSeeder::class,         // TODO: Add when bookings are created
+            ServiceSeeder::class,           // Creates services for each provider
+            BookingSeeder::class,           // Creates sample bookings for services
+            ReviewSeeder::class,            // Creates reviews for completed bookings
         ]);
 
         $this->command->info('Database seeded successfully!');

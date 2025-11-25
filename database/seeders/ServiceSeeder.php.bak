@@ -219,7 +219,7 @@ class ServiceSeeder extends Seeder
                 ],
             ];
 
-            foreach ($services as $index => $serviceData) {
+            foreach ($services as $serviceData) {
                 $galleryImages = $this->getRotatedImages($images['decor'], $serviceCounter, 7);
 
                 Service::create([
@@ -291,7 +291,7 @@ class ServiceSeeder extends Seeder
                 ],
             ];
 
-            foreach ($services as $index => $serviceData) {
+            foreach ($services as $serviceData) {
                 $galleryImages = $this->getRotatedImages($images['food'], $serviceCounter, 8);
 
                 Service::create([
@@ -406,9 +406,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['decor'], $index, 6);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $floralCategory->id,
@@ -421,13 +419,12 @@ class ServiceSeeder extends Seeder
                 'currency' => 'MWK',
                 'inclusions' => $serviceData['inclusions'],
                 'requirements' => ['Event date', 'Color scheme', 'Venue details', '50% deposit', 'Minimum 1 week notice'],
-                'primary_image' => $galleryImages[0],
-                'gallery_images' => $galleryImages,
+                'primary_image' => '/resized-win/' . $images['decor'][1],
+                'gallery_images' => array_map(fn($img) => '/resized-win/' . $img, array_slice($images['decor'], 0, 6)),
                 'is_active' => true,
                 'requires_deposit' => true,
                 'deposit_percentage' => 50,
             ]);
-
         }
     }
 
@@ -438,7 +435,6 @@ class ServiceSeeder extends Seeder
         $soundCategory = ServiceCategory::where('name', 'PA Systems')->first();
         if (!$soundCategory) return;
 
-        $serviceCounter = 0;
         foreach ($providers as $provider) {
             $services = [
                 [
@@ -464,9 +460,7 @@ class ServiceSeeder extends Seeder
                 ],
             ];
 
-            foreach ($services as $index => $serviceData) {
-                $galleryImages = $this->getRotatedImages($images['sound'], $serviceCounter, 7);
-
+            foreach ($services as $serviceData) {
                 Service::create([
                     'service_provider_id' => $provider->id,
                     'service_category_id' => $soundCategory->id,
@@ -479,14 +473,12 @@ class ServiceSeeder extends Seeder
                     'duration' => 480,
                     'inclusions' => $serviceData['inclusions'],
                     'requirements' => ['Venue details', 'Power source confirmation', 'Event timeline', '50% deposit'],
-                    'primary_image' => $galleryImages[0],
-                    'gallery_images' => $galleryImages,
+                    'primary_image' => '/resized-win/' . $images['sound'][rand(0, count($images['sound'])-1)],
+                    'gallery_images' => array_map(fn($img) => '/resized-win/' . $img, array_slice($images['sound'], 0, 7)),
                     'is_active' => true,
                     'requires_deposit' => true,
                     'deposit_percentage' => 50,
                 ]);
-
-                $serviceCounter++;
             }
         }
     }
@@ -526,9 +518,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['dj'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $djCategory->id,
@@ -547,7 +537,6 @@ class ServiceSeeder extends Seeder
                 'requires_deposit' => true,
                 'deposit_percentage' => 50,
             ]);
-
         }
     }
 
@@ -586,9 +575,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['mc'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $mcCategory->id,
@@ -645,9 +632,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['tent'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $tentCategory->id,
@@ -704,9 +689,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['venue'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $venueCategory->id,
@@ -763,9 +746,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['general'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $rentalCategory->id,
@@ -820,9 +801,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['general'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $plannerCategory->id,
@@ -878,9 +857,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['bridal'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $bridalCategory->id,
@@ -935,9 +912,7 @@ class ServiceSeeder extends Seeder
             ],
         ];
 
-        foreach ($services as $index => $serviceData) {
-            $galleryImages = $this->getRotatedImages($images['groom'], $index, 5);
-
+        foreach ($services as $serviceData) {
             Service::create([
                 'service_provider_id' => $provider->id,
                 'service_category_id' => $groomCategory->id,

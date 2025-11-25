@@ -1,8 +1,11 @@
 
-Update categories with images from a folder and remove that icon next to category name
+Update categories seeder migration with images from the @resized_win folder
+
+Will need to shut down and restart
+
 Check on wishlist functionality and implementation
 Restyle onboarding
-Similar service providers and reviews
+Similar services and reviews
 
 Restyle service view
 
@@ -15,8 +18,6 @@ Add integration with Paychangu
 
 Add Ably as a realtime driver and alternative to Supabase
 
-
-
 Add payment breakdown setting in provider panel and admin panel.. and show the breakdown in pages
 
 
@@ -25,6 +26,7 @@ Provider Dashboard Transformation notes
 Companies will be in sidebar
 Promotions will be in sidebar
 Profile settings will be in sidebar
+Payments should in the sidebar
 Analytics will be included on dashboard page
 Reviews will be on dashboard page.. dashboard should be renamed to overview or something like that
 
@@ -33,3 +35,6 @@ Pricing is not necessary
 Availability is not necessary
 
 Media Gallery will not be shown for now
+
+
+Update ServiceProviderSeeder.php to add more service  providers (w Malawi Names) then add services for those providers, product based on categories available in the system which are listed in @generated_categories.json and use images from ... folder based on image names, each service  must have at least 5 images, in cases where enough images cant be found its, also seed bookings

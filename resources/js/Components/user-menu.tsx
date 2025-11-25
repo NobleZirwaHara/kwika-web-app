@@ -92,14 +92,21 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                 </Link>
               )}
 
-              {/* Messages - Future implementation
-              <Link href="/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="h-5 w-5" />
-                  <span className="font-medium">Messages</span>
-                </div>
-              </Link>
-              */}
+              {isProvider ? (
+                <Link href="/provider/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="h-5 w-5" />
+                    <span className="font-medium">Messages</span>
+                  </div>
+                </Link>
+              ) : (
+                <Link href="/user/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="h-5 w-5" />
+                    <span className="font-medium">Messages</span>
+                  </div>
+                </Link>
+              )}
 
               {isAdmin ? (
                 <Link href="/admin/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">

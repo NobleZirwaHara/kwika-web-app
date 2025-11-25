@@ -65,6 +65,11 @@ class ServiceProvider extends Model
         return $this->hasMany(Service::class);
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);

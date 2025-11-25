@@ -85,7 +85,7 @@ class SubscriptionPlanSeeder extends Seeder
         ];
 
         foreach ($plans as $plan) {
-            \App\SubscriptionPlan::create($plan);
+            \App\Models\SubscriptionPlan::create($plan);
         }
     }
 }

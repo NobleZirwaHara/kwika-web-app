@@ -87,37 +87,31 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     )}
                   </div>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                <CardContent className="p-4 space-y-1">
+                  <h3 className="font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {product.description}
+                  <p className="text-sm text-muted-foreground truncate">
+                    by {product.provider.name}
                   </p>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-                    <MapPin className="h-3 w-3" />
-                    <span>{product.provider.city}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      by {product.provider.name}
-                    </span>
-                    <div className="flex flex-col items-end">
-                      {product.is_on_sale && product.sale_price ? (
-                        <>
-                          <span className="text-xs text-muted-foreground line-through">
-                            {product.currency} {product.regular_price.toFixed(2)}
-                          </span>
-                          <span className="text-lg font-bold text-destructive">
-                            {product.price}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-lg font-bold text-primary">
+                  <p className="text-sm text-muted-foreground truncate">
+                    {product.provider.city}
+                  </p>
+                  <div className="flex items-center pt-1">
+                    {product.is_on_sale && product.sale_price ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-destructive">
                           {product.price}
                         </span>
-                      )}
-                    </div>
+                        <span className="text-xs text-muted-foreground line-through">
+                          {product.currency} {product.regular_price.toFixed(0)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm font-bold text-primary">
+                        {product.price}
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

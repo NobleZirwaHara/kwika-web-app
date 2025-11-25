@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Provider\DashboardController;
+use App\Http\Controllers\Provider\ListingsController;
 use App\Http\Controllers\Provider\MediaController;
 use App\Http\Controllers\Provider\ServiceController;
 use App\Http\Controllers\Provider\SettingsController;
@@ -21,7 +22,7 @@ Route::middleware(['auth', 'provider'])->prefix('provider')->name('provider.')->
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Listings - Combined view for services and products
-    Route::get('/listings', fn () => inertia('Provider/Listings'))->name('listings');
+    Route::get('/listings', [ListingsController::class, 'index'])->name('listings');
 
     // Messages - Provider messaging
     Route::get('/messages', fn () => inertia('Provider/Messages'))->name('messages');

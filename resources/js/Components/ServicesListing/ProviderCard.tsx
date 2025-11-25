@@ -110,37 +110,31 @@ export function ProviderCard({
       </div>
 
       {/* Card content */}
-      <div className="space-y-2">
-        {/* Name and rating */}
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-            {provider.name}
-          </h3>
+      <div className="space-y-1">
+        {/* Name */}
+        <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+          {provider.name}
+        </h3>
+
+        {/* Location */}
+        <p className="text-sm text-muted-foreground truncate">
+          {provider.city}
+        </p>
+
+        {/* Price and rating */}
+        <div className="flex items-center justify-between">
+          {provider.min_price ? (
+            <span className="text-sm font-bold text-primary">
+              From {formatPrice(provider.min_price)}
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground">Contact for pricing</span>
+          )}
           <div className="flex items-center gap-1 shrink-0">
             <Star className="h-3.5 w-3.5 fill-foreground text-foreground" />
             <span className="text-sm font-medium">{provider.rating.toFixed(1)}</span>
           </div>
         </div>
-
-        {/* Location */}
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{provider.city}</span>
-        </div>
-
-        {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-          {provider.description}
-        </p>
-
-        {/* Reviews */}
-        <p className="text-xs text-muted-foreground">
-          {provider.reviews > 0 ? (
-            `${provider.reviews} ${provider.reviews === 1 ? 'review' : 'reviews'}`
-          ) : (
-            'No reviews yet'
-          )}
-        </p>
       </div>
     </Link>
   )

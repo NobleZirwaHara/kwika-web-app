@@ -88,14 +88,16 @@ export function FeaturedServices({ services, isAuthenticated = false }: Featured
               </div>
 
               <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-foreground truncate">{service.provider.city}</h3>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className="text-sm font-bold text-primary">{service.price}</span>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground truncate">{service.name}</p>
-                <p className="text-sm text-muted-foreground truncate">by {service.provider.name}</p>
+                <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                  {service.name}
+                </h3>
+                <p className="text-sm text-muted-foreground truncate">
+                  by {service.provider.name}
+                </p>
+                <p className="text-sm text-muted-foreground truncate">
+                  {service.provider.city}
+                </p>
+                <span className="text-sm font-bold text-primary">{service.price}</span>
               </div>
             </Link>
           ))}

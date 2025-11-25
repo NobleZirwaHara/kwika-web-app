@@ -86,24 +86,44 @@ export default function Home({ categories, featuredProviders, topProviders, feat
   const { auth } = usePage().props as any
   const isAuthenticated = !!auth?.user
 
+  // Category names that have actual images (not placeholders)
+  const categoriesWithImages = [
+    'Photographers',
+    'Videographers',
+    'Decorators',
+    'PA Systems',
+    'Caterers',
+    'Florists',
+    'Venues',
+    'DJs'
+  ]
+
+  // Sort categories: those with images first, then the rest
+  const sortedCategories = [...categories].sort((a, b) => {
+    const aHasImage = categoriesWithImages.includes(a.name)
+    const bHasImage = categoriesWithImages.includes(b.name)
+
+    if (aHasImage && !bHasImage) return -1
+    if (!aHasImage && bHasImage) return 1
+    return 0 // Maintain original order within each group
+  })
+
   return (
     <>
       <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
       <div className="min-h-screen">
         <Header />
         <main>
-          <HeroSearch categories={categories} />
-          <ServiceCategories categories={categories} />
+          <HeroSearch categories={sortedCategories} />
+          <ServiceCategories categories={sortedCategories} />
           <FeaturedServices services={featuredServices} isAuthenticated={isAuthenticated} />
           <FeaturedProducts products={featuredProducts} />
           <FeaturedProviders providers={topProviders} title="Top Service Providers" />
-          <BenefitsSection />
-          <PromotionsSection />
           <EventHighlight
             eyebrowLabel="Kwika"
             eyebrowText="Service Partner Series"
             title="Lunch Tasting for Culinary Creators"
-            description="We're hosting an intimate lunch tasting that brings together every Kwika food service provider—chefs, caterers, bakers, and mixologists—to co-create 2025 menu inspirations and collaborate on premium event experiences."
+            description="An intimate lunch tasting that brings together every food service provider—chefs, caterers, bakers, and mixologists—to co-create 2025 menu inspirations and collaborate on premium event experiences."
             details={[
               { label: "Date", value: "Friday, 12 Dec · 11:30-15:00" },
               { label: "Venue", value: "Kwika Test Kitchen, Lilongwe" },
@@ -113,6 +133,9 @@ export default function Home({ categories, featuredProviders, topProviders, feat
             imageSrc="/elegant-catering-food-display.jpg"
             imageAlt="Kwika lunch tasting setup"
           />
+          {/* <BenefitsSection /> */}
+          <PromotionsSection />
+          
           <Testimonials />
         </main>
         <Footer />

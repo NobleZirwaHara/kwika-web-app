@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($customers as $customer) {
-            \App\User::create($customer);
+            \App\Models\User::create($customer);
         }
     }
 }

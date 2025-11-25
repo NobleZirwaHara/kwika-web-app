@@ -81,15 +81,19 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
               </div>
 
               <div className="space-y-1">
+                <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                  {provider.name}
+                </h3>
+                <p className="text-sm text-muted-foreground truncate">
+                  {provider.location}
+                </p>
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-foreground truncate">{provider.location}</h3>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 fill-foreground text-foreground" />
-                    <span className="text-sm font-medium">{provider.rating.toFixed(2)}</span>
+                    <span className="text-sm font-medium">{provider.rating.toFixed(1)}</span>
+                    <span className="text-sm text-muted-foreground">({provider.reviews})</span>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground truncate">{provider.name}</p>
-                <p className="text-sm text-muted-foreground">({provider.reviews} reviews)</p>
               </div>
             </Link>
           ))}
