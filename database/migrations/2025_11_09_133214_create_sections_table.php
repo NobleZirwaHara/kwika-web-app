@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->string('name');
+            $table->integer('capacity');
+            $table->integer('row_count')->nullable();
+            $table->enum('seat_numbering_type', ['sequential', 'grid', 'custom'])->default('sequential');
             $table->timestamps();
         });
     }
