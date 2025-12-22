@@ -139,17 +139,7 @@ export function HeroSearch({ categories = [] }: HeroSearchProps) {
               Plan your events... kwika
             </h1>
 
-            {/* Mobile Search Button - Shows modal */}
-            <button
-              onClick={() => setIsMobileModalOpen(true)}
-              className="md:hidden w-full flex items-center gap-3 rounded-full border border-border bg-background p-4 shadow-xl"
-            >
-              <Search className="h-5 w-5 text-muted-foreground" />
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold">Search services</p>
-                <p className="text-xs text-muted-foreground">Location • Dates • Guests</p>
-              </div>
-            </button>
+            {/* Mobile - Search handled by sticky mobile nav */}
 
           {/* Desktop Search */}
           <div className="hidden md:block">
