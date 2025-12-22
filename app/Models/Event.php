@@ -39,6 +39,8 @@ class Event extends Model
         'status',
         'is_featured',
         'requires_approval',
+        'requires_seating',
+        'allow_guest_checkout',
         'cover_image',
         'gallery_images',
         'terms_conditions',
@@ -62,6 +64,8 @@ class Event extends Model
             'is_online' => 'boolean',
             'is_featured' => 'boolean',
             'requires_approval' => 'boolean',
+            'requires_seating' => 'boolean',
+            'allow_guest_checkout' => 'boolean',
         ];
     }
 
@@ -74,6 +78,21 @@ class Event extends Model
     public function ticketPackages()
     {
         return $this->hasMany(TicketPackage::class)->orderBy('display_order');
+    }
+
+    public function ticketOrders()
+    {
+        return $this->hasMany(TicketOrder::class);
+    }
+
+    public function eventTickets()
+    {
+        return $this->hasMany(EventTicket::class);
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
     }
 
     public function media()

@@ -45,6 +45,33 @@ Route::get('/products', function () {
 // Ticketing page
 Route::get('/ticketing', [TicketingController::class, 'index'])->name('ticketing');
 
+// Ticket Order routes (authenticated users)
+Route::middleware(['auth'])->prefix('ticket-orders')->name('ticket-orders.')->group(function () {
+    Route::post('/create', [\App\Http\Controllers\TicketOrderController::class, 'create'])->name('create');
+    Route::get('/{order}', [\App\Http\Controllers\TicketOrderController::class, 'show'])->name('show');
+    Route::get('/{order}/payment', [\App\Http\Controllers\TicketOrderController::class, 'payment'])->name('payment');
+    Route::post('/{order}/process-payment', [\App\Http\Controllers\TicketOrderController::class, 'processPayment'])->name('process-payment');
+    Route::get('/{order}/confirmation', [\App\Http\Controllers\TicketOrderController::class, 'confirmation'])->name('confirmation');
+    Route::delete('/{order}', [\App\Http\Controllers\TicketOrderController::class, 'cancel'])->name('cancel');
+});
+
+// My Tickets (authenticated users)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my-tickets', [\App\Http\Controllers\TicketOrderController::class, 'myTickets'])->name('my-tickets');
+    Route::get('/tickets/{ticket}/download', [\App\Http\Controllers\TicketOrderController::class, 'downloadTicket'])->name('tickets.download');
+});
+
+// Payment Webhooks (public, no auth required)
+Route::post('/webhooks/flutterwave', [\App\Http\Controllers\WebhookController::class, 'flutterwave'])->name('webhooks.flutterwave');
+Route::post('/webhooks/stripe', [\App\Http\Controllers\WebhookController::class, 'stripe'])->name('webhooks.stripe');
+Route::post('/webhooks/mpesa', [\App\Http\Controllers\WebhookController::class, 'mpesa'])->name('webhooks.mpesa');
+
+// Event routes (public viewing)
+Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+Route::get('/events/{slug}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+Route::get('/events/{event}/seating', [\App\Http\Controllers\EventController::class, 'seating'])->name('events.seating');
+Route::post('/events/{event}/check-availability', [\App\Http\Controllers\EventController::class, 'checkAvailability'])->name('events.check-availability');
+
 // Search routes
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/api/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
