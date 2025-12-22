@@ -7,6 +7,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProviderOnboardingController;
+use App\Http\Controllers\TicketingController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,6 +36,14 @@ Route::post('/logout', function () {
 
 // Home page - shows categories and featured providers
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Products page (coming soon)
+Route::get('/products', function () {
+    return inertia('Products');
+})->name('products');
+
+// Ticketing page
+Route::get('/ticketing', [TicketingController::class, 'index'])->name('ticketing');
 
 // Search routes
 Route::get('/search', [SearchController::class, 'search'])->name('search');

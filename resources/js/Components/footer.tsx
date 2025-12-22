@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Link } from '@inertiajs/react'
+import { cn } from "@/lib/utils"
 
-export function Footer() {
+interface FooterProps {
+  className?: string
+}
+
+export function Footer({ className }: FooterProps = {}) {
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className={cn("border-t border-border bg-muted/30", className)}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>

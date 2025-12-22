@@ -1,5 +1,5 @@
 import { Header } from "@/Components/header"
-import { HeroSearch } from "@/Components/hero-search"
+import { HeroFeatured } from "@/Components/hero-featured"
 import { ServiceCategories } from "@/Components/service-categories"
 import { FeaturedServices } from "@/Components/featured-services"
 import { FeaturedProducts } from "@/Components/featured-products"
@@ -10,6 +10,7 @@ import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
 import { Head, usePage } from '@inertiajs/react'
 import { EventHighlight } from "@/Components/event-highlight"
+import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
 
 interface Category {
   id: number
@@ -109,12 +110,12 @@ export default function Home({ categories, featuredProviders, topProviders, feat
   })
 
   return (
-    <>
+    <HeroCarouselProvider>
       <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
       <div className="min-h-screen">
         <Header />
         <main>
-          <HeroSearch categories={sortedCategories} />
+          <HeroFeatured />
           <ServiceCategories categories={sortedCategories} />
           <FeaturedServices services={featuredServices} isAuthenticated={isAuthenticated} />
           <FeaturedProducts products={featuredProducts} />
@@ -140,6 +141,6 @@ export default function Home({ categories, featuredProviders, topProviders, feat
         </main>
         <Footer />
       </div>
-    </>
+    </HeroCarouselProvider>
   )
 }
