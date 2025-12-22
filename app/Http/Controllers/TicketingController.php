@@ -36,18 +36,39 @@ class TicketingController extends Controller
                 ];
             });
 
-        // Get unique categories from published events
-        $categories = Event::where('status', 'published')
-            ->distinct()
-            ->pluck('category')
-            ->map(function ($category) {
-                return [
-                    'name' => ucfirst($category),
-                    'slug' => $category,
-                    'icon' => $this->getCategoryIcon($category),
-                ];
-            })
-            ->toArray();
+        // Static categories with images
+        $categories = [
+            [
+                'id' => 'sports',
+                'name' => 'Sports',
+                'slug' => 'sports',
+                'image' => '/ticketing/categories/sports-1.png',
+            ],
+            [
+                'id' => 'music-arts',
+                'name' => 'Music & Arts',
+                'slug' => 'music-arts',
+                'image' => '/ticketing/categories/music-1.png',
+            ],
+            [
+                'id' => 'festivals',
+                'name' => 'Festivals',
+                'slug' => 'festivals',
+                'image' => '/ticketing/categories/festivals-1.png',
+            ],
+            [
+                'id' => 'cars-motorsport',
+                'name' => 'Cars & Motorsport',
+                'slug' => 'cars-motorsport',
+                'image' => '/ticketing/categories/cars-1.png',
+            ],
+            [
+                'id' => 'expos-fairs',
+                'name' => 'Expos & Fairs',
+                'slug' => 'expos-fairs',
+                'image' => '/ticketing/categories/expo-1.png',
+            ],
+        ];
 
         return Inertia::render('Ticketing/Index', [
             'trendingEvents' => $trendingEvents,
@@ -56,22 +77,4 @@ class TicketingController extends Controller
         ]);
     }
 
-    /**
-     * Get icon for event category
-     */
-    private function getCategoryIcon(string $category): string
-    {
-        $icons = [
-            'sports' => '🏈',
-            'concert' => '🎵',
-            'festival' => '🎪',
-            'exhibition' => '🎨',
-            'conference' => '💼',
-            'workshop' => '🛠️',
-            'networking' => '🤝',
-            'other' => '🎉',
-        ];
-
-        return $icons[$category] ?? '🎉';
-    }
 }

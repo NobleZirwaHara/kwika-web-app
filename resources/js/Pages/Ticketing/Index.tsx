@@ -27,8 +27,8 @@ interface Artist {
 interface Category {
   id: string
   name: string
-  icon: string
-  color: string
+  slug: string
+  image: string
 }
 
 interface TicketingIndexProps {
@@ -148,40 +148,34 @@ const defaultArtists: Artist[] = [
 
 const defaultCategories: Category[] = [
   {
-    id: "nfl",
-    name: "NFL",
-    icon: "🏈",
-    color: "from-green-500 to-emerald-600"
+    id: "sports",
+    name: "Sports",
+    slug: "sports",
+    image: "/ticketing/categories/sports-1.png"
   },
   {
-    id: "concerts",
-    name: "Concerts",
-    icon: "🎸",
-    color: "from-red-500 to-pink-600"
-  },
-  {
-    id: "nba",
-    name: "NBA",
-    icon: "🏀",
-    color: "from-orange-500 to-red-600"
-  },
-  {
-    id: "ncaa",
-    name: "NCAA Football",
-    icon: "🏟️",
-    color: "from-blue-500 to-indigo-600"
-  },
-  {
-    id: "theater",
-    name: "Theater",
-    icon: "🎭",
-    color: "from-purple-500 to-violet-600"
+    id: "music-arts",
+    name: "Music & Arts",
+    slug: "music-arts",
+    image: "/ticketing/categories/music-1.png"
   },
   {
     id: "festivals",
     name: "Festivals",
-    icon: "🎪",
-    color: "from-pink-500 to-rose-600"
+    slug: "festivals",
+    image: "/ticketing/categories/festivals-1.png"
+  },
+  {
+    id: "cars-motorsport",
+    name: "Cars & Motorsport",
+    slug: "cars-motorsport",
+    image: "/ticketing/categories/cars-1.png"
+  },
+  {
+    id: "expos-fairs",
+    name: "Expos & Fairs",
+    slug: "expos-fairs",
+    image: "/ticketing/categories/expo-1.png"
   }
 ]
 
@@ -366,7 +360,7 @@ export default function TicketingIndex({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {categories.map((category, index) => (
                   <motion.div
                     key={category.id}
@@ -375,13 +369,14 @@ export default function TicketingIndex({
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
                   >
-                    <div className={cn(
-                      "absolute inset-0 bg-gradient-to-br opacity-90 group-hover:opacity-100 transition-opacity",
-                      category.color
-                    )} />
-                    <div className="relative h-full flex flex-col items-center justify-center p-6">
-                      <div className="text-6xl mb-4">{category.icon}</div>
-                      <h3 className="text-xl font-bold text-white">{category.name}</h3>
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h3 className="text-lg font-bold text-white">{category.name}</h3>
                     </div>
                   </motion.div>
                 ))}
