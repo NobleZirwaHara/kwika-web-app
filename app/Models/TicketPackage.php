@@ -45,6 +45,11 @@ class TicketPackage extends Model
         return $this->belongsTo(Event::class);
     }
 
+    public function eventTickets()
+    {
+        return $this->hasMany(EventTicket::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

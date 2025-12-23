@@ -10,6 +10,7 @@ import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
 import { Head, usePage } from '@inertiajs/react'
 import { EventHighlight } from "@/Components/event-highlight"
+import { KwikaRewards } from "@/Components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
 
 interface Category {
@@ -120,6 +121,7 @@ export default function Home({ categories, featuredProviders, topProviders, feat
           <FeaturedServices services={featuredServices} isAuthenticated={isAuthenticated} />
           <FeaturedProducts products={featuredProducts} />
           <FeaturedProviders providers={topProviders} title="Top Service Providers" />
+          {/* <KwikaRewards /> */}
           <EventHighlight
             eyebrowLabel="Kwika"
             eyebrowText="Service Partner Series"

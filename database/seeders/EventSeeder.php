@@ -107,7 +107,7 @@ class EventSeeder extends Seeder
             [
                 'title' => 'Lake of Stars Music Festival 2026',
                 'description' => '3-day music festival on the shores of Lake Malawi featuring international and local artists.',
-                'category' => 'festival',
+                'category' => 'festivals',
                 'venue_name' => 'Lake Malawi Beach',
                 'venue_city' => 'Mangochi',
                 'cover_image' => '/resized-win/dj-1.jpg',
@@ -123,7 +123,7 @@ class EventSeeder extends Seeder
             [
                 'title' => 'Malawi Food & Wine Expo',
                 'description' => 'Discover the best of Malawian cuisine and wines. Featuring celebrity chefs and wine tasting sessions.',
-                'category' => 'exhibition',
+                'category' => 'expos-fairs',
                 'venue_name' => 'Sunbird Capital',
                 'venue_city' => 'Lilongwe',
                 'cover_image' => '/resized-win/food-7.jpg',
@@ -138,7 +138,7 @@ class EventSeeder extends Seeder
             [
                 'title' => 'Jazz Night Under the Stars',
                 'description' => 'An intimate evening of smooth jazz performances in a beautiful garden setting.',
-                'category' => 'concert',
+                'category' => 'music-arts',
                 'venue_name' => 'Garden Lounge',
                 'venue_city' => 'Lilongwe',
                 'cover_image' => '/resized-win/mc-2.jpg',
@@ -164,6 +164,36 @@ class EventSeeder extends Seeder
                     ['name' => 'VIP', 'price' => 50, 'quantity' => 500],
                     ['name' => 'Covered Stand', 'price' => 25, 'quantity' => 10000],
                     ['name' => 'General Stand', 'price' => 15, 'quantity' => 40000],
+                ],
+            ],
+            [
+                'title' => 'Malawi Rally Championship 2026',
+                'description' => 'Experience the thrill of motorsport! Watch top rally drivers compete on challenging terrain across Malawi.',
+                'category' => 'cars-motorsport',
+                'venue_name' => 'Dzalanyama Forest Reserve',
+                'venue_city' => 'Lilongwe',
+                'cover_image' => '/ticketing/categories/cars-1.png',
+                'start_datetime' => Carbon::parse('2026-05-10 08:00:00'),
+                'end_datetime' => Carbon::parse('2026-05-10 17:00:00'),
+                'max_attendees' => 5000,
+                'packages' => [
+                    ['name' => 'VIP Spectator Pass', 'price' => 100, 'quantity' => 200],
+                    ['name' => 'General Admission', 'price' => 30, 'quantity' => 4800],
+                ],
+            ],
+            [
+                'title' => 'Malawi Auto Show & Classic Car Exhibition',
+                'description' => 'The biggest car show in Malawi featuring classic cars, supercars, and the latest automotive innovations.',
+                'category' => 'cars-motorsport',
+                'venue_name' => 'Gateway Mall Parking',
+                'venue_city' => 'Lilongwe',
+                'cover_image' => '/ticketing/categories/cars-2.png',
+                'start_datetime' => Carbon::parse('2026-07-20 09:00:00'),
+                'end_datetime' => Carbon::parse('2026-07-20 18:00:00'),
+                'max_attendees' => 3000,
+                'packages' => [
+                    ['name' => 'Early Bird', 'price' => 20, 'quantity' => 1000],
+                    ['name' => 'Regular Entry', 'price' => 35, 'quantity' => 2000],
                 ],
             ],
         ];

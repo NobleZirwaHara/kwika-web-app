@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Link, usePage, router } from '@inertiajs/react'
-import { Search } from 'lucide-react'
+import { Search, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
+import { useCart } from '@/contexts/CartContext'
+import { Button } from '@/Components/ui/button'
 
 interface Tab {
   id: string
@@ -120,6 +122,7 @@ interface MobileNavTabsProps {
 
 export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
   const { url } = usePage()
+  const { cart } = useCart()
 
   // Determine active tab based on current URL
   const getActiveTab = () => {
@@ -142,14 +145,28 @@ export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
   return (
     <div className="md:hidden bg-white dark:bg-background sticky top-0 z-50 shadow-sm">
       <div className="px-6 pt-5 pb-0">
-        {/* Search Bar */}
-        <button
-          onClick={handleSearchClick}
-          className="w-full flex items-center justify-center gap-3 rounded-full border border-border/20 bg-white dark:bg-card shadow-md hover:shadow-lg transition-all p-4 mb-5"
-        >
-          <Search className="h-5 w-5 text-foreground/80" />
-          <span className="text-base font-semibold text-foreground">Start your search</span>
-        </button>
+        {/* Search Bar with Cart */}
+        <div className="flex items-center gap-3 mb-5">
+          <button
+            onClick={handleSearchClick}
+            className="flex-1 flex items-center justify-center gap-3 rounded-full border border-border/20 bg-white dark:bg-card shadow-md hover:shadow-lg transition-all p-4"
+          >
+            <Search className="h-5 w-5 text-foreground/80" />
+            <span className="text-base font-semibold text-foreground">Start your search</span>
+          </button>
+
+          {/* Cart Icon */}
+          <Link href="/cart" className="relative">
+            <Button variant="outline" size="icon" className="rounded-full h-12 w-12 shadow-md">
+              <ShoppingCart className="h-5 w-5" />
+              {cart.total_items > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                  {cart.total_items > 99 ? '99+' : cart.total_items}
+                </span>
+              )}
+            </Button>
+          </Link>
+        </div>
 
         {/* Tabs */}
         <div className="flex items-start justify-around border-b border-border/10">

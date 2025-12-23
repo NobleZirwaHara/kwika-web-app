@@ -37,16 +37,27 @@ Route::post('/logout', function () {
 // Home page - shows categories and featured providers
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Products page (coming soon)
-Route::get('/products', function () {
-    return inertia('Products');
-})->name('products');
+// Products page
+Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('products');
+Route::get('/products/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+
+// Cart routes (works for both guests and authenticated users)
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CartController::class, 'index'])->name('index');
+    Route::get('/data', [\App\Http\Controllers\CartController::class, 'show'])->name('show');
+    Route::get('/count', [\App\Http\Controllers\CartController::class, 'count'])->name('count');
+    Route::post('/add', [\App\Http\Controllers\CartController::class, 'addItem'])->name('add');
+    Route::patch('/items/{itemId}', [\App\Http\Controllers\CartController::class, 'updateItem'])->name('update');
+    Route::delete('/items/{itemId}', [\App\Http\Controllers\CartController::class, 'removeItem'])->name('remove');
+    Route::delete('/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('clear');
+});
 
 // Ticketing page
 Route::get('/ticketing', [TicketingController::class, 'index'])->name('ticketing');
 
 // Ticket Order routes (authenticated users)
 Route::middleware(['auth'])->prefix('ticket-orders')->name('ticket-orders.')->group(function () {
+    Route::post('/checkout', [\App\Http\Controllers\TicketOrderController::class, 'checkout'])->name('checkout');
     Route::post('/create', [\App\Http\Controllers\TicketOrderController::class, 'create'])->name('create');
     Route::get('/{order}', [\App\Http\Controllers\TicketOrderController::class, 'show'])->name('show');
     Route::get('/{order}/payment', [\App\Http\Controllers\TicketOrderController::class, 'payment'])->name('payment');

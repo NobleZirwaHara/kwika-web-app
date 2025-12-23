@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button"
-import { Search, Heart } from "lucide-react"
+import { Search, Heart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { router, Link } from "@inertiajs/react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -27,7 +27,7 @@ const defaultEvents: FeaturedEvent[] = [
     title: "Wedding Photography",
     description: "Professional event photographers ready to capture your special moments",
     ctaText: "Browse Photographers",
-    ctaLink: "/search?query=photographers",
+    ctaLink: "/search?category=35",
     backgroundType: 'image',
     backgroundValue: '/resized-win/bride-groom-shoot-3.jpg',
     favoriteCount: "12.6K"
@@ -37,7 +37,7 @@ const defaultEvents: FeaturedEvent[] = [
     title: "Event Catering",
     description: "Top-rated caterers for events of any size",
     ctaText: "Find Caterers",
-    ctaLink: "/search?query=catering",
+    ctaLink: "/search?category=35",
     backgroundType: 'image',
     backgroundValue: '/resized-win/food-5.jpg',
     favoriteCount: "8.3K"
@@ -47,7 +47,7 @@ const defaultEvents: FeaturedEvent[] = [
     title: "Event Decor",
     description: "Transform your venue with professional decorators",
     ctaText: "Browse Decorators",
-    ctaLink: "/search?query=decorators",
+    ctaLink: "/search?category=35",
     backgroundType: 'image',
     backgroundValue: '/resized-win/decor-3.jpg',
     favoriteCount: "5.1K"
@@ -67,7 +67,7 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % events.length)
-    }, 8000) // Change slide every 8 seconds
+    }, 5000) // Change slide every 5 seconds
 
     return () => clearInterval(interval)
   }, [events.length, setActiveSlide])
@@ -101,7 +101,7 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
         </form>
 
         {/* Featured Event Card */}
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSlide}
@@ -123,13 +123,13 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
                       alt=""
                       className="w-full h-full object-cover"
                     />
-                    {/* Gradient overlays for better text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-900/95 via-purple-800/70 to-transparent" />
+                    {/* Gradient overlays for better text readability - teal/blue theme */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.25_0.12_215)]/95 via-[oklch(0.35_0.14_215)]/70 to-transparent" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                     {/* Geometric pattern overlay */}
                     <div className="absolute inset-0 opacity-20">
-                      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl" />
-                      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" />
+                      <div className="absolute top-0 right-0 w-96 h-96 bg-[oklch(0.58_0.16_215)]/30 rounded-full blur-3xl" />
+                      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[oklch(0.48_0.14_205)]/30 rounded-full blur-3xl" />
                     </div>
                   </>
                 )}
@@ -158,7 +158,7 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
                         <Button
                           size="lg"
                           variant="outline"
-                          className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-900 text-lg px-8 py-6 rounded-xl transition-all duration-300"
+                          className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-6 rounded-xl transition-all duration-300"
                         >
                           {currentEvent.ctaText}
                         </Button>
@@ -212,6 +212,26 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
               )}
             </motion.div>
           </AnimatePresence>
+
+          {/* Navigation Arrows - appear on hover */}
+          {events.length > 1 && (
+            <div className="absolute bottom-6 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button
+                onClick={() => setActiveSlide((prev) => (prev - 1 + events.length) % events.length)}
+                className="bg-black/80 backdrop-blur-sm text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/90 transition-colors"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setActiveSlide((prev) => (prev + 1) % events.length)}
+                className="bg-black/80 backdrop-blur-sm text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/90 transition-colors"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

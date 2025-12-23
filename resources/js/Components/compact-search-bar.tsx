@@ -82,7 +82,7 @@ export function CompactSearchBar({ categories = [], className = "" }: CompactSea
             onFocus={() => setActiveField("service")}
             onKeyPress={handleKeyPress}
             placeholder="Service"
-            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 rounded-l-full transition-colors bg-transparent border-none outline-none w-32 cursor-pointer"
+            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 rounded-l-full transition-colors bg-transparent border-none outline-none w-32 cursor-pointer text-foreground placeholder:text-muted-foreground"
           />
           {activeField === "service" && (
             <SearchDropdown
@@ -105,7 +105,7 @@ export function CompactSearchBar({ categories = [], className = "" }: CompactSea
             onFocus={() => setActiveField("location")}
             onKeyPress={handleKeyPress}
             placeholder="Location"
-            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 transition-colors bg-transparent border-none outline-none w-32 cursor-pointer"
+            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 transition-colors bg-transparent border-none outline-none w-32 cursor-pointer text-foreground placeholder:text-muted-foreground"
           />
           {activeField === "location" && (
             <SearchDropdown
@@ -128,7 +128,7 @@ export function CompactSearchBar({ categories = [], className = "" }: CompactSea
             onFocus={() => setActiveField("date")}
             onKeyPress={handleKeyPress}
             placeholder="Date"
-            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 transition-colors bg-transparent border-none outline-none w-32 cursor-pointer"
+            className="px-6 py-3 text-sm font-medium hover:bg-primary/10 transition-colors bg-transparent border-none outline-none w-32 cursor-pointer text-foreground placeholder:text-muted-foreground"
           />
           {activeField === "date" && (
             <SearchDropdown

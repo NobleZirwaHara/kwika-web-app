@@ -27,6 +27,47 @@ class TicketOrderController extends Controller
     }
 
     /**
+     * Show checkout page.
+     */
+    public function checkout(Request $request)
+    {
+        $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'packages' => 'required|array|min:1',
+            'packages.*.package_id' => 'required|exists:ticket_packages,id',
+            'packages.*.quantity' => 'required|integer|min:1|max:10',
+        ]);
+
+        $event = Event::with('serviceProvider')->findOrFail($request->event_id);
+        
+        // Get selected ticket packages with details
+        $selectedTickets = collect($request->packages)->map(function ($item) {
+            $package = TicketPackage::findOrFail($item['package_id']);
+            return [
+                'package_id' => $package->id,
+                'quantity' => $item['quantity'],
+                'package' => [
+                    'id' => $package->id,
+                    'name' => $package->name,
+                    'price' => $package->price,
+                    'currency' => $package->currency,
+                ],
+            ];
+        });
+
+        // Calculate total
+        $totalAmount = $selectedTickets->sum(function ($ticket) {
+            return $ticket['package']['price'] * $ticket['quantity'];
+        });
+
+        return Inertia::render('Ticketing/Checkout', [
+            'event' => $event,
+            'selectedTickets' => $selectedTickets,
+            'totalAmount' => $totalAmount,
+        ]);
+    }
+
+    /**
      * Create a new ticket order.
      */
     public function create(Request $request)

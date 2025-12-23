@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
-import { Calendar, MapPin, Clock, Users, Share2, Heart } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { format } from 'date-fns'
 
@@ -49,7 +49,7 @@ interface Props {
   similarEvents: Event[]
 }
 
-export default function EventDetail({ event, ticketPackages, seatingData, similarEvents }: Props) {
+export default function EventDetail({ event, ticketPackages, similarEvents }: Props) {
   const [selectedPackages, setSelectedPackages] = useState<Record<number, number>>({})
 
   const handleQuantityChange = (packageId: number, quantity: number) => {
@@ -76,18 +76,15 @@ export default function EventDetail({ event, ticketPackages, seatingData, simila
   const handleProceedToCheckout = () => {
     if (getTotalTickets() === 0) return
 
-    // Navigate to checkout with selected packages
-    router.post(route('ticket-orders.create'), {
+    // Navigate to checkout page with selected packages
+    const packages = Object.entries(selectedPackages).map(([packageId, quantity]) => ({
+      package_id: parseInt(packageId),
+      quantity
+    }))
+
+    router.post(route('ticket-orders.checkout'), {
       event_id: event.id,
-      tickets: Object.entries(selectedPackages).map(([packageId, quantity]) => ({
-        package_id: parseInt(packageId),
-        quantity,
-        attendees: Array.from({ length: quantity }, () => ({
-          name: '',
-          email: '',
-          phone: ''
-        }))
-      }))
+      packages: packages
     })
   }
 
@@ -104,6 +101,18 @@ export default function EventDetail({ event, ticketPackages, seatingData, simila
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+          {/* Back Button */}
+          <div className="absolute top-4 left-4 lg:top-6 lg:left-8 z-10">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => window.history.back()}
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 rounded-full w-10 h-10"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-8">
             <div className="container mx-auto max-w-7xl">
@@ -213,7 +222,7 @@ export default function EventDetail({ event, ticketPackages, seatingData, simila
                           </div>
                         </div>
 
-                        {pkg.features && pkg.features.length > 0 && (
+                        {pkg.features && Array.isArray(pkg.features) && pkg.features.length > 0 && (
                           <ul className="text-sm text-muted-foreground mb-3 space-y-1">
                             {pkg.features.map((feature, idx) => (
                               <li key={idx} className="flex items-center gap-2">

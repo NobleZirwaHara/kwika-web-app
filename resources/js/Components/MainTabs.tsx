@@ -16,7 +16,7 @@ const tabs: Tab[] = [
     label: 'Services',
     href: '/',
     icon: (
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
         {/* Simple globe - global services */}
 
         {/* Globe circle */}
@@ -42,7 +42,7 @@ const tabs: Tab[] = [
     label: 'Products',
     href: '/products',
     icon: (
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
         {/* Shopping bag with colorful elements */}
         <defs>
           <linearGradient id="bagGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -88,7 +88,7 @@ const tabs: Tab[] = [
     label: 'Ticketing',
     href: '/ticketing',
     icon: (
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
         {/* Event ticket with vibrant colors */}
         <defs>
           <linearGradient id="ticketGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -150,23 +150,7 @@ export default function MainTabs() {
 
   return (
     <div className="w-auto">
-      <div className="relative flex items-center justify-between bg-white dark:bg-card rounded-full p-1 shadow-md border border-border/50">
-        {/* Animated background indicator */}
-        <motion.div
-          className="absolute h-[calc(100%-6px)] bg-primary rounded-full"
-          initial={false}
-          animate={{
-            left: `${tabs.findIndex(t => t.id === activeTab) * (100 / tabs.length)}%`,
-            width: `${100 / tabs.length - 2}%`,
-          }}
-          transition={{
-            type: 'spring',
-            stiffness: 400,
-            damping: 30,
-          }}
-          style={{ top: '3px', marginLeft: '1%' }}
-        />
-
+      <div className="relative flex items-center gap-8">
         {/* Tab buttons */}
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id
@@ -176,49 +160,52 @@ export default function MainTabs() {
               key={tab.id}
               href={tab.href}
               className={cn(
-                'relative z-10 flex flex-col items-center justify-center gap-0.5 py-1.5 px-7 rounded-full transition-all duration-300',
+                'relative flex items-center gap-2 py-4 px-1 transition-all duration-200',
                 'min-w-0',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
               )}
             >
-              {/* Icon with animation */}
-              <motion.div
-                animate={{
-                  scale: isActive ? 1.1 : 1,
-                  rotateZ: isActive ? [0, -10, 10, -5, 5, 0] : 0,
-                }}
-                transition={{
-                  scale: { type: 'spring', stiffness: 400, damping: 25 },
-                  rotateZ: { duration: 0.5 },
-                }}
+              {/* Icon */}
+              <div
                 className={cn(
-                  'transition-colors duration-300',
-                  isActive ? 'text-primary-foreground' : 'text-foreground/60'
+                  'transition-colors duration-200',
+                  isActive ? 'text-foreground' : 'text-foreground/60 hover:text-foreground/80'
                 )}
               >
                 {tab.icon}
-              </motion.div>
+              </div>
 
-              {/* Label with smooth color transition */}
-              <motion.span
-                animate={{
-                  y: isActive ? -1 : 0,
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              {/* Label */}
+              <span
                 className={cn(
-                  'text-[10px] font-semibold transition-colors duration-300 whitespace-nowrap',
-                  isActive ? 'text-primary-foreground' : 'text-foreground/70'
+                  'text-[15px] font-medium transition-colors duration-200 whitespace-nowrap',
+                  isActive ? 'text-foreground' : 'text-foreground/70 hover:text-foreground/90'
                 )}
               >
                 {tab.label}
-              </motion.span>
+              </span>
 
-              {/* Subtle hover effect */}
+              {/* Bottom border underline for active tab */}
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground"
+                initial={false}
+                animate={{
+                  scaleX: isActive ? 1 : 0,
+                  opacity: isActive ? 1 : 0,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 500,
+                  damping: 30,
+                }}
+              />
+
+              {/* Hover underline for inactive tabs */}
               {!isActive && (
                 <motion.div
-                  className="absolute inset-0 rounded-full bg-muted/50"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground/20"
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
                   transition={{ duration: 0.2 }}
                 />
               )}

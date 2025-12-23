@@ -27,6 +27,7 @@ class TicketingController extends Controller
 
                 return [
                     'id' => $event->id,
+                    'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j • g:i A'),
                     'price' => $minPrice ? 'From MWK ' . number_format($minPrice) : 'TBA',

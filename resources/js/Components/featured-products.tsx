@@ -55,7 +55,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           {products.slice(0, 8).map((product) => (
             <Link
               key={product.id}
-              href={`/providers/${product.provider.slug}`}
+              href={`/products/${product.slug}`}
               className="group"
             >
               <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
