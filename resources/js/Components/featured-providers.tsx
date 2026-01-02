@@ -2,6 +2,7 @@ import { Badge } from "@/Components/ui/badge"
 import { Star, Heart } from "lucide-react"
 import { useRef, useState } from "react"
 import { Link } from "@inertiajs/react"
+import { ScrollArrows } from "@/Components/ui/scroll-arrows"
 
 interface Provider {
   id: number
@@ -44,11 +45,13 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
           <h2 className="text-2xl font-semibold font-[family-name:var(--font-heading)]">{title}</h2>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <div className="relative">
+          <ScrollArrows scrollRef={scrollRef} />
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
           {providers.map((provider) => (
             <Link
               key={provider.id}
@@ -97,6 +100,7 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
               </div>
             </Link>
           ))}
+          </div>
         </div>
       </div>
     </section>

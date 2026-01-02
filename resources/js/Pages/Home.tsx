@@ -1,14 +1,13 @@
 import { Header } from "@/Components/header"
 import { HeroFeatured } from "@/Components/hero-featured"
 import { ServiceCategories } from "@/Components/service-categories"
-import { FeaturedServices } from "@/Components/featured-services"
 import { FeaturedProducts } from "@/Components/featured-products"
 import { FeaturedProviders } from "@/Components/featured-providers"
 import { BenefitsSection } from "@/Components/benefits-section"
 import { PromotionsSection } from "@/Components/promotions-section"
 import { Testimonials } from "@/Components/testimonials"
 import { Footer } from "@/Components/footer"
-import { Head, usePage } from '@inertiajs/react'
+import { Head } from '@inertiajs/react'
 import { EventHighlight } from "@/Components/event-highlight"
 import { KwikaRewards } from "@/Components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
@@ -38,24 +37,6 @@ interface Provider {
   featured: boolean
 }
 
-interface Service {
-  id: number
-  name: string
-  slug: string
-  description: string
-  price: string
-  base_price: number
-  currency: string
-  image: string | null
-  category: string | null
-  provider: {
-    id: number
-    name: string
-    slug: string
-    city: string
-  }
-}
-
 interface Product {
   id: number
   name: string
@@ -80,36 +61,12 @@ interface HomeProps {
   categories: Category[]
   featuredProviders: Provider[]
   topProviders: Provider[]
-  featuredServices: Service[]
+  lilongweProviders: Provider[]
+  newProviders: Provider[]
   featuredProducts: Product[]
 }
 
-export default function Home({ categories, featuredProviders, topProviders, featuredServices, featuredProducts }: HomeProps) {
-  const { auth } = usePage().props as any
-  const isAuthenticated = !!auth?.user
-
-  // Category names that have actual images (not placeholders)
-  const categoriesWithImages = [
-    'Photographers',
-    'Videographers',
-    'Decorators',
-    'PA Systems',
-    'Caterers',
-    'Florists',
-    'Venues',
-    'DJs'
-  ]
-
-  // Sort categories: those with images first, then the rest
-  const sortedCategories = [...categories].sort((a, b) => {
-    const aHasImage = categoriesWithImages.includes(a.name)
-    const bHasImage = categoriesWithImages.includes(b.name)
-
-    if (aHasImage && !bHasImage) return -1
-    if (!aHasImage && bHasImage) return 1
-    return 0 // Maintain original order within each group
-  })
-
+export default function Home({ categories, featuredProviders, topProviders, lilongweProviders, newProviders, featuredProducts }: HomeProps) {
   return (
     <HeroCarouselProvider>
       <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
@@ -117,11 +74,12 @@ export default function Home({ categories, featuredProviders, topProviders, feat
         <Header />
         <main>
           <HeroFeatured />
-          <ServiceCategories categories={sortedCategories} />
-          <FeaturedServices services={featuredServices} isAuthenticated={isAuthenticated} />
+          <ServiceCategories categories={categories} />
           <FeaturedProducts products={featuredProducts} />
-          <FeaturedProviders providers={topProviders} title="Top Service Providers" />
-          {/* <KwikaRewards /> */}
+          <FeaturedProviders providers={lilongweProviders} title="Providers in Lilongwe" />
+          <FeaturedProviders providers={topProviders} title="Top Providers" />
+          <FeaturedProviders providers={newProviders} title="New to the Platform" />
+          <KwikaRewards />
           <EventHighlight
             eyebrowLabel="Kwika"
             eyebrowText="Service Partner Series"

@@ -63,13 +63,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{id}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('destroy');
     });
 
-    // Services Management
+    // Services Management (legacy - redirects handled in controller)
     Route::prefix('services')->name('services.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\ServicesController::class, 'index'])->name('index');
         Route::get('/{id}/edit', [\App\Http\Controllers\Admin\ServicesController::class, 'edit'])->name('edit');
         Route::put('/{id}', [\App\Http\Controllers\Admin\ServicesController::class, 'update'])->name('update');
         Route::put('/{id}/toggle-active', [\App\Http\Controllers\Admin\ServicesController::class, 'toggleActive'])->name('toggle-active');
         Route::delete('/{id}', [\App\Http\Controllers\Admin\ServicesController::class, 'destroy'])->name('destroy');
+    });
+
+    // Provider Listings Management (combined services & products view)
+    Route::prefix('provider-listings')->name('provider-listings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ProviderListingsController::class, 'index'])->name('index');
+        Route::put('/services/{id}/toggle-status', [\App\Http\Controllers\Admin\ProviderListingsController::class, 'toggleServiceStatus'])->name('services.toggle-status');
+        Route::put('/products/{id}/toggle-status', [\App\Http\Controllers\Admin\ProviderListingsController::class, 'toggleProductStatus'])->name('products.toggle-status');
     });
 
     // Categories Management

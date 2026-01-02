@@ -52,8 +52,9 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('clear');
 });
 
-// Ticketing page
+// Ticketing pages
 Route::get('/ticketing', [TicketingController::class, 'index'])->name('ticketing');
+Route::get('/ticketing/organizer/{slug}', [TicketingController::class, 'organizer'])->name('ticketing.organizer');
 
 // Ticket Order routes (authenticated users)
 Route::middleware(['auth'])->prefix('ticket-orders')->name('ticket-orders.')->group(function () {

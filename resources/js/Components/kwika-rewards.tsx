@@ -42,7 +42,7 @@ export function KwikaRewards() {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
-        <div className="relative overflow-hidden rounded-3xl bg-[#84cc16] p-8 lg:p-12 min-h-[400px] lg:min-h-[450px]">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] p-8 lg:p-12 min-h-[400px] lg:min-h-[450px]">
           {/* Floating Sticker Icons */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
 
@@ -123,9 +123,9 @@ export function KwikaRewards() {
               </StickerBadge>
             </motion.div>
 
-            {/* Far right bottom - Percent */}
+            {/* Far right - Percent */}
             <motion.div
-              className="absolute bottom-12 right-8 lg:right-16 hidden lg:block"
+              className="absolute bottom-12 left-[52%] lg:left-[50%] hidden lg:block"
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
             >
@@ -138,18 +138,21 @@ export function KwikaRewards() {
 
           {/* Content */}
           <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-center gap-8 lg:gap-12 h-full">
-            {/* Phone Mockup - Left Side */}
-            <div className="flex-shrink-0 w-56 lg:w-64 order-1 lg:order-1">
+            {/* Phone Mockup and Icons - Left Side (60%) */}
+            <div className="flex-shrink-0 w-full lg:w-3/5 flex justify-center order-1 lg:order-1" style={{ perspective: '1000px' }}>
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="relative"
-                style={{ transform: 'rotate(-6deg)' }}
+                className="relative w-64 lg:w-72"
+                style={{ 
+                  transform: 'rotateY(-15deg) rotateX(5deg)',
+                  transformStyle: 'preserve-3d'
+                }}
               >
                 {/* Phone frame */}
-                <div className="relative bg-gray-900 rounded-[2.5rem] p-1.5 shadow-2xl">
+                <div className="relative bg-gray-900 rounded-[2.5rem] p-1.5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)]" style={{ transform: 'translateZ(20px)' }}>
                   <div className="bg-white rounded-[2rem] overflow-hidden">
                     {/* Phone screen content */}
                     <div className="aspect-[9/17] bg-white">
@@ -201,13 +204,13 @@ export function KwikaRewards() {
               </motion.div>
             </div>
 
-            {/* Text Content - Right Side */}
+            {/* Text Content - Right Side (40%) */}
             <motion.div
               initial={{ x: 30, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex-1 text-center lg:text-left order-2 lg:order-2 lg:pl-8"
+              className="w-full lg:w-2/5 text-center lg:text-left order-2 lg:order-2"
             >
               {/* Badge */}
               <div className="flex items-center justify-center lg:justify-start gap-2 mb-3">
@@ -216,25 +219,27 @@ export function KwikaRewards() {
               </div>
 
               {/* Heading */}
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 leading-[1.1] tracking-tight">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-4 leading-[1.05] tracking-tight">
                 Introducing<br />
                 Kwika<br />
                 Rewards
               </h2>
 
               {/* Description */}
-              <p className="text-base lg:text-lg text-gray-800 mb-6 max-w-sm">
+              <p className="text-base lg:text-lg text-gray-800 mb-6 mx-auto lg:mx-0 max-w-sm">
                 It pays to plan, book, and share.<br />
                 Join now for MWK 5,000 off your first booking.
               </p>
 
               {/* CTA Button */}
-              <Button
-                size="lg"
-                className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-8 py-6 text-base font-semibold"
-              >
-                Learn more
-              </Button>
+              <div className="flex justify-center lg:justify-start">
+                <Button
+                  size="lg"
+                  className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-8 py-6 text-base font-semibold"
+                >
+                  Learn more
+                </Button>
+              </div>
             </motion.div>
           </div>
         </div>

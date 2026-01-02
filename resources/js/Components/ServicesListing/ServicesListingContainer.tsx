@@ -48,6 +48,7 @@ interface ServicesListingContainerProps {
   }
   totalResults: number
   className?: string
+  hideListingTypeToggle?: boolean
 }
 
 export function ServicesListingContainer({
@@ -57,7 +58,8 @@ export function ServicesListingContainer({
   cities,
   searchParams,
   totalResults,
-  className
+  className,
+  hideListingTypeToggle = false
 }: ServicesListingContainerProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [favorites, setFavorites] = useState<Set<number>>(new Set())
@@ -147,10 +149,12 @@ export function ServicesListingContainer({
       <div className="space-y-4 mb-6">
         {/* Top Row: Listing Type & View Mode */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <ListingTypeToggle
-            value={listingType}
-            onChange={handleListingTypeChange}
-          />
+          {!hideListingTypeToggle && (
+            <ListingTypeToggle
+              value={listingType}
+              onChange={handleListingTypeChange}
+            />
+          )}
 
           <div className="flex items-center gap-3">
             {/* Mobile Filter Button */}

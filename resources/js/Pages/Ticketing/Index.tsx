@@ -306,7 +306,7 @@ export default function TicketingIndex({
 
   return (
     <>
-      <Head title="Ticketing - Find Live Events & Sports" />
+      <Head title="Events & Ticketing - Find Live Events & Sports" />
       <div className="min-h-screen bg-[#2b6068] text-white">
         <Header />
 
@@ -385,7 +385,7 @@ export default function TicketingIndex({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                     onClick={() => router.get(`/events/${event.slug}`)}
-                    className="group relative bg-[oklch(0.30_0.16_215)] rounded-xl overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                    className="group relative bg-white rounded-xl overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer shadow-lg"
                   >
                     {/* Event Image */}
                     <div className="relative aspect-[4/3] overflow-hidden">
@@ -400,12 +400,12 @@ export default function TicketingIndex({
                           e.stopPropagation()
                           toggleFavorite(event.id)
                         }}
-                        className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[#2b6068]/60 backdrop-blur-sm flex items-center justify-center hover:bg-[#2b6068]/80 transition-colors"
+                        className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors"
                       >
                         <Heart
                           className={cn(
                             "h-5 w-5 transition-colors",
-                            favorites.includes(event.id) ? "fill-red-500 text-red-500" : "text-white"
+                            favorites.includes(event.id) ? "fill-red-500 text-red-500" : "text-gray-600"
                           )}
                         />
                       </button>
@@ -413,10 +413,10 @@ export default function TicketingIndex({
 
                     {/* Event Info */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-sm mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                      <h3 className="font-semibold text-sm mb-2 line-clamp-2 text-gray-900 group-hover:text-primary transition-colors">
                         {event.title}
                       </h3>
-                      <p className="text-xs text-gray-400 mb-1">{event.date}</p>
+                      <p className="text-xs text-gray-500 mb-1">{event.date}</p>
                       <p className="text-sm font-bold text-primary">{event.price}</p>
                     </div>
                   </motion.div>
@@ -425,30 +425,8 @@ export default function TicketingIndex({
             </div>
           </section>
 
-          {/* Browse Events by Location */}
-          <section className="py-12 bg-black text-white">
-            <div className="container mx-auto px-6 lg:px-20">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">Browse Events</h2>
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <MapPin className="h-4 w-4" />
-                    <span className="font-semibold">{location}</span>
-                  </div>
-                  <Button variant="link" className="text-sm text-primary p-0 h-auto">
-                    Change Location
-                  </Button>
-                  <span className="text-gray-600">•</span>
-                  <Button variant="link" className="text-sm text-primary p-0 h-auto">
-                    View All Dates
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Categories */}
-          <section className="py-12 bg-[#2b6068]">
+          <section className="py-12 bg-black">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Categories</h2>
@@ -476,7 +454,7 @@ export default function TicketingIndex({
                       alt={category.name}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2b6068]/80 via-[#2b6068]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="text-lg font-bold text-white">{category.name}</h3>
                     </div>
@@ -503,10 +481,11 @@ export default function TicketingIndex({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
+                    onClick={() => router.get(`/ticketing/organizer/${organizer.slug}`)}
                   >
-                    <Card className="overflow-hidden bg-[#2b6068] border-[#3a7a83] hover:border-primary/50 transition-all group cursor-pointer">
+                    <Card className="overflow-hidden bg-[#1a365d] border-[#234e7a] hover:border-primary/50 transition-all group cursor-pointer">
                       {/* Cover Image */}
-                      <div className="relative h-32 bg-[#3a7a83]">
+                      <div className="relative h-32 bg-[#234e7a]">
                         {organizer.image ? (
                           <img
                             src={organizer.image}
@@ -516,12 +495,12 @@ export default function TicketingIndex({
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#2b6068]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a365d]/80 to-transparent" />
                       </div>
 
                       <CardContent className="p-4 relative">
                         {/* Logo */}
-                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-[#3a7a83] border-4 border-[#2b6068] overflow-hidden shadow-lg">
+                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-[#234e7a] border-4 border-[#1a365d] overflow-hidden shadow-lg">
                           {organizer.logo ? (
                             <img src={organizer.logo} alt={organizer.name} className="w-full h-full object-cover" />
                           ) : (
@@ -555,7 +534,7 @@ export default function TicketingIndex({
                               <span className="font-medium text-white">{organizer.rating.toFixed(1)}</span>
                               <span className="text-gray-500">({organizer.reviews})</span>
                             </div>
-                            <Badge variant="secondary" className="bg-[#3a7a83] text-gray-300">
+                            <Badge variant="secondary" className="bg-[#234e7a] text-gray-300">
                               {organizer.event_count} events
                             </Badge>
                           </div>
@@ -569,7 +548,7 @@ export default function TicketingIndex({
           </section>
         </main>
 
-        <Footer className="bg-[#2b6068]" />
+        <Footer className="bg-gray-50" />
       </div>
     </>
   )

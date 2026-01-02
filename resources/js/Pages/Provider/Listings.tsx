@@ -4,7 +4,6 @@ import ProviderLayout from '@/Components/ProviderLayout'
 import { Button } from '@/Components/ui/button'
 import { Card, CardContent } from '@/Components/ui/card'
 import { Badge } from '@/Components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -584,182 +583,175 @@ export default function Listings({ provider, services = [], products = [], categ
           <div>
             <h1 className="text-3xl font-bold">Listings</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your services and products
+              Manage your listings ({services.length + products.length} total)
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={openCreateProductDialog}>
               <Plus className="h-4 w-4 mr-2" />
-              New Product
+              Add Product
             </Button>
             <Button onClick={openCreateServiceDialog}>
               <Plus className="h-4 w-4 mr-2" />
-              New Service
+              Add Service
             </Button>
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="services" className="w-full">
-          <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
-            <TabsTrigger
-              value="services"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6"
-            >
-              Services ({services.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="products"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6"
-            >
-              Products ({products.length})
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Services Tab */}
-          <TabsContent value="services" className="mt-6">
-            {services.length === 0 ? (
-              <EmptyState type="services" />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {services.map((service) => (
-                  <Card key={service.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-video bg-muted flex items-center justify-center">
-                      {service.primary_image ? (
-                        <img src={service.primary_image} alt={service.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Briefcase className="h-12 w-12 text-muted-foreground" />
-                      )}
+        {/* Unified Listings Grid */}
+        {services.length === 0 && products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Package className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No listings yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md">
+              Create your first listing to start getting bookings and orders from customers.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={openCreateProductDialog}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Button>
+              <Button onClick={openCreateServiceDialog}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Service
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Services */}
+            {services.map((service) => (
+              <Card key={`service-${service.id}`} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="aspect-video bg-muted flex items-center justify-center relative">
+                  {service.primary_image ? (
+                    <img src={service.primary_image} alt={service.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Briefcase className="h-12 w-12 text-muted-foreground" />
+                  )}
+                  <Badge className="absolute top-2 left-2 bg-blue-500 text-white">Service</Badge>
+                </div>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg line-clamp-1">{service.name}</h3>
+                      <p className="text-sm text-muted-foreground">{service.category_name}</p>
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg line-clamp-1">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground">{service.category_name}</p>
-                        </div>
-                        <Badge variant="secondary" className={getStatusColor(service.is_active)}>
-                          {service.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
+                    <Badge variant="secondary" className={getStatusColor(service.is_active)}>
+                      {service.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
 
-                      <div className="space-y-2 mt-3">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-muted-foreground" />
-                          <p className="text-lg font-bold text-primary">
-                            {service.currency} {service.base_price.toLocaleString()}
-                            {service.max_price && ` - ${service.max_price.toLocaleString()}`}
-                          </p>
-                        </div>
-                        {service.duration && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            <span>{service.duration} minutes</span>
-                          </div>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                          {service.bookings_count} booking{service.bookings_count !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-
-                      <div className="flex gap-2 mt-4 pt-4 border-t">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => openEditServiceDialog(service)}
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setServiceToDelete(service.id)
-                            setDeleteServiceDialogOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Products Tab */}
-          <TabsContent value="products" className="mt-6">
-            {products.length === 0 ? (
-              <EmptyState type="products" />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-video bg-muted flex items-center justify-center">
-                      {product.primary_image ? (
-                        <img src={product.primary_image} alt={product.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Package className="h-12 w-12 text-muted-foreground" />
-                      )}
+                  <div className="space-y-2 mt-3">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-lg font-bold text-primary">
+                        {service.currency} {service.base_price.toLocaleString()}
+                        {service.max_price && ` - ${service.max_price.toLocaleString()}`}
+                      </p>
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground">{product.catalogue_name}</p>
-                        </div>
-                        <Badge variant="secondary" className={getStatusColor(product.is_active)}>
-                          {product.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
+                    {service.duration && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{service.duration} minutes</span>
                       </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {service.bookings_count} booking{service.bookings_count !== 1 ? 's' : ''}
+                    </p>
+                  </div>
 
-                      <div className="space-y-2 mt-3">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-muted-foreground" />
-                          <p className="text-lg font-bold text-primary">
-                            {product.currency} {product.price.toLocaleString()}
-                          </p>
-                        </div>
-                        {product.sale_price && product.sale_price < product.price && (
-                          <p className="text-sm text-muted-foreground line-through">
-                            {product.currency} {product.sale_price.toLocaleString()}
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                          Stock: {product.track_inventory ? product.stock_quantity : 'Unlimited'}
-                        </p>
-                      </div>
+                  <div className="flex gap-2 mt-4 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => openEditServiceDialog(service)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setServiceToDelete(service.id)
+                        setDeleteServiceDialogOpen(true)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
 
-                      <div className="flex gap-2 mt-4 pt-4 border-t">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => openEditProductDialog(product)}
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setProductToDelete(product.id)
-                            setDeleteProductDialogOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            {/* Products */}
+            {products.map((product) => (
+              <Card key={`product-${product.id}`} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="aspect-video bg-muted flex items-center justify-center relative">
+                  {product.primary_image ? (
+                    <img src={product.primary_image} alt={product.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="h-12 w-12 text-muted-foreground" />
+                  )}
+                  <Badge className="absolute top-2 left-2 bg-green-500 text-white">Product</Badge>
+                </div>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
+                      <p className="text-sm text-muted-foreground">{product.catalogue_name}</p>
+                    </div>
+                    <Badge variant="secondary" className={getStatusColor(product.is_active)}>
+                      {product.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2 mt-3">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-lg font-bold text-primary">
+                        {product.currency} {product.price.toLocaleString()}
+                      </p>
+                    </div>
+                    {product.sale_price && product.sale_price < product.price && (
+                      <p className="text-sm text-muted-foreground line-through">
+                        {product.currency} {product.sale_price.toLocaleString()}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Stock: {product.track_inventory ? product.stock_quantity : 'Unlimited'}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 mt-4 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => openEditProductDialog(product)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setProductToDelete(product.id)
+                        setDeleteProductDialogOpen(true)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Service Create/Edit Dialog */}

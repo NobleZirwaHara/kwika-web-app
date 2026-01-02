@@ -1,10 +1,19 @@
 import { Button } from "@/Components/ui/button"
 import { Search, Heart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
-import { router, Link } from "@inertiajs/react"
+import { router, Link, usePage } from "@inertiajs/react"
 import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
 import { useHeroCarousel } from "@/contexts/HeroCarouselContext"
+import { SearchDropdown } from "@/Components/search-dropdown"
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+  subcategories?: { id: number; name: string }[]
+}
 
 interface FeaturedEvent {
   id: number
@@ -56,7 +65,9 @@ const defaultEvents: FeaturedEvent[] = [
 
 export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
   const [searchQuery, setSearchQuery] = useState("")
+  const [isSearchActive, setIsSearchActive] = useState(false)
   const { activeSlide, setActiveSlide, setTotalSlides } = useHeroCarousel()
+  const { categories } = usePage().props as { categories?: Category[] }
 
   // Set total slides on mount
   useEffect(() => {
@@ -72,33 +83,117 @@ export function HeroFeatured({ events = defaultEvents }: HeroFeaturedProps) {
     return () => clearInterval(interval)
   }, [events.length, setActiveSlide])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.get('/search', { query: searchQuery })
+  const handleSearchFocus = () => {
+    setIsSearchActive(true)
+  }
+
+  const handleCloseSearch = () => {
+    setIsSearchActive(false)
+    setSearchQuery("")
+  }
+
+  const handleSelect = (value: string, categoryId?: number, type?: 'category' | 'location' | 'date') => {
+    setIsSearchActive(false)
+    if (categoryId) {
+      router.get('/providers', { category: categoryId })
+    } else if (type === 'location') {
+      router.get('/providers', { city: value })
+    } else if (type === 'date') {
+      router.get('/providers', { available_date: value })
+    } else {
+      router.get('/providers', { query: value })
     }
   }
 
   const currentEvent = events[activeSlide]
 
   return (
-    <section className="bg-gradient-to-b from-background to-muted/20 pt-8 pb-16">
+    <section className="bg-gradient-to-b from-background to-muted/20 pt-8 pb-6">
       <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-8">
+        {/* Search Bar - Clickable to expand */}
+        <div className="mb-8">
           <div className="max-w-3xl mx-auto relative">
-            <div className="flex items-center gap-3 rounded-full border-2 border-border bg-background px-6 py-4 shadow-lg hover:shadow-xl transition-shadow">
+            <button
+              type="button"
+              onClick={handleSearchFocus}
+              className="w-full flex items-center gap-3 rounded-full border-2 border-border bg-background px-6 py-4 shadow-lg hover:shadow-xl hover:border-primary/50 transition-all cursor-text text-left"
+            >
               <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search photographers, caterers, decorators and more"
-                className="flex-1 text-base bg-transparent border-none outline-none placeholder:text-muted-foreground/60"
-              />
-            </div>
+              <span className="flex-1 text-base text-muted-foreground/60">
+                Search photographers, caterers, decorators and more
+              </span>
+            </button>
           </div>
-        </form>
+        </div>
+
+        {/* Centered Search Dropdown Modal */}
+        <AnimatePresence>
+          {isSearchActive && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                onClick={handleCloseSearch}
+              />
+
+              {/* Centered Search with Dropdown */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] max-w-[calc(100%-2rem)] z-[110]"
+              >
+                {/* Search Input */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (searchQuery.trim()) {
+                      handleCloseSearch()
+                      router.get('/providers', { query: searchQuery })
+                    }
+                  }}
+                  className="mb-2"
+                >
+                  <div className="flex items-center gap-3 rounded-full border-2 border-primary bg-background px-6 py-4 shadow-xl">
+                    <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search photographers, caterers, decorators..."
+                      className="flex-1 text-base bg-transparent border-none outline-none placeholder:text-muted-foreground/60"
+                      autoFocus
+                    />
+                    {searchQuery && (
+                      <Button
+                        type="submit"
+                        size="sm"
+                        className="rounded-full"
+                      >
+                        Search
+                      </Button>
+                    )}
+                  </div>
+                </form>
+
+                {/* Dropdown */}
+                <SearchDropdown
+                  activeField="service"
+                  onClose={handleCloseSearch}
+                  onSelect={handleSelect}
+                  searchValue={searchQuery}
+                  categories={categories}
+                  floating
+                />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Featured Event Card */}
         <div className="relative rounded-3xl overflow-hidden shadow-2xl group">

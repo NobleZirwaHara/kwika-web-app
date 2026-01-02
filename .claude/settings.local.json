@@ -17,7 +17,8 @@
       "Bash(do)",
       "Bash(cat:*)",
       "Bash(composer require:*)",
-      "Bash(dir \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\resized-win\")"
+      "Bash(dir \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\resized-win\")",
+      "Bash(dir \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\app\\\\Models\")"
     ],
     "deny": [],
     "ask": []

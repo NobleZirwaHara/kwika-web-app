@@ -1,9 +1,10 @@
 import { Badge } from "@/Components/ui/badge"
 import { Button } from "@/Components/ui/button"
 import { WishlistButton } from "@/Components/wishlist-button"
-import { MapPin, ArrowRight, Heart, Star } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { useRef } from "react"
+import { ScrollArrows } from "@/Components/ui/scroll-arrows"
 
 interface Service {
   id: number
@@ -48,11 +49,13 @@ export function FeaturedServices({ services, isAuthenticated = false }: Featured
           </Link>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <div className="relative">
+          <ScrollArrows scrollRef={scrollRef} />
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
           {services.slice(0, 8).map((service) => (
             <Link
               key={service.id}
@@ -101,6 +104,7 @@ export function FeaturedServices({ services, isAuthenticated = false }: Featured
               </div>
             </Link>
           ))}
+          </div>
         </div>
       </div>
     </section>

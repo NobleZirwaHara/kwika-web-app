@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
-use App\Models\Service;
 use App\Models\Product;
 use App\Models\ServiceCategory;
 use App\Models\ServiceProvider;
@@ -55,13 +54,13 @@ class HomeController extends Controller
                 ];
             });
 
-        // Get all top-rated providers (for the second section)
+        // Get top-rated providers
         $topProviders = ServiceProvider::with(['user'])
             ->verified()
             ->active()
             ->orderBy('average_rating', 'desc')
             ->orderBy('total_reviews', 'desc')
-            ->limit(10)
+            ->limit(8)
             ->get()
             ->map(function ($provider) {
                 return [
@@ -77,33 +76,46 @@ class HomeController extends Controller
                 ];
             });
 
-        // Get featured services with their images (only from verified providers)
-        $featuredServices = Service::with(['serviceProvider', 'category'])
+        // Get providers in Lilongwe
+        $lilongweProviders = ServiceProvider::with(['user'])
+            ->verified()
             ->active()
-            ->whereHas('serviceProvider', function ($query) {
-                $query->where('verification_status', 'approved');
-            })
-            ->whereNotNull('primary_image')
-            ->latest()
+            ->where('city', 'Lilongwe')
+            ->orderBy('average_rating', 'desc')
             ->limit(8)
             ->get()
-            ->map(function ($service) {
+            ->map(function ($provider) {
                 return [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'slug' => $service->slug,
-                    'description' => $service->description,
-                    'price' => $service->getFormattedPrice(),
-                    'base_price' => (float) $service->base_price,
-                    'currency' => $service->currency,
-                    'image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
-                    'category' => $service->category->name ?? null,
-                    'provider' => [
-                        'id' => $service->serviceProvider->id,
-                        'name' => $service->serviceProvider->business_name,
-                        'slug' => $service->serviceProvider->slug,
-                        'city' => $service->serviceProvider->city,
-                    ],
+                    'id' => $provider->id,
+                    'slug' => $provider->slug,
+                    'name' => $provider->business_name,
+                    'location' => $provider->city,
+                    'rating' => (float) $provider->average_rating,
+                    'reviews' => $provider->total_reviews,
+                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'featured' => $provider->is_featured,
+                ];
+            });
+
+        // Get new providers (recently joined)
+        $newProviders = ServiceProvider::with(['user'])
+            ->verified()
+            ->active()
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get()
+            ->map(function ($provider) {
+                return [
+                    'id' => $provider->id,
+                    'slug' => $provider->slug,
+                    'name' => $provider->business_name,
+                    'location' => $provider->city,
+                    'rating' => (float) $provider->average_rating,
+                    'reviews' => $provider->total_reviews,
+                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'featured' => $provider->is_featured,
                 ];
             });
 
@@ -145,7 +157,8 @@ class HomeController extends Controller
             'categories' => $categories,
             'featuredProviders' => $featuredProviders,
             'topProviders' => $topProviders,
-            'featuredServices' => $featuredServices,
+            'lilongweProviders' => $lilongweProviders,
+            'newProviders' => $newProviders,
             'featuredProducts' => $featuredProducts,
         ]);
     }
