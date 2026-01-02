@@ -16,7 +16,8 @@
       "Bash(for file in app/Http/Controllers/*.php app/Http/Controllers/Provider/*.php)",
       "Bash(do)",
       "Bash(cat:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(dir \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\resized-win\")"
     ],
     "deny": [],
     "ask": []

@@ -307,7 +307,7 @@ export default function TicketingIndex({
   return (
     <>
       <Head title="Ticketing - Find Live Events & Sports" />
-      <div className="min-h-screen bg-[#2b6068] text-white">
+      <div className="min-h-screen bg-[oklch(0.15_0.08_215)] text-white">
         <Header />
 
         <main>
@@ -321,7 +321,7 @@ export default function TicketingIndex({
               <div className="absolute right-0 top-0 w-1/3 h-full opacity-20">
                 <img src="/resized-win/pa-system-1.jpg" alt="" className="h-full w-full object-cover transform scale-x-[-1]" />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-[#2b6068] via-[#2b6068]/50 to-[#2b6068]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.15_0.08_215)] via-[oklch(0.15_0.08_215)]/50 to-[oklch(0.15_0.08_215)]" />
             </div>
 
             {/* Content */}
@@ -368,7 +368,7 @@ export default function TicketingIndex({
           </section>
 
           {/* Trending Events */}
-          <section className="py-12 bg-[#2b6068]">
+          <section className="py-12 bg-[oklch(0.15_0.08_215)]">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Trending Events</h2>
@@ -385,7 +385,7 @@ export default function TicketingIndex({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                     onClick={() => router.get(`/events/${event.slug}`)}
-                    className="group relative bg-[oklch(0.30_0.16_215)] rounded-xl overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                    className="group relative bg-[oklch(0.22_0.06_215)] rounded-xl overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer"
                   >
                     {/* Event Image */}
                     <div className="relative aspect-[4/3] overflow-hidden">
@@ -400,7 +400,7 @@ export default function TicketingIndex({
                           e.stopPropagation()
                           toggleFavorite(event.id)
                         }}
-                        className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[#2b6068]/60 backdrop-blur-sm flex items-center justify-center hover:bg-[#2b6068]/80 transition-colors"
+                        className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[oklch(0.15_0.08_215)]/60 backdrop-blur-sm flex items-center justify-center hover:bg-[oklch(0.15_0.08_215)]/80 transition-colors"
                       >
                         <Heart
                           className={cn(
@@ -426,7 +426,7 @@ export default function TicketingIndex({
           </section>
 
           {/* Browse Events by Location */}
-          <section className="py-12 bg-black text-white">
+          <section className="py-12 bg-[oklch(0.12_0.06_215)]">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">Browse Events</h2>
@@ -448,7 +448,7 @@ export default function TicketingIndex({
           </section>
 
           {/* Categories */}
-          <section className="py-12 bg-[#2b6068]">
+          <section className="py-12 bg-[oklch(0.15_0.08_215)]">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Categories</h2>
@@ -476,7 +476,7 @@ export default function TicketingIndex({
                       alt={category.name}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2b6068]/80 via-[#2b6068]/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.15_0.08_215)]/80 via-[oklch(0.15_0.08_215)]/20 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="text-lg font-bold text-white">{category.name}</h3>
                     </div>
@@ -486,12 +486,63 @@ export default function TicketingIndex({
             </div>
           </section>
 
+          {/* Top Artists */}
+          <section className="py-12 bg-[oklch(0.12_0.06_215)]">
+            <div className="container mx-auto px-6 lg:px-20">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Top artists</h2>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {topArtists.map((artist, index) => (
+                  <motion.div
+                    key={artist.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="group relative rounded-xl overflow-hidden cursor-pointer"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <img
+                        src={artist.image}
+                        alt={artist.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.12_0.06_215)]/80 via-transparent to-transparent" />
+
+                      {/* Favorite Button */}
+                      <button
+                        className="absolute top-3 right-3 w-10 h-10 rounded-full bg-[oklch(0.15_0.08_215)]/60 backdrop-blur-sm flex items-center justify-center hover:bg-[oklch(0.15_0.08_215)]/80 transition-colors"
+                      >
+                        <Heart className="h-5 w-5 text-white" />
+                      </button>
+                    </div>
+
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                        {artist.name}
+                      </h3>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {/* Top Organizers */}
-          <section className="py-12 bg-[white] text-gray-900">
+          <section className="py-12 bg-[oklch(0.15_0.08_215)]">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Top Organizers</h2>
-                <Button variant="ghost" className="text-sm text-gray-600 hover:text-gray-900">
+                <Button variant="ghost" className="text-sm text-gray-300 hover:text-white">
                   View all <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
@@ -504,9 +555,9 @@ export default function TicketingIndex({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                   >
-                    <Card className="overflow-hidden bg-[#2b6068] border-[#3a7a83] hover:border-primary/50 transition-all group cursor-pointer">
+                    <Card className="overflow-hidden bg-[oklch(0.20_0.06_215)] border-[oklch(0.25_0.06_215)] hover:border-primary/50 transition-all group cursor-pointer">
                       {/* Cover Image */}
-                      <div className="relative h-32 bg-[#3a7a83]">
+                      <div className="relative h-32 bg-[oklch(0.22_0.06_215)]">
                         {organizer.image ? (
                           <img
                             src={organizer.image}
@@ -516,12 +567,12 @@ export default function TicketingIndex({
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#2b6068]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.20_0.06_215)]/80 to-transparent" />
                       </div>
 
                       <CardContent className="p-4 relative">
                         {/* Logo */}
-                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-[#3a7a83] border-4 border-[#2b6068] overflow-hidden shadow-lg">
+                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-[oklch(0.22_0.06_215)] border-4 border-[oklch(0.20_0.06_215)] overflow-hidden shadow-lg">
                           {organizer.logo ? (
                             <img src={organizer.logo} alt={organizer.name} className="w-full h-full object-cover" />
                           ) : (
@@ -555,7 +606,7 @@ export default function TicketingIndex({
                               <span className="font-medium text-white">{organizer.rating.toFixed(1)}</span>
                               <span className="text-gray-500">({organizer.reviews})</span>
                             </div>
-                            <Badge variant="secondary" className="bg-[#3a7a83] text-gray-300">
+                            <Badge variant="secondary" className="bg-[oklch(0.22_0.06_215)] text-gray-300">
                               {organizer.event_count} events
                             </Badge>
                           </div>
@@ -569,7 +620,7 @@ export default function TicketingIndex({
           </section>
         </main>
 
-        <Footer className="bg-[#2b6068]" />
+        <Footer className="bg-[oklch(0.18_0.07_215)]" />
       </div>
     </>
   )

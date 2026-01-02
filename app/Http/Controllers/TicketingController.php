@@ -43,31 +43,31 @@ class TicketingController extends Controller
                 'id' => 'sports',
                 'name' => 'Sports',
                 'slug' => 'sports',
-                'image' => '/ticketing/categories/sports-1.png',
+                'image' => '/resized-win/venue-1.jpg',
             ],
             [
                 'id' => 'music-arts',
                 'name' => 'Music & Arts',
                 'slug' => 'music-arts',
-                'image' => '/ticketing/categories/music-1.png',
+                'image' => '/resized-win/dj-1.jpg',
             ],
             [
                 'id' => 'festivals',
                 'name' => 'Festivals',
                 'slug' => 'festivals',
-                'image' => '/ticketing/categories/festivals-1.png',
+                'image' => '/resized-win/lighting-1.jpg',
             ],
             [
                 'id' => 'cars-motorsport',
                 'name' => 'Cars & Motorsport',
                 'slug' => 'cars-motorsport',
-                'image' => '/ticketing/categories/cars-1.png',
+                'image' => '/resized-win/venue-5.jpg',
             ],
             [
                 'id' => 'expos-fairs',
                 'name' => 'Expos & Fairs',
                 'slug' => 'expos-fairs',
-                'image' => '/ticketing/categories/expo-1.png',
+                'image' => '/resized-win/tent-1.jpg',
             ],
         ];
 
