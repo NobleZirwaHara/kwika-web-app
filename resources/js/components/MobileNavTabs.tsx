@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { Link, usePage, router } from '@inertiajs/react'
-import { Search, ShoppingCart } from 'lucide-react'
+import { Link, usePage } from '@inertiajs/react'
+import { ShoppingCart } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/button'
@@ -59,11 +59,7 @@ const tabs: Tab[] = [
   },
 ]
 
-interface MobileNavTabsProps {
-  onSearchClick?: () => void
-}
-
-export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
+export default function MobileNavTabs() {
   const { url } = usePage()
   const { cart } = useCart()
 
@@ -77,28 +73,15 @@ export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
 
   const activeTab = getActiveTab()
 
-  const handleSearchClick = () => {
-    if (onSearchClick) {
-      onSearchClick()
-    } else {
-      router.visit('/search')
-    }
-  }
-
   return (
     <div className="md:hidden bg-white dark:bg-background sticky top-0 z-50 shadow-sm">
       <div className="px-6 pt-5 pb-0">
-        {/* Search Bar with Cart */}
-        <div className="flex items-center justify-end gap-3 mb-5">
-          {/* Search button - temporarily hidden
-          <button
-            onClick={handleSearchClick}
-            className="flex-1 flex items-center justify-center gap-3 rounded-full border border-border/20 bg-white dark:bg-card shadow-md hover:shadow-lg transition-all p-4"
-          >
-            <Search className="h-5 w-5 text-foreground/80" />
-            <span className="text-base font-semibold text-foreground">Start your search</span>
-          </button>
-          */}
+        {/* Logo and Cart */}
+        <div className="flex items-center justify-between mb-5">
+          {/* Logo */}
+          <Link href="/">
+            <img src="/kwika-logo.png" alt="Kwika" className="h-8" />
+          </Link>
 
           {/* Cart Icon */}
           <Link href="/cart" className="relative">
