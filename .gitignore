@@ -15,7 +15,7 @@ yarn-error.log
 # Laravel specific
 !/bootstrap/cache/.gitkeep
 /storage/*.key
-/storage/app/*
+
 !/storage/app/.gitkeep
 /storage/framework/cache/*
 !/storage/framework/cache/.gitkeep
