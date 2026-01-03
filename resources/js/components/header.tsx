@@ -39,9 +39,9 @@ export function Header() {
           <div className="flex py-[24.5px] items-center justify-between gap-4">
             {/* Left: Logo */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <a href="/" className="flex items-center ">
+              <Link href="/" className="flex items-center ">
                 <img src="/kwika-logo.png" alt="Logo" width={100} />
-              </a>
+              </Link>
             </div>
 
             {/* Center: Animated transition between Tabs and Search */}

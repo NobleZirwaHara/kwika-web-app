@@ -14,9 +14,10 @@ interface Category {
 interface CompactSearchBarProps {
   categories?: Category[]
   className?: string
+  isMobile?: boolean
 }
 
-export function CompactSearchBar({ categories = [], className = "" }: CompactSearchBarProps) {
+export function CompactSearchBar({ categories = [], className = "", isMobile = false }: CompactSearchBarProps) {
   const [activeField, setActiveField] = useState<"service" | "location" | "date" | null>(null)
   const [serviceValue, setServiceValue] = useState("")
   const [locationValue, setLocationValue] = useState("")
@@ -71,6 +72,46 @@ export function CompactSearchBar({ categories = [], className = "" }: CompactSea
     }
   }
 
+  // Mobile layout - simplified single search input
+  if (isMobile) {
+    return (
+      <div className={className}>
+        <div className="flex items-center gap-2 rounded-full border border-border/50 bg-white dark:bg-card shadow-md px-4 py-2">
+          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+          <input
+            type="text"
+            value={serviceValue}
+            onChange={(e) => setServiceValue(e.target.value)}
+            onFocus={() => setActiveField("service")}
+            onKeyPress={handleKeyPress}
+            placeholder="Search services, locations..."
+            className="flex-1 text-sm font-medium bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground min-w-0"
+          />
+          {(serviceValue || locationValue) && (
+            <button
+              onClick={handleSearchClick}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer shrink-0"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        {activeField === "service" && (
+          <div className="relative z-[60]">
+            <SearchDropdown
+              activeField="service"
+              onClose={() => setActiveField(null)}
+              onSelect={handleSelect}
+              searchValue={serviceValue}
+              categories={categories}
+            />
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Desktop layout
   return (
     <div className={className}>
       <div className="flex items-center gap-0 rounded-full border border-border/50 bg-white dark:bg-card shadow-md hover:shadow-lg transition-shadow">

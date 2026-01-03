@@ -39,8 +39,9 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
         isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md' : 'bg-background border-b'
       }`}
     >
-      <div className="container mx-auto px-6 lg:px-20">
-        <div className="flex items-center justify-between gap-6 h-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-20">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between gap-6 h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img src="/kwika-logo.png" alt="Logo" width={100} />
@@ -49,11 +50,11 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
           {/* Search Bar - Desktop Only */}
           <CompactSearchBar
             categories={categories}
-            className="lg:block transition-all duration-300 absolute left-1/2 -translate-x-1/2 opacity-100 translate-y-0"
+            className="hidden lg:block transition-all duration-300 absolute left-1/2 -translate-x-1/2 opacity-100 translate-y-0"
           />
 
           {/* Right Side - Desktop */}
-          <div className="hidden md:flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {!isProvider && !isAdmin && !user && (
               <Link href="/onboarding/welcome" className="cursor-pointer">
                 <Button variant="ghost" className="text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
@@ -62,18 +63,26 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
               </Link>
             )}
 
-            {/* Translation Section For Future */}
-            {/* <Button variant="ghost" size="icon" className="rounded-full">
-              <Globe className="h-4 w-4" />
-            </Button> */}
+            <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
+          </div>
+        </div>
 
+        {/* Mobile Layout */}
+        <div className="flex md:hidden flex-col gap-3 py-3">
+          {/* Top row: Logo and User Menu */}
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 shrink-0">
+              <img src="/kwika-logo.png" alt="Logo" width={80} />
+            </Link>
             <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
           </div>
 
-          {/* Mobile Menu Button */}
-          {/* <div className="md:hidden">
-            <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
-          </div> */}
+          {/* Search Bar - Mobile */}
+          <CompactSearchBar
+            categories={categories}
+            className="w-full"
+            isMobile={true}
+          />
         </div>
       </div>
     </header>
