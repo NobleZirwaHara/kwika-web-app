@@ -6,9 +6,12 @@ use App\Models\User;
 use App\Models\ServiceProvider;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\Traits\UploadsSeederImages;
 
 class ServiceProviderSeeder extends Seeder
 {
+    use UploadsSeederImages;
+
     /**
      * Run the database seeds.
      */
@@ -622,7 +625,19 @@ class ServiceProviderSeeder extends Seeder
 
         foreach ($providers as $providerData) {
             $user = User::create($providerData['user']);
-            $provider = $user->serviceProvider()->create($providerData['provider']);
+
+            // Upload images to storage
+            $providerInfo = $providerData['provider'];
+
+            if (!empty($providerInfo['logo'])) {
+                $providerInfo['logo'] = $this->uploadImage($providerInfo['logo'], 'providers/logos');
+            }
+
+            if (!empty($providerInfo['cover_image'])) {
+                $providerInfo['cover_image'] = $this->uploadImage($providerInfo['cover_image'], 'providers/covers');
+            }
+
+            $provider = $user->serviceProvider()->create($providerInfo);
         }
 
         $this->command->info('Service providers seeded successfully!');

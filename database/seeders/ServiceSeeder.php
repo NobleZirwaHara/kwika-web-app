@@ -6,9 +6,11 @@ use App\Models\Service;
 use App\Models\ServiceProvider;
 use App\Models\ServiceCategory;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Traits\UploadsSeederImages;
 
 class ServiceSeeder extends Seeder
 {
+    use UploadsSeederImages;
     /**
      * Run the database seeds.
      */
@@ -52,7 +54,7 @@ class ServiceSeeder extends Seeder
     }
 
     /**
-     * Get rotated images for a service to avoid repetition
+     * Get rotated images for a service and upload to storage
      */
     private function getRotatedImages($categoryImages, $serviceIndex, $count = 6)
     {
@@ -60,7 +62,11 @@ class ServiceSeeder extends Seeder
         $galleryImages = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $galleryImages[] = '/resized-win/' . $categoryImages[($imageOffset + $i) % count($categoryImages)];
+            $publicPath = '/resized-win/' . $categoryImages[($imageOffset + $i) % count($categoryImages)];
+            $storagePath = $this->uploadImage($publicPath, 'services/gallery');
+            if ($storagePath) {
+                $galleryImages[] = $storagePath;
+            }
         }
 
         return $galleryImages;

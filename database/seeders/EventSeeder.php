@@ -10,9 +10,11 @@ use App\Models\ServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Database\Seeders\Traits\UploadsSeederImages;
 
 class EventSeeder extends Seeder
 {
+    use UploadsSeederImages;
     /**
      * Run the database seeds.
      */
@@ -202,6 +204,11 @@ class EventSeeder extends Seeder
         foreach ($events as $eventData) {
             $packages = $eventData['packages'];
             unset($eventData['packages']);
+
+            // Upload cover image to storage
+            if (!empty($eventData['cover_image'])) {
+                $eventData['cover_image'] = $this->uploadImage($eventData['cover_image'], 'events/covers');
+            }
 
             // Generate slug
             $slug = Str::slug($eventData['title']) . '-' . Str::random(6);

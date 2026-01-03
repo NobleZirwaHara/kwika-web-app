@@ -8,9 +8,12 @@ use App\Models\User;
 use App\Models\TicketPackage;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Database\Seeders\Traits\UploadsSeederImages;
 
 class EventOrganizersSeeder extends Seeder
 {
+    use UploadsSeederImages;
+
     public function run(): void
     {
         $organizers = [
@@ -310,6 +313,12 @@ class EventOrganizersSeeder extends Seeder
                 continue;
             }
 
+            // Upload cover image to storage
+            $coverImage = null;
+            if (!empty($eventData['cover_image'])) {
+                $coverImage = $this->uploadImage($eventData['cover_image'], 'events/covers');
+            }
+
             $event = Event::firstOrCreate(
                 ['slug' => $eventData['slug']],
                 [
@@ -322,7 +331,7 @@ class EventOrganizersSeeder extends Seeder
                     'venue_city' => $eventData['venue_city'],
                     'start_datetime' => $eventData['start_datetime'],
                     'end_datetime' => $eventData['end_datetime'],
-                    'cover_image' => $eventData['cover_image'],
+                    'cover_image' => $coverImage,
                     'status' => 'published',
                     'is_featured' => rand(0, 1),
                 ]

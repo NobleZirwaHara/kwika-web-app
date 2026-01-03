@@ -8,9 +8,12 @@ use App\Models\Company;
 use App\Models\ServiceProvider;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Database\Seeders\Traits\UploadsSeederImages;
 
 class ProductSeeder extends Seeder
 {
+    use UploadsSeederImages;
+
     private $catalogues = [];
 
     /**
@@ -78,6 +81,43 @@ class ProductSeeder extends Seeder
         return $this->catalogues[$name] ?? Catalogue::where('name', $name)->where('type', 'product')->first();
     }
 
+    /**
+     * Create a product with uploaded images
+     */
+    private function createProductWithImages(array $data, ServiceProvider $provider, Catalogue $catalogue): void
+    {
+        // Upload primary image
+        $primaryImage = null;
+        if (!empty($data['image'])) {
+            $primaryImage = $this->uploadImage($data['image'], 'products/primary');
+        }
+
+        // Upload gallery images
+        $galleryImages = [];
+        if (!empty($data['gallery_images'])) {
+            $galleryImages = $this->uploadImages($data['gallery_images'], 'products/gallery');
+        }
+
+        Product::create([
+            'service_provider_id' => $provider->id,
+            'catalogue_id' => $catalogue->id,
+            'name' => $data['name'],
+            'slug' => Str::slug($data['name']) . '-' . Str::random(6),
+            'description' => $data['description'],
+            'price' => $data['price'],
+            'sale_price' => $data['sale_price'] ?? null,
+            'currency' => 'MWK',
+            'stock_quantity' => $data['stock_quantity'],
+            'track_inventory' => true,
+            'unit' => $data['unit'] ?? null,
+            'features' => $data['features'],
+            'primary_image' => $primaryImage,
+            'gallery_images' => $galleryImages,
+            'is_active' => true,
+            'is_featured' => true,
+        ]);
+    }
+
     private function createDecorationProducts(): void
     {
         $provider = ServiceProvider::where('slug', 'elegant-events-decor')->first();
@@ -136,23 +176,8 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            Product::create([
-                'service_provider_id' => $provider->id,
-                'catalogue_id' => $catalogue->id,
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']) . '-' . Str::random(6),
-                'description' => $productData['description'],
-                'price' => $productData['price'],
-                'sale_price' => $productData['sale_price'] ?? null,
-                'currency' => 'MWK',
-                'stock_quantity' => $productData['stock_quantity'],
-                'track_inventory' => true,
-                'features' => $productData['features'],
-                'primary_image' => $productData['image'],
-                'gallery_images' => ['/resized-win/decor-6.jpg', '/resized-win/decor-7.jpg'],
-                'is_active' => true,
-                'is_featured' => true,
-            ]);
+            $productData['gallery_images'] = ['/resized-win/decor-6.jpg', '/resized-win/decor-7.jpg'];
+            $this->createProductWithImages($productData, $provider, $catalogue);
         }
     }
 
@@ -213,23 +238,8 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            Product::create([
-                'service_provider_id' => $provider->id,
-                'catalogue_id' => $catalogue->id,
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']) . '-' . Str::random(6),
-                'description' => $productData['description'],
-                'price' => $productData['price'],
-                'sale_price' => $productData['sale_price'] ?? null,
-                'currency' => 'MWK',
-                'stock_quantity' => $productData['stock_quantity'],
-                'track_inventory' => true,
-                'features' => $productData['features'],
-                'primary_image' => $productData['image'],
-                'gallery_images' => ['/resized-win/cake-6.jpg', '/resized-win/cake-7.jpg', '/resized-win/cake-8.jpg'],
-                'is_active' => true,
-                'is_featured' => true,
-            ]);
+            $productData['gallery_images'] = ['/resized-win/cake-6.jpg', '/resized-win/cake-7.jpg', '/resized-win/cake-8.jpg'];
+            $this->createProductWithImages($productData, $provider, $catalogue);
         }
     }
 
@@ -295,24 +305,8 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            Product::create([
-                'service_provider_id' => $provider->id,
-                'catalogue_id' => $catalogue->id,
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']) . '-' . Str::random(6),
-                'description' => $productData['description'],
-                'price' => $productData['price'],
-                'sale_price' => $productData['sale_price'] ?? null,
-                'currency' => 'MWK',
-                'stock_quantity' => $productData['stock_quantity'],
-                'track_inventory' => true,
-                'unit' => $productData['unit'] ?? null,
-                'features' => $productData['features'],
-                'primary_image' => $productData['image'],
-                'gallery_images' => ['/resized-win/tent-decor.jpg', '/resized-win/venue-1.jpg'],
-                'is_active' => true,
-                'is_featured' => true,
-            ]);
+            $productData['gallery_images'] = ['/resized-win/tent-decor.jpg', '/resized-win/venue-1.jpg'];
+            $this->createProductWithImages($productData, $provider, $catalogue);
         }
     }
 
@@ -371,24 +365,8 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            Product::create([
-                'service_provider_id' => $provider->id,
-                'catalogue_id' => $catalogue->id,
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']) . '-' . Str::random(6),
-                'description' => $productData['description'],
-                'price' => $productData['price'],
-                'sale_price' => $productData['sale_price'] ?? null,
-                'currency' => 'MWK',
-                'stock_quantity' => $productData['stock_quantity'],
-                'track_inventory' => true,
-                'unit' => $productData['unit'] ?? null,
-                'features' => $productData['features'],
-                'primary_image' => $productData['image'],
-                'gallery_images' => ['/resized-win/decor-3.jpg', '/resized-win/decor-4.jpg'],
-                'is_active' => true,
-                'is_featured' => true,
-            ]);
+            $productData['gallery_images'] = ['/resized-win/decor-3.jpg', '/resized-win/decor-4.jpg'];
+            $this->createProductWithImages($productData, $provider, $catalogue);
         }
     }
 }
