@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Users, TrendingUp, Shield, Zap, Building2, Home, Play } from 'lucide-react'
 
 export default function Welcome() {

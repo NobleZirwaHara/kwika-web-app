@@ -1,9 +1,9 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Search, MapPin, Calendar, Users, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { SearchDropdown } from "./search-dropdown"
 import { router } from "@inertiajs/react"
-import { Dialog, DialogContent } from "@/Components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 interface Subcategory {
   id: number

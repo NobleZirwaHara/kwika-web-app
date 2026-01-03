@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react'
 import { Heart } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 export interface Service {

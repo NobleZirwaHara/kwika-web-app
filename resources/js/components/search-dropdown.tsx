@@ -1,5 +1,5 @@
 import { Camera, Video, Palette, Music, UtensilsCrossed, Navigation, Building2, Landmark, Calendar, Sparkles, Flower, Disc, MapPin } from "lucide-react"
-import { Input } from "@/Components/ui/input"
+import { Input } from "@/components/ui/input"
 import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
 

@@ -1,5 +1,5 @@
 import { Search, Filter } from "lucide-react"
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 
 interface EmptyResultsProps {
   title?: string

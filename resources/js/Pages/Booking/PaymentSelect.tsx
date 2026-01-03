@@ -1,8 +1,8 @@
 import { Head, Link } from '@inertiajs/react'
-import { Header } from '@/Components/header'
-import { Footer } from '@/Components/footer'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { CreditCard, Building2, Smartphone, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 interface Booking {

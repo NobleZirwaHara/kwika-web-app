@@ -1,5 +1,5 @@
 import { Star, Heart } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 
 const similarProviders = [

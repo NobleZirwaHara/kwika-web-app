@@ -1,11 +1,11 @@
 import { useForm, Head } from '@inertiajs/react'
 import { FormEvent } from 'react'
-import { Header } from '@/Components/header'
-import { Footer } from '@/Components/footer'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Input } from '@/Components/ui/input'
-import { Label } from '@/Components/ui/label'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Smartphone, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 interface Booking {

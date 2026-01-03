@@ -1,9 +1,9 @@
 import { useForm, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
-import WizardLayout from '@/Components/WizardLayout'
-import { Button } from '@/Components/ui/button'
-import { Input } from '@/Components/ui/input'
-import { Label } from '@/Components/ui/label'
+import WizardLayout from '@/components/WizardLayout'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { User, Mail, Phone, Lock, IdCard } from 'lucide-react'
 
 interface Props {

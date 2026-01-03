@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react'
-import AdminLayout from '@/Components/AdminLayout'
-import { Card, CardContent } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
-import { Input } from '@/Components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
-import { Label } from '@/Components/ui/label'
+import AdminLayout from '@/components/AdminLayout'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import {
   Activity,
   Search,

@@ -1,12 +1,12 @@
 import { Head, Link, useForm } from '@inertiajs/react'
 import { FormEvent, useState } from 'react'
-import { Header } from '@/Components/header'
-import { Footer } from '@/Components/footer'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
-import { Textarea } from '@/Components/ui/textarea'
-import { Label } from '@/Components/ui/label'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   Calendar,
   MapPin,

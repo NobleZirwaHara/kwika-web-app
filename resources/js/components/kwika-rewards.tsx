@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { Gift, Wallet, Trophy, Tag, Percent } from "lucide-react"
 import { Canvas, useFrame } from "@react-three/fiber"

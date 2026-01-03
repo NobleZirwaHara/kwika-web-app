@@ -1,10 +1,10 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Search, Heart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { router, Link, usePage } from "@inertiajs/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useHeroCarousel } from "@/contexts/HeroCarouselContext"
-import { SearchDropdown } from "@/Components/search-dropdown"
+import { SearchDropdown } from "@/components/search-dropdown"
 
 interface Category {
   id: number

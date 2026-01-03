@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react'
-import MainTabs from '@/Components/MainTabs'
+import MainTabs from '@/components/MainTabs'
 
 export default function TabsDemo() {
   return (

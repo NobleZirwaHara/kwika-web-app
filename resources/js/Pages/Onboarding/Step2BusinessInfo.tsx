@@ -1,11 +1,11 @@
 import { useForm, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
-import WizardLayout from '@/Components/WizardLayout'
-import { Button } from '@/Components/ui/button'
-import { Input } from '@/Components/ui/input'
-import { Label } from '@/Components/ui/label'
-import { Textarea } from '@/Components/ui/textarea'
-import { LocationPicker } from '@/Components/location-picker'
+import WizardLayout from '@/components/WizardLayout'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { LocationPicker } from '@/components/location-picker'
 import { Building2, FileText, Phone, Mail, Globe, Hash } from 'lucide-react'
 
 interface Props {

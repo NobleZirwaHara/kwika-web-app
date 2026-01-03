@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react'
 import { Star, Heart, MapPin } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Provider } from "./ProviderCard"

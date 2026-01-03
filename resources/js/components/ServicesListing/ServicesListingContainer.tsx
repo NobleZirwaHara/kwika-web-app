@@ -12,8 +12,8 @@ import { SortingDropdown, type SortOption, type SortOrder } from './SortingDropd
 import { ActiveFilters, type FilterState } from './ActiveFilters'
 import { MapView } from './MapView'
 import { EmptyResults } from './EmptyResults'
-import { Card } from '@/Components/ui/card'
-import { Skeleton } from '@/Components/ui/skeleton'
+import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useMediaQuery } from 'react-responsive'
 
 interface Category {

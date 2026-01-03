@@ -1,5 +1,5 @@
-import { Button } from "@/Components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Menu, User, Heart, Calendar, MessageCircle, UserCircle, Settings, Globe, HelpCircle, LogOut, LayoutDashboard } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { Link } from "@inertiajs/react"

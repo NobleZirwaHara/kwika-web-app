@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Search, MapPin, Calendar } from "lucide-react"
 import { useState, useEffect } from "react"
 import { SearchDropdown } from "./search-dropdown"

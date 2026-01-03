@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/Components/ui/card"
-import { Button } from "@/Components/ui/button"
-import { Badge } from "@/Components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { MapPin, ArrowRight, ShoppingCart, Tag } from "lucide-react"
 import { Link } from "@inertiajs/react"
 

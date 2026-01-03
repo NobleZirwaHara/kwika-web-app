@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
+import ProviderLayout from '@/components/ProviderLayout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Building2, Plus, Edit, Trash2, MoreVertical } from 'lucide-react'
 
 interface Company {

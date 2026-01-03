@@ -1,5 +1,5 @@
 import { Link, usePage } from "@inertiajs/react"
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Globe } from "lucide-react"
 import { useState, useEffect } from "react"
 import { CompactSearchBar } from "./compact-search-bar"

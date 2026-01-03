@@ -1,8 +1,8 @@
 import { Head, Link } from '@inertiajs/react'
-import { Header } from '@/Components/header'
-import { Footer } from '@/Components/footer'
-import { Button } from '@/Components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCart } from '@/contexts/CartContext'
 import {
   ShoppingCart,

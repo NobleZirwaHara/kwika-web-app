@@ -1,8 +1,8 @@
 import { router } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
-import { Input } from '@/Components/ui/input'
-import { Label } from '@/Components/ui/label'
-import { Card, CardContent } from '@/Components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { Calendar } from 'lucide-react'
 import { useState } from 'react'
 

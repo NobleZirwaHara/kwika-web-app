@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown, TrendingUp, Star, DollarSign, Clock } from "lucide-react"
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from "@/Components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 export type SortOption = 'rating' | 'reviews' | 'price' | 'newest'

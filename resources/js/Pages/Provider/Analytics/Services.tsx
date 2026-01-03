@@ -1,11 +1,11 @@
 import { Head, Link } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import DateRangeSelector from '@/Components/Analytics/DateRangeSelector'
-import ServiceBarChart from '@/Components/Analytics/ServiceBarChart'
-import StatusPieChart from '@/Components/Analytics/StatusPieChart'
-import { Button } from '@/Components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card'
-import { Badge } from '@/Components/ui/badge'
+import ProviderLayout from '@/components/ProviderLayout'
+import DateRangeSelector from '@/components/Analytics/DateRangeSelector'
+import ServiceBarChart from '@/components/Analytics/ServiceBarChart'
+import StatusPieChart from '@/components/Analytics/StatusPieChart'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 interface DateRange {

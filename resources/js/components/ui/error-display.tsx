@@ -1,5 +1,5 @@
 import { AlertCircle, XCircle } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 
 interface ErrorDisplayProps {

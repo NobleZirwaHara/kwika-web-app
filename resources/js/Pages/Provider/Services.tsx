@@ -1,19 +1,19 @@
 import { useState } from 'react'
 import { useForm, router } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Input } from '@/Components/ui/input'
-import { Label } from '@/Components/ui/label'
-import { Textarea } from '@/Components/ui/textarea'
-import { Badge } from '@/Components/ui/badge'
+import ProviderLayout from '@/components/ProviderLayout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/Components/ui/select'
+} from '@/components/ui/select'
 import {
   Dialog,
   DialogContent,
@@ -21,10 +21,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog'
+} from '@/components/ui/dialog'
 import { Plus, Edit, Trash2, Package, DollarSign, Clock, Image as ImageIcon, X } from 'lucide-react'
 import { processCroppedImage, createImagePreview } from '@/lib/imageUtils'
-import { ImageCropperDialog } from '@/Components/ImageCropperDialog'
+import { ImageCropperDialog } from '@/components/ImageCropperDialog'
 
 interface Service {
   id: number

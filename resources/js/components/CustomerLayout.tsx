@@ -11,14 +11,14 @@ import {
   Heart,
   Package
 } from 'lucide-react'
-import { Button } from '@/Components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/Components/ui/sheet'
+} from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 
 interface CustomerLayoutProps {

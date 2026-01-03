@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react'
 import { Star, Heart, MapPin, DollarSign } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 

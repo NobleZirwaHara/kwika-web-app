@@ -1,6 +1,6 @@
 import { X, Filter } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 
 export interface FilterState {

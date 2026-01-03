@@ -4,7 +4,7 @@ import { Link, usePage, router } from '@inertiajs/react'
 import { Search, ShoppingCart } from 'lucide-react'
 import { useRef, useEffect } from 'react'
 import { useCart } from '@/contexts/CartContext'
-import { Button } from '@/Components/ui/button'
+import { Button } from '@/components/ui/button'
 
 // Animated icon component that plays on load and hover
 function AnimatedIcon({ src, className }: { src: string; className?: string }) {

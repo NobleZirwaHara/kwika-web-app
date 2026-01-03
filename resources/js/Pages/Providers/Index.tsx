@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react'
-import { SearchHeader } from "@/Components/search-header"
-import { Footer } from "@/Components/footer"
-import { ServicesListingContainer } from "@/Components/ServicesListing/ServicesListingContainer"
-import type { Provider } from "@/Components/ServicesListing/ProviderCard"
+import { SearchHeader } from "@/components/search-header"
+import { Footer } from "@/components/footer"
+import { ServicesListingContainer } from "@/components/ServicesListing/ServicesListingContainer"
+import type { Provider } from "@/components/ServicesListing/ProviderCard"
 
 interface Category {
   id: number

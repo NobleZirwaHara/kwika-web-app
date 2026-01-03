@@ -1,6 +1,6 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Link } from "@inertiajs/react"
-import { TimeSlotPicker } from "@/Components/time-slot-picker"
+import { TimeSlotPicker } from "@/components/time-slot-picker"
 import { Calendar, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { format } from "date-fns"

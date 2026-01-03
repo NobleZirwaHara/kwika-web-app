@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, MapPin, Ticket, Download, QrCode, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useState } from 'react'
@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog'
+} from '@/components/ui/dialog'
 
 interface EventTicket {
   id: number

@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { ShoppingCart, Check, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"

@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react'
-import { Header } from '@/Components/header'
-import { Footer } from '@/Components/footer'
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
-import { AddToCartButton } from '@/Components/add-to-cart-button'
+import { Header } from '@/components/header'
+import { Footer } from '@/components/footer'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { AddToCartButton } from '@/components/add-to-cart-button'
 import { useState } from 'react'
 import {
   ArrowLeft,

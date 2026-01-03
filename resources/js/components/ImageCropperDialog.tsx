@@ -7,10 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog'
-import { Button } from '@/Components/ui/button'
-import { Label } from '@/Components/ui/label'
-import { Slider } from '@/Components/ui/slider'
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Slider } from '@/components/ui/slider'
 import { ImageType } from '@/lib/imageUtils'
 
 interface ImageCropperDialogProps {

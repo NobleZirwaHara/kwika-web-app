@@ -1,10 +1,10 @@
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
-import { WishlistButton } from "@/Components/wishlist-button"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { WishlistButton } from "@/components/wishlist-button"
 import { ArrowRight } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { useRef } from "react"
-import { ScrollArrows } from "@/Components/ui/scroll-arrows"
+import { ScrollArrows } from "@/components/ui/scroll-arrows"
 
 interface Service {
   id: number

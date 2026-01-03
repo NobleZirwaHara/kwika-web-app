@@ -1,8 +1,8 @@
-import { Badge } from "@/Components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { Star, Heart } from "lucide-react"
 import { useRef, useState } from "react"
 import { Link } from "@inertiajs/react"
-import { ScrollArrows } from "@/Components/ui/scroll-arrows"
+import { ScrollArrows } from "@/components/ui/scroll-arrows"
 
 interface Provider {
   id: number

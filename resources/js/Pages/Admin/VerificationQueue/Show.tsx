@@ -1,10 +1,10 @@
 import { Head, Link, router, useForm } from '@inertiajs/react'
-import AdminLayout from '@/Components/AdminLayout'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
-import { Textarea } from '@/Components/ui/textarea'
-import { Label } from '@/Components/ui/label'
+import AdminLayout from '@/components/AdminLayout'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/Components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   ShieldCheck,
   ArrowLeft,

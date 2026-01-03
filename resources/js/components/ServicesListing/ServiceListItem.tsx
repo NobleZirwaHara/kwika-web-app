@@ -1,8 +1,8 @@
 import { Link } from '@inertiajs/react'
 import { Star, Clock, Tag, MapPin, Heart } from "lucide-react"
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Service } from "./ServiceCard"

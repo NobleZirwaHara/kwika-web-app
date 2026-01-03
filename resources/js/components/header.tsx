@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Globe, ShoppingCart } from "lucide-react"
 import { useState, useEffect } from "react"
 import { CompactSearchBar } from "./compact-search-bar"

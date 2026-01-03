@@ -1,8 +1,8 @@
 import { useForm, router } from '@inertiajs/react'
 import { FormEvent, useState, ChangeEvent } from 'react'
-import WizardLayout from '@/Components/WizardLayout'
-import { Button } from '@/Components/ui/button'
-import { Label } from '@/Components/ui/label'
+import WizardLayout from '@/components/WizardLayout'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Upload, Image as ImageIcon, X, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

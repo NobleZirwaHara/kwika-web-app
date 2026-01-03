@@ -1,9 +1,9 @@
 import { useState, ChangeEvent } from 'react'
 import { useForm } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs'
+import ProviderLayout from '@/components/ProviderLayout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/Components/ui/dialog'
+} from '@/components/ui/dialog'
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { resizeImage, resizeImages, createImagePreview, processCroppedImage } from '@/lib/imageUtils'
-import { ImageCropperDialog } from '@/Components/ImageCropperDialog'
+import { ImageCropperDialog } from '@/components/ImageCropperDialog'
 
 interface Props {
   provider: {

@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { format } from 'date-fns'

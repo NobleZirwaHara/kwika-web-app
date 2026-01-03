@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { router, Head } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
+import ProviderLayout from '@/components/ProviderLayout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Plus, Edit, Trash2, Package as PackageIcon, Eye, EyeOff, DollarSign } from 'lucide-react'
 import {
   AlertDialog,
@@ -14,7 +14,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/Components/ui/alert-dialog'
+} from '@/components/ui/alert-dialog'
 
 interface Service {
   id: number

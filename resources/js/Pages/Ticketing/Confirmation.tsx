@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
+import { Button } from '@/components/ui/button'
 import { CheckCircle2, Calendar, MapPin, Ticket, Download, Mail, Share2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'

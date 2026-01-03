@@ -1,8 +1,8 @@
 import { useForm, Link, router } from '@inertiajs/react'
 import { FormEvent } from 'react'
-import WizardLayout from '@/Components/WizardLayout'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
+import WizardLayout from '@/components/WizardLayout'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   User,
   Mail,

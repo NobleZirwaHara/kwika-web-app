@@ -1,11 +1,11 @@
 import { Head, Link } from '@inertiajs/react'
-import ProviderLayout from '@/Components/ProviderLayout'
-import DateRangeSelector from '@/Components/Analytics/DateRangeSelector'
-import MetricCard from '@/Components/Analytics/MetricCard'
-import RevenueChart from '@/Components/Analytics/RevenueChart'
-import StatusPieChart from '@/Components/Analytics/StatusPieChart'
-import { Button } from '@/Components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card'
+import ProviderLayout from '@/components/ProviderLayout'
+import DateRangeSelector from '@/components/Analytics/DateRangeSelector'
+import MetricCard from '@/components/Analytics/MetricCard'
+import RevenueChart from '@/components/Analytics/RevenueChart'
+import StatusPieChart from '@/components/Analytics/StatusPieChart'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DollarSign,
   TrendingUp,
