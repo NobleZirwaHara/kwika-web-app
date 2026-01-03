@@ -89,7 +89,8 @@ export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
     <div className="md:hidden bg-white dark:bg-background sticky top-0 z-50 shadow-sm">
       <div className="px-6 pt-5 pb-0">
         {/* Search Bar with Cart */}
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center justify-end gap-3 mb-5">
+          {/* Search button - temporarily hidden
           <button
             onClick={handleSearchClick}
             className="flex-1 flex items-center justify-center gap-3 rounded-full border border-border/20 bg-white dark:bg-card shadow-md hover:shadow-lg transition-all p-4"
@@ -97,6 +98,7 @@ export default function MobileNavTabs({ onSearchClick }: MobileNavTabsProps) {
             <Search className="h-5 w-5 text-foreground/80" />
             <span className="text-base font-semibold text-foreground">Start your search</span>
           </button>
+          */}
 
           {/* Cart Icon */}
           <Link href="/cart" className="relative">
