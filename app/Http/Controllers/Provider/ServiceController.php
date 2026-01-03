@@ -43,9 +43,9 @@ class ServiceController extends Controller
                     'category_name' => $service->category->name,
                     'is_active' => $service->is_active,
                     'bookings_count' => $service->bookings_count,
-                    'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                    'primary_image' => $service->primary_image ? Storage::url($service->primary_image) : null,
                     'gallery_images' => $service->gallery_images ? collect($service->gallery_images)->map(function ($image) {
-                        return asset('storage/' . $image);
+                        return Storage::url($image);
                     })->toArray() : [],
                 ];
             });

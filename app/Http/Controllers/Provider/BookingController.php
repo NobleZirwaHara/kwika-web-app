@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Inertia\Inertia;
 
@@ -191,7 +192,7 @@ class BookingController extends Controller
                         'payment_method' => $payment->payment_method,
                         'payment_gateway' => $payment->payment_gateway,
                         'status' => $payment->status,
-                        'proof_of_payment' => $payment->proof_of_payment ? asset('storage/' . $payment->proof_of_payment) : null,
+                        'proof_of_payment' => $payment->proof_of_payment ? Storage::url($payment->proof_of_payment) : null,
                         'phone_number' => $payment->phone_number,
                         'paid_at' => $payment->paid_at?->format('M d, Y g:i A'),
                         'created_at' => $payment->created_at->format('M d, Y g:i A'),

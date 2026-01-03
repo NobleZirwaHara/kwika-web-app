@@ -6,6 +6,7 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServicePackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ServiceController extends Controller
@@ -87,7 +88,7 @@ class ServiceController extends Controller
                     'base_price' => $relatedService->base_price,
                     'price_type' => $relatedService->price_type,
                     'currency' => $relatedService->currency,
-                    'primary_image' => $relatedService->primary_image ? asset('storage/' . $relatedService->primary_image) : null,
+                    'primary_image' => $relatedService->primary_image ? Storage::url($relatedService->primary_image) : null,
                 ];
             });
 
@@ -112,7 +113,7 @@ class ServiceController extends Controller
                     'base_price' => $similarService->base_price,
                     'price_type' => $similarService->price_type,
                     'currency' => $similarService->currency,
-                    'primary_image' => $similarService->primary_image ? asset('storage/' . $similarService->primary_image) : null,
+                    'primary_image' => $similarService->primary_image ? Storage::url($similarService->primary_image) : null,
                     'provider' => [
                         'business_name' => $similarService->serviceProvider->business_name,
                         'city' => $similarService->serviceProvider->city,
@@ -153,7 +154,7 @@ class ServiceController extends Controller
                     'final_price' => $package->final_price,
                     'currency' => $package->currency,
                     'is_featured' => $package->is_featured,
-                    'primary_image' => $package->primary_image ? asset('storage/' . $package->primary_image) : null,
+                    'primary_image' => $package->primary_image ? Storage::url($package->primary_image) : null,
                     'items' => $package->items->map(function ($item) {
                         return [
                             'quantity' => $item->quantity,
@@ -177,9 +178,9 @@ class ServiceController extends Controller
                 'max_attendees' => $service->max_attendees,
                 'inclusions' => $service->inclusions,
                 'requirements' => $service->requirements,
-                'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                'primary_image' => $service->primary_image ? Storage::url($service->primary_image) : null,
                 'gallery_images' => collect($service->gallery_images ?? [])->map(function ($image) {
-                    return asset('storage/' . $image);
+                    return Storage::url($image);
                 })->toArray(),
                 'requires_deposit' => $service->requires_deposit,
                 'deposit_percentage' => $service->deposit_percentage,
@@ -202,7 +203,7 @@ class ServiceController extends Controller
                     'total_reviews' => $service->serviceProvider->reviews_count ?? 0,
                     'verification_status' => $service->serviceProvider->verification_status,
                     'is_featured' => $service->serviceProvider->is_featured,
-                    'logo' => $service->serviceProvider->logo ? asset('storage/' . $service->serviceProvider->logo) : null,
+                    'logo' => $service->serviceProvider->logo ? Storage::url($service->serviceProvider->logo) : null,
                 ],
             ],
             'relatedServices' => $relatedServices,

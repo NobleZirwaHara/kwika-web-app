@@ -80,7 +80,7 @@ class PromotionController extends Controller
                     'remaining_uses' => $promotion->remaining_uses,
                     'status' => $promotion->status,
                     'is_active' => $promotion->is_active,
-                    'banner_image' => $promotion->banner_image ? asset('storage/' . $promotion->banner_image) : null,
+                    'banner_image' => $promotion->banner_image ? Storage::url($promotion->banner_image) : null,
                     'created_at' => $promotion->created_at->format('M d, Y'),
                 ];
             });
@@ -212,7 +212,7 @@ class PromotionController extends Controller
                 'is_active' => $promotion->is_active,
                 'priority' => $promotion->priority,
                 'terms_conditions' => $promotion->terms_conditions,
-                'banner_image' => $promotion->banner_image ? asset('storage/' . $promotion->banner_image) : null,
+                'banner_image' => $promotion->banner_image ? Storage::url($promotion->banner_image) : null,
             ],
             'services' => $services,
             'categories' => $categories,

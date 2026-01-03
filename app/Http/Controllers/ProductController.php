@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Catalogue;
 use App\Models\ServiceProvider;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -23,7 +24,7 @@ class ProductController extends Controller
                     'name' => $catalogue->name,
                     'slug' => $catalogue->slug,
                     'description' => $catalogue->description,
-                    'image' => $catalogue->cover_image ? asset('storage/' . $catalogue->cover_image) : null,
+                    'image' => $catalogue->cover_image ? Storage::url($catalogue->cover_image) : null,
                     'product_count' => $catalogue->products_count,
                 ];
             });
@@ -49,7 +50,7 @@ class ProductController extends Controller
                     'regular_price' => (float) $product->price,
                     'sale_price' => $product->sale_price ? (float) $product->sale_price : null,
                     'currency' => $product->currency,
-                    'image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'is_on_sale' => $product->is_on_sale,
                     'in_stock' => $product->is_in_stock,
                     'category' => $product->catalogue->name ?? null,
@@ -85,7 +86,7 @@ class ProductController extends Controller
                     'regular_price' => (float) $product->price,
                     'sale_price' => (float) $product->sale_price,
                     'currency' => $product->currency,
-                    'image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'is_on_sale' => true,
                     'in_stock' => $product->is_in_stock,
                     'discount_percent' => round((($product->price - $product->sale_price) / $product->price) * 100),
@@ -118,7 +119,7 @@ class ProductController extends Controller
                     'regular_price' => (float) $product->price,
                     'sale_price' => $product->sale_price ? (float) $product->sale_price : null,
                     'currency' => $product->currency,
-                    'image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'is_on_sale' => $product->is_on_sale,
                     'in_stock' => $product->is_in_stock,
                     'provider' => [
@@ -147,8 +148,8 @@ class ProductController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'product_count' => $provider->products_count,
                 ];
             });
@@ -186,7 +187,7 @@ class ProductController extends Controller
                     'regular_price' => (float) $p->price,
                     'sale_price' => $p->sale_price ? (float) $p->sale_price : null,
                     'currency' => $p->currency,
-                    'image' => $p->primary_image ? asset('storage/' . $p->primary_image) : null,
+                    'image' => $p->primary_image ? Storage::url($p->primary_image) : null,
                     'is_on_sale' => $p->is_on_sale,
                 ];
             });
@@ -209,7 +210,7 @@ class ProductController extends Controller
                     'regular_price' => (float) $p->price,
                     'sale_price' => $p->sale_price ? (float) $p->sale_price : null,
                     'currency' => $p->currency,
-                    'image' => $p->primary_image ? asset('storage/' . $p->primary_image) : null,
+                    'image' => $p->primary_image ? Storage::url($p->primary_image) : null,
                     'is_on_sale' => $p->is_on_sale,
                     'provider' => [
                         'name' => $p->serviceProvider->business_name,
@@ -236,8 +237,8 @@ class ProductController extends Controller
                 'dimensions' => $product->dimensions,
                 'specifications' => $product->specifications,
                 'features' => $product->features,
-                'primary_image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
-                'gallery_images' => $product->gallery_images ? collect($product->gallery_images)->map(fn($img) => asset('storage/' . $img))->toArray() : [],
+                'primary_image' => $product->primary_image ? Storage::url($product->primary_image) : null,
+                'gallery_images' => $product->gallery_images ? collect($product->gallery_images)->map(fn($img) => Storage::url($img))->toArray() : [],
                 'is_on_sale' => $product->is_on_sale,
                 'is_in_stock' => $product->is_in_stock,
                 'category' => $product->catalogue ? [
@@ -257,7 +258,7 @@ class ProductController extends Controller
                     'rating' => (float) $product->serviceProvider->average_rating,
                     'total_reviews' => $product->serviceProvider->total_reviews,
                     'verification_status' => $product->serviceProvider->verification_status,
-                    'logo' => $product->serviceProvider->logo ? asset('storage/' . $product->serviceProvider->logo) : null,
+                    'logo' => $product->serviceProvider->logo ? Storage::url($product->serviceProvider->logo) : null,
                 ],
             ],
             'relatedProducts' => $relatedProducts,

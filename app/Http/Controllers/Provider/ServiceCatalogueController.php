@@ -41,7 +41,7 @@ class ServiceCatalogueController extends Controller
                     'name' => $catalogue->name,
                     'slug' => $catalogue->slug,
                     'description' => $catalogue->description,
-                    'cover_image' => $catalogue->cover_image ? asset('storage/' . $catalogue->cover_image) : null,
+                    'cover_image' => $catalogue->cover_image ? Storage::url($catalogue->cover_image) : null,
                     'is_active' => $catalogue->is_active,
                     'is_featured' => $catalogue->is_featured,
                     'display_order' => $catalogue->display_order,
@@ -49,7 +49,7 @@ class ServiceCatalogueController extends Controller
                     'company' => [
                         'id' => $catalogue->company->id,
                         'name' => $catalogue->company->name,
-                        'logo' => $catalogue->company->logo ? asset('storage/' . $catalogue->company->logo) : null,
+                        'logo' => $catalogue->company->logo ? Storage::url($catalogue->company->logo) : null,
                     ],
                     'created_at' => $catalogue->created_at->format('M d, Y'),
                 ];
@@ -80,7 +80,7 @@ class ServiceCatalogueController extends Controller
                 return [
                     'id' => $company->id,
                     'name' => $company->name,
-                    'logo' => $company->logo ? asset('storage/' . $company->logo) : null,
+                    'logo' => $company->logo ? Storage::url($company->logo) : null,
                 ];
             });
 
@@ -144,7 +144,7 @@ class ServiceCatalogueController extends Controller
                 return [
                     'id' => $company->id,
                     'name' => $company->name,
-                    'logo' => $company->logo ? asset('storage/' . $company->logo) : null,
+                    'logo' => $company->logo ? Storage::url($company->logo) : null,
                 ];
             });
 
@@ -154,7 +154,7 @@ class ServiceCatalogueController extends Controller
                 'company_id' => $catalogue->company_id,
                 'name' => $catalogue->name,
                 'description' => $catalogue->description,
-                'cover_image' => $catalogue->cover_image ? asset('storage/' . $catalogue->cover_image) : null,
+                'cover_image' => $catalogue->cover_image ? Storage::url($catalogue->cover_image) : null,
                 'display_order' => $catalogue->display_order,
                 'is_active' => $catalogue->is_active,
                 'is_featured' => $catalogue->is_featured,

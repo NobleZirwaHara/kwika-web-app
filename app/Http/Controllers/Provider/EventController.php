@@ -83,7 +83,7 @@ class EventController extends Controller
                     'capacity_percentage' => $event->capacity_percentage,
                     'spots_remaining' => $event->spots_remaining,
                     'ticket_packages_count' => $event->ticketPackages->count(),
-                    'cover_image' => $event->cover_image ? asset('storage/' . $event->cover_image) : null,
+                    'cover_image' => $event->cover_image ? Storage::url($event->cover_image) : null,
                     'created_at' => $event->created_at->format('M d, Y'),
                 ];
             });
@@ -201,7 +201,7 @@ class EventController extends Controller
                 'status' => $event->status,
                 'is_featured' => $event->is_featured,
                 'requires_approval' => $event->requires_approval,
-                'cover_image' => $event->cover_image ? asset('storage/' . $event->cover_image) : null,
+                'cover_image' => $event->cover_image ? Storage::url($event->cover_image) : null,
                 'gallery_images' => $event->gallery_images,
                 'terms_conditions' => $event->terms_conditions,
                 'agenda' => $event->agenda,

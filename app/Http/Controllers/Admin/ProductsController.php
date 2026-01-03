@@ -315,7 +315,7 @@ class ProductsController extends Controller
                 'dimensions' => $product->dimensions,
                 'specifications' => $product->specifications,
                 'features' => $product->features,
-                'primary_image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                'primary_image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                 'is_active' => $product->is_active,
                 'is_featured' => $product->is_featured,
                 'display_order' => $product->display_order,
@@ -333,7 +333,7 @@ class ProductsController extends Controller
                 'media' => $product->media->map(function ($media) {
                     return [
                         'id' => $media->id,
-                        'url' => $media->url ? asset('storage/' . $media->url) : null,
+                        'url' => $media->url ? Storage::url($media->url) : null,
                         'type' => $media->type,
                     ];
                 }),

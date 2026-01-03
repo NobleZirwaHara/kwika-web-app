@@ -81,7 +81,7 @@ class ProductController extends Controller
                     'unit' => $product->unit,
                     'is_active' => $product->is_active,
                     'is_featured' => $product->is_featured,
-                    'primary_image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'primary_image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'catalogue' => [
                         'id' => $product->catalogue->id,
                         'name' => $product->catalogue->name,
@@ -206,7 +206,7 @@ class ProductController extends Controller
                 'dimensions' => $product->dimensions,
                 'specifications' => $product->specifications,
                 'features' => $product->features,
-                'primary_image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                'primary_image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                 'is_active' => $product->is_active,
                 'is_featured' => $product->is_featured,
                 'display_order' => $product->display_order,

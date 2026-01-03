@@ -6,6 +6,7 @@ use App\Models\ServiceProvider;
 use App\Models\ServiceCategory;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class SearchController extends Controller
@@ -157,8 +158,8 @@ class SearchController extends Controller
                     'city' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image,
-                    'logo' => $provider->logo,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'featured' => $provider->is_featured,
                     'min_price' => $provider->services->where('is_active', true)->min('base_price'),
                     'latitude' => $provider->latitude,
@@ -281,7 +282,7 @@ class SearchController extends Controller
                     'price_type' => $service->price_type,
                     'currency' => $service->currency,
                     'duration' => $service->duration,
-                    'image' => $service->primary_image,
+                    'image' => $service->primary_image ? Storage::url($service->primary_image) : null,
                     'category' => $service->category ? [
                         'id' => $service->category->id,
                         'name' => $service->category->name,
@@ -293,7 +294,7 @@ class SearchController extends Controller
                         'city' => $service->serviceProvider->city,
                         'rating' => (float) $service->serviceProvider->average_rating,
                         'reviews' => $service->serviceProvider->total_reviews,
-                        'logo' => $service->serviceProvider->logo,
+                        'logo' => $service->serviceProvider->logo ? Storage::url($service->serviceProvider->logo) : null,
                         'latitude' => $service->serviceProvider->latitude,
                         'longitude' => $service->serviceProvider->longitude,
                     ],

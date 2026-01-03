@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ServiceCategory;
 use App\Models\Catalogue;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ListingsController extends Controller
@@ -41,9 +42,9 @@ class ListingsController extends Controller
                     'category_name' => $service->category->name,
                     'is_active' => $service->is_active,
                     'bookings_count' => $service->bookings_count,
-                    'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                    'primary_image' => $service->primary_image ? Storage::url($service->primary_image) : null,
                     'gallery_images' => $service->gallery_images ? collect($service->gallery_images)->map(function ($image) {
-                        return asset('storage/' . $image);
+                        return Storage::url($image);
                     })->toArray() : [],
                 ];
             });
@@ -68,9 +69,9 @@ class ListingsController extends Controller
                     'unit' => $product->unit,
                     'specifications' => $product->specifications ?? [],
                     'features' => $product->features ?? [],
-                    'primary_image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'primary_image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'gallery_images' => $product->gallery_images ? collect($product->gallery_images)->map(function ($image) {
-                        return asset('storage/' . $image);
+                        return Storage::url($image);
                     })->toArray() : [],
                     'is_active' => $product->is_active,
                     'is_featured' => $product->is_featured,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class TicketingController extends Controller
@@ -87,8 +88,8 @@ class TicketingController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) ($provider->average_rating ?? 4.5),
                     'reviews' => $provider->total_reviews ?? 0,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'event_count' => $provider->events()->count(),
                     'is_verified' => $provider->verification_status === 'approved',
                 ];

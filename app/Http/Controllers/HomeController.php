@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ServiceCategory;
 use App\Models\ServiceProvider;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -47,8 +48,8 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'description' => $provider->description,
                     'featured' => true,
                 ];
@@ -70,8 +71,8 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'featured' => $provider->is_featured,
                 ];
             });
@@ -92,8 +93,8 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'featured' => $provider->is_featured,
                 ];
             });
@@ -113,8 +114,8 @@ class HomeController extends Controller
                     'location' => $provider->city,
                     'rating' => (float) $provider->average_rating,
                     'reviews' => $provider->total_reviews,
-                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'image' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                    'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                     'featured' => $provider->is_featured,
                 ];
             });
@@ -141,7 +142,7 @@ class HomeController extends Controller
                     'regular_price' => (float) $product->price,
                     'sale_price' => $product->sale_price ? (float) $product->sale_price : null,
                     'currency' => $product->currency,
-                    'image' => $product->primary_image ? asset('storage/' . $product->primary_image) : null,
+                    'image' => $product->primary_image ? Storage::url($product->primary_image) : null,
                     'is_on_sale' => $product->is_on_sale,
                     'in_stock' => $product->is_in_stock,
                     'provider' => [

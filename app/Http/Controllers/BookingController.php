@@ -719,7 +719,7 @@ class BookingController extends Controller
                 'base_price' => $service->base_price,
                 'price_type' => $service->price_type,
                 'currency' => $service->currency,
-                'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                'primary_image' => $service->primary_image ? Storage::url($service->primary_image) : null,
                 'max_attendees' => $service->max_attendees,
             ];
         })->values();
@@ -745,7 +745,7 @@ class BookingController extends Controller
                 'phone' => $provider->phone,
                 'email' => $provider->email,
                 'rating' => $provider->rating ?? 0,
-                'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                'logo' => $provider->logo ? Storage::url($provider->logo) : null,
             ],
             'services' => $services,
             'categories' => $categories,

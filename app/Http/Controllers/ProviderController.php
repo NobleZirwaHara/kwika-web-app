@@ -6,6 +6,7 @@ use App\Models\ServiceProvider;
 use App\Models\ServiceCategory;
 use App\Models\ServicePackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProviderController extends Controller
@@ -266,7 +267,7 @@ class ProviderController extends Controller
                     'location' => $similar->city,
                     'rating' => (float) $similar->average_rating,
                     'reviews' => $similar->total_reviews,
-                    'image' => $similar->cover_image ? asset('storage/' . $similar->cover_image) : null,
+                    'image' => $similar->cover_image ? Storage::url($similar->cover_image) : null,
                 ];
             });
 
@@ -279,10 +280,10 @@ class ProviderController extends Controller
         if (empty($portfolioImages)) {
             $fallbackImages = [];
             if ($provider->cover_image) {
-                $fallbackImages[] = asset('storage/' . $provider->cover_image);
+                $fallbackImages[] = Storage::url($provider->cover_image);
             }
             if ($provider->logo) {
-                $fallbackImages[] = asset('storage/' . $provider->logo);
+                $fallbackImages[] = Storage::url($provider->logo);
             }
             $portfolioImages = $fallbackImages;
         }
@@ -315,7 +316,7 @@ class ProviderController extends Controller
                     'final_price' => $package->final_price,
                     'currency' => $package->currency,
                     'is_featured' => $package->is_featured,
-                    'primary_image' => $package->primary_image ? asset('storage/' . $package->primary_image) : null,
+                    'primary_image' => $package->primary_image ? Storage::url($package->primary_image) : null,
                     'items' => $package->items->map(function ($item) {
                         return [
                             'quantity' => $item->quantity,
@@ -339,8 +340,8 @@ class ProviderController extends Controller
                 'rating' => (float) $provider->average_rating,
                 'totalReviews' => $provider->total_reviews,
                 'totalBookings' => $provider->total_bookings,
-                'coverImage' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
-                'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                'coverImage' => $provider->cover_image ? Storage::url($provider->cover_image) : null,
+                'logo' => $provider->logo ? Storage::url($provider->logo) : null,
                 'verificationStatus' => $provider->verification_status,
                 'isFeatured' => $provider->is_featured,
                 'images' => $portfolioImages,
