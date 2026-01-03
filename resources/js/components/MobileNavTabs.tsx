@@ -77,14 +77,14 @@ export default function MobileNavTabs() {
     <div className="md:hidden bg-white dark:bg-background sticky top-0 z-50 shadow-sm">
       <div className="px-6 pt-5 pb-0">
         {/* Logo and Cart */}
-        <div className="flex items-center justify-between mb-5">
-          {/* Logo */}
+        <div className="relative flex items-center justify-center mb-5">
+          {/* Logo - Centered */}
           <Link href="/">
-            <img src="/kwika-logo.png" alt="Kwika" className="h-8" />
+            <img src="/kwika-logo.png" alt="Kwika" className="h-14" />
           </Link>
 
-          {/* Cart Icon */}
-          <Link href="/cart" className="relative">
+          {/* Cart Icon - Absolute Right */}
+          <Link href="/cart" className="absolute right-0 top-1/2 -translate-y-1/2">
             <Button variant="outline" size="icon" className="rounded-full h-12 w-12 shadow-md">
               <ShoppingCart className="h-5 w-5" />
               {cart.total_items > 0 && (
