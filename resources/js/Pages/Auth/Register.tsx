@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
+import { ErrorDisplay, FieldError } from '@/Components/ui/error-display'
 import { UserPlus } from 'lucide-react'
 
 export default function Register() {
@@ -13,6 +14,10 @@ export default function Register() {
     password: '',
     password_confirmation: '',
   })
+
+  const hasGeneralError = errors && Object.keys(errors).some(key =>
+    !['name', 'email', 'phone', 'password', 'password_confirmation'].includes(key)
+  )
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -49,6 +54,11 @@ export default function Register() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* General Errors */}
+                {hasGeneralError && (
+                  <ErrorDisplay errors={errors} title="Registration Error" />
+                )}
+
                 <div>
                   <Label htmlFor="name">Full Name</Label>
                   <Input
@@ -57,13 +67,11 @@ export default function Register() {
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
                     placeholder="John Doe"
-                    className={errors.name ? 'border-red-500' : ''}
+                    className={errors.name ? 'border-destructive' : ''}
                     autoComplete="name"
                     autoFocus
                   />
-                  {errors.name && (
-                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-                  )}
+                  <FieldError error={errors.name} />
                 </div>
 
                 <div>
@@ -74,12 +82,10 @@ export default function Register() {
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
                     placeholder="you@example.com"
-                    className={errors.email ? 'border-red-500' : ''}
+                    className={errors.email ? 'border-destructive' : ''}
                     autoComplete="email"
                   />
-                  {errors.email && (
-                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-                  )}
+                  <FieldError error={errors.email} />
                 </div>
 
                 <div>
@@ -89,13 +95,11 @@ export default function Register() {
                     type="tel"
                     value={data.phone}
                     onChange={(e) => setData('phone', e.target.value)}
-                    placeholder="+256 700 000 000"
-                    className={errors.phone ? 'border-red-500' : ''}
+                    placeholder="+265 999 000 000"
+                    className={errors.phone ? 'border-destructive' : ''}
                     autoComplete="tel"
                   />
-                  {errors.phone && (
-                    <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-                  )}
+                  <FieldError error={errors.phone} />
                 </div>
 
                 <div>
@@ -106,12 +110,10 @@ export default function Register() {
                     value={data.password}
                     onChange={(e) => setData('password', e.target.value)}
                     placeholder="Create a strong password"
-                    className={errors.password ? 'border-red-500' : ''}
+                    className={errors.password ? 'border-destructive' : ''}
                     autoComplete="new-password"
                   />
-                  {errors.password && (
-                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-                  )}
+                  <FieldError error={errors.password} />
                   <p className="text-xs text-muted-foreground mt-1">
                     Must be at least 8 characters
                   </p>
@@ -125,12 +127,10 @@ export default function Register() {
                     value={data.password_confirmation}
                     onChange={(e) => setData('password_confirmation', e.target.value)}
                     placeholder="Re-enter your password"
-                    className={errors.password_confirmation ? 'border-red-500' : ''}
+                    className={errors.password_confirmation ? 'border-destructive' : ''}
                     autoComplete="new-password"
                   />
-                  {errors.password_confirmation && (
-                    <p className="text-sm text-red-600 mt-1">{errors.password_confirmation}</p>
-                  )}
+                  <FieldError error={errors.password_confirmation} />
                 </div>
 
                 <Button type="submit" className="w-full cursor-pointer" disabled={processing}>

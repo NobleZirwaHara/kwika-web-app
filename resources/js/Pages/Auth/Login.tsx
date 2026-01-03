@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Checkbox } from '@/Components/ui/checkbox'
+import { ErrorDisplay, FieldError } from '@/Components/ui/error-display'
 import { LogIn } from 'lucide-react'
 
 export default function Login() {
@@ -12,6 +13,8 @@ export default function Login() {
     password: '',
     remember: false,
   })
+
+  const hasGeneralError = errors && Object.keys(errors).some(key => !['email', 'password'].includes(key))
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,6 +51,11 @@ export default function Login() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* General Errors */}
+                {hasGeneralError && (
+                  <ErrorDisplay errors={errors} title="Login Error" />
+                )}
+
                 <div>
                   <Label htmlFor="email">Email Address</Label>
                   <Input
@@ -56,13 +64,11 @@ export default function Login() {
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
                     placeholder="you@example.com"
-                    className={errors.email ? 'border-red-500' : ''}
+                    className={errors.email ? 'border-destructive' : ''}
                     autoComplete="email"
                     autoFocus
                   />
-                  {errors.email && (
-                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-                  )}
+                  <FieldError error={errors.email} />
                 </div>
 
                 <div>
@@ -73,12 +79,10 @@ export default function Login() {
                     value={data.password}
                     onChange={(e) => setData('password', e.target.value)}
                     placeholder="Enter your password"
-                    className={errors.password ? 'border-red-500' : ''}
+                    className={errors.password ? 'border-destructive' : ''}
                     autoComplete="current-password"
                   />
-                  {errors.password && (
-                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-                  )}
+                  <FieldError error={errors.password} />
                 </div>
 
                 <div className="flex items-center justify-between">

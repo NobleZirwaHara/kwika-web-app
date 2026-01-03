@@ -8,6 +8,7 @@ import { Badge } from '@/Components/ui/badge'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
+import { ErrorDisplay, FieldError } from '@/Components/ui/error-display'
 import {
   ArrowLeft,
   Plus,
@@ -63,6 +64,7 @@ interface Props {
   auth?: {
     user?: any
   }
+  errors?: Record<string, string>
 }
 
 interface SelectedService {
@@ -71,7 +73,7 @@ interface SelectedService {
   notes: string
 }
 
-export default function CreateCustom({ provider, services, categories = [], auth }: Props) {
+export default function CreateCustom({ provider, services, categories = [], auth, errors }: Props) {
   const [selectedServices, setSelectedServices] = useState<Map<number, SelectedService>>(new Map())
   const [eventDate, setEventDate] = useState<Date | undefined>()
   const [startTime, setStartTime] = useState('')
@@ -79,6 +81,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
   const [eventLocation, setEventLocation] = useState('')
   const [specialRequests, setSpecialRequests] = useState('')
   const [processing, setProcessing] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   const addService = (service: Service) => {
     const newSelected = new Map(selectedServices)
@@ -125,14 +128,15 @@ export default function CreateCustom({ provider, services, categories = [], auth
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError(null)
 
     if (selectedServices.size === 0) {
-      alert('Please select at least one service')
+      setFormError('Please select at least one service')
       return
     }
 
     if (!eventDate || !startTime || !endTime || !eventLocation) {
-      alert('Please fill in all required fields')
+      setFormError('Please fill in all required fields (event date, start time, end time, and location)')
       return
     }
 
@@ -158,6 +162,9 @@ export default function CreateCustom({ provider, services, categories = [], auth
       {
         preserveScroll: true,
         onFinish: () => setProcessing(false),
+        onError: () => {
+          setFormError('There was an error submitting your booking request. Please check the form and try again.')
+        },
       }
     )
   }
@@ -192,6 +199,15 @@ export default function CreateCustom({ provider, services, categories = [], auth
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* Error Display */}
+            {(formError || errors) && (
+              <ErrorDisplay
+                errors={errors || formError || undefined}
+                title="Booking Request Error"
+                className="mb-6"
+              />
+            )}
+
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Service Selection */}
               <div className="lg:col-span-2 space-y-6">
@@ -377,6 +393,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                         className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                         required
                       />
+                      <FieldError error={errors?.event_date} />
                     </div>
 
                     {/* Time Range */}
@@ -390,6 +407,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                           onChange={(e) => setStartTime(e.target.value)}
                           required
                         />
+                        <FieldError error={errors?.start_time} />
                       </div>
                       <div>
                         <Label htmlFor="end_time">End Time *</Label>
@@ -400,6 +418,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                           onChange={(e) => setEndTime(e.target.value)}
                           required
                         />
+                        <FieldError error={errors?.end_time} />
                       </div>
                     </div>
 
@@ -413,6 +432,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                         onChange={(e) => setEventLocation(e.target.value)}
                         required
                       />
+                      <FieldError error={errors?.event_location} />
                     </div>
 
                     {/* Special Requests */}
@@ -425,6 +445,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                         value={specialRequests}
                         onChange={(e) => setSpecialRequests(e.target.value)}
                       />
+                      <FieldError error={errors?.special_requests} />
                     </div>
                   </CardContent>
                 </Card>
