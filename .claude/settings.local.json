@@ -24,7 +24,8 @@
       "Bash(ren \"resources\\\\js\\\\Components\" \"components_temp\")",
       "Bash(powershell -Command \"Rename-Item -Path ''C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\resources\\\\js\\\\Components'' -NewName ''components_temp''\")",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(powershell -Command \"Rename-Item -Path ''C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\ticketing'' -NewName ''ticket-assets''\")"
     ],
     "deny": [],
     "ask": []
