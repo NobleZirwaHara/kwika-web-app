@@ -37,6 +37,7 @@ Route::post('/logout', function () {
 
 // Home page - shows categories and featured providers
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home.default');
 
 // Products page
 Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('products');
