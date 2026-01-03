@@ -13,7 +13,6 @@ yarn-error.log
 .pnpm-debug.log*
 
 # Laravel specific
-/bootstrap/cache/*
 !/bootstrap/cache/.gitkeep
 /storage/*.key
 /storage/app/*
@@ -26,8 +25,6 @@ yarn-error.log
 !/storage/framework/testing/.gitkeep
 /storage/framework/views/*
 !/storage/framework/views/.gitkeep
-/storage/logs/*
-!/storage/logs/.gitkeep
 
 # Vite
 /public/hot
