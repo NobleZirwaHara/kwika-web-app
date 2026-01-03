@@ -1,8 +1,9 @@
-import { Head, Link, router } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { format } from 'date-fns'
+import { SEO, createEventSchema } from '@/components/seo'
 
 interface TicketPackage {
   id: number
@@ -88,9 +89,33 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
     })
   }
 
+  const minPrice = ticketPackages.length > 0
+    ? Math.min(...ticketPackages.map(p => p.price))
+    : undefined
+
+  const eventSchema = createEventSchema({
+    name: event.title,
+    description: event.description,
+    startDate: event.start_datetime,
+    endDate: event.end_datetime,
+    location: event.venue_name,
+    city: event.venue_city,
+    image: event.cover_image,
+    price: minPrice,
+    currency: ticketPackages[0]?.currency || 'MWK',
+    organizer: event.service_provider?.business_name,
+  })
+
   return (
     <>
-      <Head title={event.title} />
+      <SEO
+        title={`${event.title} - Tickets & Info`}
+        description={`Get tickets for ${event.title} at ${event.venue_name}, ${event.venue_city}. ${event.description?.substring(0, 100) || ''}`}
+        keywords={`${event.title}, ${event.category}, tickets ${event.venue_city}, events Malawi, ${event.service_provider?.business_name}`}
+        image={event.cover_image}
+        type="event"
+        structuredData={eventSchema}
+      />
 
       <div className="min-h-screen bg-background">
         {/* Hero Section */}

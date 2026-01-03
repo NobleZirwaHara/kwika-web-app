@@ -7,10 +7,10 @@ import { BenefitsSection } from "@/components/benefits-section"
 import { PromotionsSection } from "@/components/promotions-section"
 import { Testimonials } from "@/components/testimonials"
 import { Footer } from "@/components/footer"
-import { Head } from '@inertiajs/react'
 import { EventHighlight } from "@/components/event-highlight"
 import { KwikaRewards } from "@/components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
+import { SEO } from "@/components/seo"
 
 interface Category {
   id: number
@@ -69,7 +69,11 @@ interface HomeProps {
 export default function Home({ categories, featuredProviders, topProviders, lilongweProviders, newProviders, featuredProducts }: HomeProps) {
   return (
     <HeroCarouselProvider>
-      <Head title="Kwika Events - Find Perfect Event Service Providers in Malawi" />
+      <SEO
+        title="Find Perfect Event Service Providers in Malawi"
+        description="Discover top-rated photographers, caterers, venues, decorators, DJs, and more for your wedding, corporate event, or celebration in Malawi. Book trusted providers in Lilongwe, Blantyre, and across the country."
+        keywords="events Malawi, wedding services Lilongwe, event planning Blantyre, photographers, caterers, venues, decorators, DJ services, event rentals, wedding planner, party supplies Malawi"
+      />
       <div className="min-h-screen">
         <Header />
         <main>

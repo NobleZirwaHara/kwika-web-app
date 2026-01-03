@@ -6,9 +6,9 @@ import { ProviderPackagesSection } from "@/components/provider-packages-section"
 import { ProviderReviews } from "@/components/provider-reviews"
 import { SimilarProviders } from "@/components/similar-providers"
 import { Footer } from "@/components/footer"
-import { Head } from '@inertiajs/react'
 import { Share2, Heart, MapPin } from "lucide-react"
 import { useState } from "react"
+import { SEO, createLocalBusinessSchema, createBreadcrumbSchema } from "@/components/seo"
 
 interface ProviderData {
   id: string | number
@@ -100,9 +100,34 @@ interface Props {
 export default function ProviderDetail({ provider, services, packages, reviews, similarProviders, categories = [], auth }: Props) {
   const [isFavorite, setIsFavorite] = useState(false)
 
+  const businessSchema = createLocalBusinessSchema({
+    name: provider.name,
+    description: provider.description,
+    address: provider.location,
+    city: provider.city,
+    phone: provider.phone,
+    email: provider.email,
+    image: provider.coverImage || provider.logo,
+    rating: provider.rating,
+    reviewCount: provider.totalReviews,
+  })
+
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Providers', url: '/search?listing_type=providers' },
+    { name: provider.name, url: `/providers/${provider.slug}` },
+  ])
+
   return (
     <>
-      <Head title={`${provider.name} - EventHub`} />
+      <SEO
+        title={`${provider.name} - Event Services in ${provider.city}`}
+        description={`${provider.description?.substring(0, 155) || `Book ${provider.name} for your events in ${provider.city}, Malawi.`}...`}
+        keywords={`${provider.name}, event services ${provider.city}, ${provider.location}, weddings Malawi, events`}
+        image={provider.coverImage || provider.logo}
+        type="profile"
+        structuredData={{ ...businessSchema, ...breadcrumbs }}
+      />
       <div className="min-h-screen">
         <SearchHeader categories={categories} />
         <main className="pt-16">

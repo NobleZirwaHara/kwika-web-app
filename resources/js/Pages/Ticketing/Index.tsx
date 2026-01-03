@@ -1,7 +1,8 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { Head, Link } from '@inertiajs/react'
+import { Link } from '@inertiajs/react'
 import { Search, ChevronRight, ChevronLeft, Heart, MapPin, Calendar, Star, Ticket, BadgeCheck } from "lucide-react"
+import { SEO } from "@/components/seo"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -306,7 +307,12 @@ export default function TicketingIndex({
 
   return (
     <>
-      <Head title="Events & Ticketing - Find Live Events & Sports" />
+      <SEO
+        title="Events & Ticketing - Find Live Events in Malawi"
+        description="Discover and buy tickets for concerts, sports, festivals, and live events in Malawi. From Lake of Stars Festival to local sports matches - find events in Lilongwe, Blantyre, Mangochi and beyond."
+        keywords="events Malawi, tickets, concerts Lilongwe, sports Blantyre, festivals, Lake of Stars, live events, entertainment Malawi, ticket booking"
+        type="website"
+      />
       <div className="min-h-screen bg-[#2b6068] text-white">
         <Header />
 

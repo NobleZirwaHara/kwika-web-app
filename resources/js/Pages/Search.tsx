@@ -1,9 +1,9 @@
-import { Head } from '@inertiajs/react'
 import { SearchHeader } from "@/components/search-header"
 import { Footer } from "@/components/footer"
 import { ServicesListingContainer } from "@/components/ServicesListing/ServicesListingContainer"
 import type { Provider } from "@/components/ServicesListing/ProviderCard"
 import type { Service } from "@/components/ServicesListing/ServiceCard"
+import { SEO, createBreadcrumbSchema } from "@/components/seo"
 
 interface Category {
   id: number
@@ -103,9 +103,48 @@ export default function Search({
     return listingType === 'providers' ? 'All Providers' : 'All Services'
   }
 
+  const getPageDescription = () => {
+    const parts = []
+
+    if (searchParams.query) {
+      parts.push(`Search results for "${searchParams.query}"`)
+    } else if (listingType === 'providers') {
+      parts.push('Browse event service providers')
+    } else {
+      parts.push('Browse event services')
+    }
+
+    if (searchParams.category) {
+      const category = categories.find(c => c.id === searchParams.category)
+      if (category) {
+        parts.push(`in ${category.name}`)
+      }
+    }
+
+    if (searchParams.city) {
+      parts.push(`located in ${searchParams.city}`)
+    }
+
+    return `${parts.join(' ')} in Malawi. Find and book top-rated ${listingType === 'providers' ? 'photographers, caterers, venues, decorators' : 'photography, catering, venue, decoration services'} for your events.`
+  }
+
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: listingType === 'providers' ? 'Providers' : 'Services', url: '/search' },
+    ...(searchParams.category ? [{
+      name: categories.find(c => c.id === searchParams.category)?.name || 'Category',
+      url: `/search?category=${searchParams.category}`
+    }] : []),
+  ]
+
   return (
     <>
-      <Head title={getPageTitle()} />
+      <SEO
+        title={getPageTitle()}
+        description={getPageDescription()}
+        keywords={`${listingType} Malawi, ${searchParams.city || 'Lilongwe Blantyre'}, event services, ${searchParams.query || 'wedding corporate party'}`}
+        structuredData={createBreadcrumbSchema(breadcrumbs)}
+      />
       <div className="min-h-screen">
         <SearchHeader />
 
