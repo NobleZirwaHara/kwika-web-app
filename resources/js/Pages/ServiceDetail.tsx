@@ -25,6 +25,7 @@ import {
   ArrowLeft,
   Shield,
   XCircle,
+  Package as PackageIcon,
 } from 'lucide-react'
 
 interface Service {
@@ -94,17 +95,34 @@ interface Category {
   icon: string
 }
 
+interface ProviderPackage {
+  id: number
+  slug: string
+  name: string
+  description: string | null
+  package_type: 'tier' | 'bundle'
+  final_price: number
+  currency: string
+  is_featured: boolean
+  primary_image: string | null
+  items: {
+    quantity: number
+    service_name: string
+  }[]
+}
+
 interface Props {
   service: Service
   relatedServices: RelatedService[]
   similarServices: SimilarService[]
+  providerPackages: ProviderPackage[]
   categories?: Category[]
   auth?: {
     user?: any
   }
 }
 
-export default function ServiceDetail({ service, relatedServices, similarServices, categories = [], auth }: Props) {
+export default function ServiceDetail({ service, relatedServices, similarServices, providerPackages, categories = [], auth }: Props) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [bookedDates, setBookedDates] = useState<Date[]>([])
   const [bookedTimeSlots, setBookedTimeSlots] = useState<string[]>([])
@@ -532,6 +550,83 @@ export default function ServiceDetail({ service, relatedServices, similarService
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Service Packages */}
+              {providerPackages.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <PackageIcon className="h-5 w-5 text-primary" />
+                        Service Packages Including This Service
+                      </CardTitle>
+                    </div>
+                    <CardDescription>
+                      Save money by booking one of these curated packages
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {providerPackages.map((pkg) => (
+                        <Link
+                          key={pkg.id}
+                          href={`/packages/${pkg.slug}`}
+                          className="group border rounded-lg p-4 hover:shadow-md transition-shadow relative"
+                        >
+                          {pkg.is_featured && (
+                            <Badge className="absolute top-2 right-2 bg-yellow-500 text-white">
+                              Featured
+                            </Badge>
+                          )}
+                          {pkg.primary_image && (
+                            <img
+                              src={pkg.primary_image}
+                              alt={pkg.name}
+                              className="w-full h-32 object-cover rounded-md mb-3"
+                            />
+                          )}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant={pkg.package_type === 'bundle' ? 'default' : 'secondary'}>
+                              {pkg.package_type === 'bundle' ? 'Bundle' : 'Tier'}
+                            </Badge>
+                          </div>
+                          <h4 className="font-semibold group-hover:text-primary transition-colors mb-1">
+                            {pkg.name}
+                          </h4>
+                          {pkg.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              {pkg.description}
+                            </p>
+                          )}
+                          {pkg.items.length > 0 && (
+                            <div className="mb-3">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Includes:</p>
+                              <ul className="text-xs text-muted-foreground space-y-1">
+                                {pkg.items.slice(0, 2).map((item, idx) => (
+                                  <li key={idx} className="flex items-start">
+                                    <CheckCircle className="h-3 w-3 text-green-600 mt-0.5 mr-1 flex-shrink-0" />
+                                    <span>{item.quantity}x {item.service_name}</span>
+                                  </li>
+                                ))}
+                                {pkg.items.length > 2 && (
+                                  <li className="text-xs text-muted-foreground italic">
+                                    +{pkg.items.length - 2} more...
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+                          )}
+                          <div className="pt-3 border-t">
+                            <p className="text-lg font-bold text-primary">
+                              {pkg.currency} {pkg.final_price.toLocaleString()}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Related Services */}
               {relatedServices.length > 0 && (

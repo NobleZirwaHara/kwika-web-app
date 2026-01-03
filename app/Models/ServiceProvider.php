@@ -80,6 +80,21 @@ class ServiceProvider extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(ServicePackage::class);
+    }
+
+    public function activePackages()
+    {
+        return $this->hasMany(ServicePackage::class)->where('is_active', true);
+    }
+
     public function availability()
     {
         return $this->hasMany(Availability::class);

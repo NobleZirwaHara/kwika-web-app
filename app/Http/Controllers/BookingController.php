@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Contracts\Broadcasting\RealtimeMessenger;
 use App\Models\Booking;
+use App\Models\BookingItem;
 use App\Models\Payment;
 use App\Models\Service;
+use App\Models\ServicePackage;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -577,5 +579,276 @@ class BookingController extends Controller
         }
 
         return $amount;
+    }
+
+    /**
+     * Show booking form for a package
+     */
+    public function createFromPackage(Request $request)
+    {
+        $packageId = $request->query('package_id');
+
+        if (!$packageId) {
+            return redirect()->route('home')->withErrors(['error' => 'Package not found']);
+        }
+
+        $package = ServicePackage::with(['serviceProvider', 'items.service'])
+            ->where('id', $packageId)
+            ->where('is_active', true)
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
+            ->firstOrFail();
+
+        return Inertia::render('Booking/CreateFromPackage', [
+            'package' => $package,
+            'provider' => $package->serviceProvider,
+        ]);
+    }
+
+    /**
+     * Store package booking
+     */
+    public function storePackageBooking(Request $request)
+    {
+        $validated = $request->validate([
+            'package_id' => ['required', 'exists:service_packages,id'],
+            'event_date' => ['required', 'date', 'after:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'event_end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
+            'event_location' => ['nullable', 'string', 'max:500'],
+            'event_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'event_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'attendees' => ['nullable', 'integer', 'min:1'],
+            'special_requests' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $package = ServicePackage::with(['serviceProvider', 'items.service'])
+            ->where('id', $validated['package_id'])
+            ->whereHas('serviceProvider', function ($query) {
+                $query->where('verification_status', 'approved')
+                      ->where('is_active', true);
+            })
+            ->firstOrFail();
+
+        DB::beginTransaction();
+        try {
+            // Calculate total from package
+            $totalAmount = (float) $package->final_price;
+            $depositAmount = 0;
+
+            // Create booking
+            $booking = Booking::create([
+                'booking_number' => 'BK-' . strtoupper(Str::random(10)),
+                'user_id' => Auth::id(),
+                'service_id' => null, // No single service for package bookings
+                'service_provider_id' => $package->service_provider_id,
+                'booking_type' => 'package',
+                'service_package_id' => $package->id,
+                'event_date' => $validated['event_date'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'event_end_date' => $validated['event_end_date'] ?? null,
+                'event_location' => $validated['event_location'] ?? null,
+                'event_latitude' => $validated['event_latitude'] ?? null,
+                'event_longitude' => $validated['event_longitude'] ?? null,
+                'attendees' => $validated['attendees'] ?? null,
+                'special_requests' => $validated['special_requests'] ?? null,
+                'subtotal' => $totalAmount,
+                'discount_amount' => 0,
+                'total_amount' => $totalAmount,
+                'deposit_amount' => $depositAmount,
+                'remaining_amount' => $totalAmount - $depositAmount,
+                'status' => 'pending',
+                'payment_status' => 'pending',
+            ]);
+
+            // Create booking items for each package item
+            foreach ($package->items as $packageItem) {
+                BookingItem::create([
+                    'booking_id' => $booking->id,
+                    'service_id' => $packageItem->service_id,
+                    'service_package_id' => $package->id,
+                    'item_type' => 'package',
+                    'name' => $packageItem->service->name,
+                    'description' => $packageItem->service->description,
+                    'quantity' => $packageItem->quantity,
+                    'unit_price' => $packageItem->unit_price,
+                    'subtotal' => $packageItem->subtotal,
+                    'notes' => $packageItem->notes,
+                ]);
+            }
+
+            // Send booking request message to provider
+            $this->messageService->sendBookingRequestMessage($booking);
+
+            DB::commit();
+
+            return redirect()->route('bookings.payment.select', $booking->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to create booking. Please try again.']);
+        }
+    }
+
+    /**
+     * Show custom package builder and booking form
+     */
+    public function createCustom(Request $request)
+    {
+        $providerId = $request->query('provider_id');
+
+        if (!$providerId) {
+            return redirect()->route('home')->withErrors(['error' => 'Provider not found']);
+        }
+
+        $provider = \App\Models\ServiceProvider::with('services')
+            ->where('id', $providerId)
+            ->where('verification_status', 'approved')
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $services = $provider->services->where('is_active', true)->map(function ($service) {
+            return [
+                'id' => $service->id,
+                'slug' => $service->slug,
+                'name' => $service->name,
+                'description' => $service->description,
+                'base_price' => $service->base_price,
+                'price_type' => $service->price_type,
+                'currency' => $service->currency,
+                'primary_image' => $service->primary_image ? asset('storage/' . $service->primary_image) : null,
+                'max_attendees' => $service->max_attendees,
+            ];
+        })->values();
+
+        $categories = \App\Models\ServiceCategory::active()->get()->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+                'icon' => $category->icon,
+            ];
+        });
+
+        return Inertia::render('Booking/CreateCustom', [
+            'provider' => [
+                'id' => $provider->id,
+                'slug' => $provider->slug,
+                'business_name' => $provider->business_name,
+                'description' => $provider->description,
+                'city' => $provider->city,
+                'location' => $provider->location,
+                'phone' => $provider->phone,
+                'email' => $provider->email,
+                'rating' => $provider->rating ?? 0,
+                'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+            ],
+            'services' => $services,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Store custom package booking
+     */
+    public function storeCustomBooking(Request $request)
+    {
+        $validated = $request->validate([
+            'provider_id' => ['required', 'exists:service_providers,id'],
+            'services' => ['required', 'array', 'min:1'],
+            'services.*.service_id' => ['required', 'exists:services,id'],
+            'services.*.quantity' => ['required', 'integer', 'min:1'],
+            'event_date' => ['required', 'date', 'after:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'event_end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
+            'event_location' => ['nullable', 'string', 'max:500'],
+            'event_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'event_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'attendees' => ['nullable', 'integer', 'min:1'],
+            'special_requests' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $provider = \App\Models\ServiceProvider::where('id', $validated['provider_id'])
+            ->where('verification_status', 'approved')
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        DB::beginTransaction();
+        try {
+            // Calculate total from selected services
+            $totalAmount = 0;
+            $servicesData = [];
+
+            foreach ($validated['services'] as $serviceData) {
+                $service = Service::find($serviceData['service_id']);
+                $quantity = $serviceData['quantity'];
+                $unitPrice = (float) $service->base_price;
+                $subtotal = $quantity * $unitPrice;
+                $totalAmount += $subtotal;
+
+                $servicesData[] = [
+                    'service' => $service,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            // Create booking
+            $booking = Booking::create([
+                'booking_number' => 'BK-' . strtoupper(Str::random(10)),
+                'user_id' => Auth::id(),
+                'service_id' => null, // No single service
+                'service_provider_id' => $provider->id,
+                'booking_type' => 'custom',
+                'service_package_id' => null,
+                'event_date' => $validated['event_date'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'event_end_date' => $validated['event_end_date'] ?? null,
+                'event_location' => $validated['event_location'] ?? null,
+                'event_latitude' => $validated['event_latitude'] ?? null,
+                'event_longitude' => $validated['event_longitude'] ?? null,
+                'attendees' => $validated['attendees'] ?? null,
+                'special_requests' => $validated['special_requests'] ?? null,
+                'subtotal' => $totalAmount,
+                'discount_amount' => 0,
+                'total_amount' => $totalAmount,
+                'deposit_amount' => 0,
+                'remaining_amount' => $totalAmount,
+                'status' => 'pending',
+                'payment_status' => 'pending',
+            ]);
+
+            // Create booking items for each selected service
+            foreach ($servicesData as $data) {
+                BookingItem::create([
+                    'booking_id' => $booking->id,
+                    'service_id' => $data['service']->id,
+                    'service_package_id' => null,
+                    'item_type' => 'custom',
+                    'name' => $data['service']->name,
+                    'description' => $data['service']->description,
+                    'quantity' => $data['quantity'],
+                    'unit_price' => $data['unit_price'],
+                    'subtotal' => $data['subtotal'],
+                ]);
+            }
+
+            // Send booking request message to provider
+            $this->messageService->sendBookingRequestMessage($booking);
+
+            DB::commit();
+
+            return redirect()->route('bookings.payment.select', $booking->id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to create booking. Please try again.']);
+        }
     }
 }

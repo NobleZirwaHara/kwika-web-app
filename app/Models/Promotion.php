@@ -147,7 +147,7 @@ class Promotion extends Model
             return $this->discount_value . '%';
         }
 
-        return 'MWK ' . number_format($this->discount_value, 2);
+        return 'MWK ' . number_format($this->discount_value, 2, '.', ',');
     }
 
     // Methods

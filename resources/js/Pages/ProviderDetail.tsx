@@ -2,6 +2,7 @@ import { SearchHeader } from "@/Components/search-header"
 import { ProviderCover } from "@/Components/provider-cover"
 import { ProviderGalleryLightbox } from "@/Components/provider-gallery-lightbox"
 import { ProviderServices } from "@/Components/provider-services"
+import { ProviderPackagesSection } from "@/Components/provider-packages-section"
 import { ProviderReviews } from "@/Components/provider-reviews"
 import { SimilarProviders } from "@/Components/similar-providers"
 import { Footer } from "@/Components/footer"
@@ -68,9 +69,26 @@ interface Category {
   icon: string
 }
 
+interface ServicePackage {
+  id: number
+  slug: string
+  name: string
+  description: string | null
+  package_type: 'tier' | 'bundle'
+  final_price: number
+  currency: string
+  is_featured: boolean
+  primary_image: string | null
+  items: {
+    quantity: number
+    service_name: string
+  }[]
+}
+
 interface Props {
   provider: ProviderData
   services: Service[]
+  packages: ServicePackage[]
   reviews: Review[]
   similarProviders: SimilarProvider[]
   categories?: Category[]
@@ -79,7 +97,7 @@ interface Props {
   }
 }
 
-export default function ProviderDetail({ provider, services, reviews, similarProviders, categories = [], auth }: Props) {
+export default function ProviderDetail({ provider, services, packages, reviews, similarProviders, categories = [], auth }: Props) {
   const [isFavorite, setIsFavorite] = useState(false)
 
   return (
@@ -145,6 +163,9 @@ export default function ProviderDetail({ provider, services, reviews, similarPro
           {/* Main content area */}
           <div className="container mx-auto px-6 lg:px-20 py-8">
             <div className="space-y-8 mb-12">
+              {/* Packages Section - Prominent */}
+              <ProviderPackagesSection packages={packages} providerId={provider.id} />
+
               {/* Services Section */}
               <ProviderServices services={services} currency="MWK" providerId={provider.id} />
 

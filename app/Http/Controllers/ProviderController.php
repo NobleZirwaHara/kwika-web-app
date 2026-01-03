@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ServiceProvider;
 use App\Models\ServiceCategory;
+use App\Models\ServicePackage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -297,6 +298,33 @@ class ProviderController extends Controller
             ];
         });
 
+        // Get provider's service packages
+        $packages = ServicePackage::where('service_provider_id', $provider->id)
+            ->where('is_active', true)
+            ->with(['items.service'])
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('display_order')
+            ->get()
+            ->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'slug' => $package->slug,
+                    'name' => $package->name,
+                    'description' => $package->description,
+                    'package_type' => $package->package_type,
+                    'final_price' => $package->final_price,
+                    'currency' => $package->currency,
+                    'is_featured' => $package->is_featured,
+                    'primary_image' => $package->primary_image ? asset('storage/' . $package->primary_image) : null,
+                    'items' => $package->items->map(function ($item) {
+                        return [
+                            'quantity' => $item->quantity,
+                            'service_name' => $item->service->name,
+                        ];
+                    }),
+                ];
+            });
+
         return Inertia::render('ProviderDetail', [
             'provider' => [
                 'id' => $provider->id,
@@ -318,6 +346,7 @@ class ProviderController extends Controller
                 'images' => $portfolioImages,
             ],
             'services' => $services,
+            'packages' => $packages,
             'reviews' => $reviews,
             'similarProviders' => $similarProviders,
             'categories' => $categories,

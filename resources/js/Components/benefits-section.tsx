@@ -1,5 +1,5 @@
 import { DollarSign, Users, Shield } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 
 export function BenefitsSection() {
   const benefits = [

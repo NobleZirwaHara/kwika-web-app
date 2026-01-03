@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,              // Creates customer users
             ServiceProviderSeeder::class,   // Creates provider users and their business profiles
             ServiceSeeder::class,           // Creates services for each provider
+            ServicePackageSeeder::class,    // Creates service packages for each provider
             EventSeeder::class,             // Creates sample events with ticket packages
             BookingSeeder::class,           // Creates sample bookings for services
             ReviewSeeder::class,            // Creates reviews for completed bookings

@@ -114,8 +114,8 @@ class EventsController extends Controller
                 'spots_remaining' => $event->spots_remaining,
                 'price_range' => $lowestPrice && $highestPrice
                     ? ($lowestPrice === $highestPrice
-                        ? number_format($lowestPrice, 2)
-                        : number_format($lowestPrice, 2) . ' - ' . number_format($highestPrice, 2))
+                        ? number_format($lowestPrice, 2, '.', ',')
+                        : number_format($lowestPrice, 2, '.', ',') . ' - ' . number_format($highestPrice, 2, '.', ','))
                     : 'Free',
                 'ticket_count' => $ticketPackages->count(),
                 'created_at' => $event->created_at->format('M d, Y'),

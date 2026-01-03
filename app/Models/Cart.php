@@ -38,7 +38,7 @@ class Cart extends Model
 
     public function getFormattedSubtotalAttribute(): string
     {
-        return $this->currency . ' ' . number_format($this->subtotal, 0);
+        return $this->currency . ' ' . number_format($this->subtotal, 0, '.', ',');
     }
 
     // Methods

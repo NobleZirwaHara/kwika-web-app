@@ -179,8 +179,8 @@ export default function OrganizerDetail({
                     </div>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium text-white">{organizer.rating.toFixed(1)}</span>
-                      <span className="text-gray-400">({organizer.reviews} reviews)</span>
+                      <span className="font-medium text-white">{organizer.rating != null ? Number(organizer.rating).toFixed(1) : 'N/A'}</span>
+                      <span className="text-gray-400">({organizer.reviews || 0} reviews)</span>
                     </div>
                   </div>
 

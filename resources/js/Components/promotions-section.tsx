@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/Components/ui/button"
+import { Badge } from "@/Components/ui/badge"
 
 export function PromotionsSection() {
   const promotions = [

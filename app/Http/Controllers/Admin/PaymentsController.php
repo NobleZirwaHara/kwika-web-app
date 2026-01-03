@@ -347,7 +347,7 @@ class PaymentsController extends Controller
             // Update payment status to refunded
             $payment->update([
                 'status' => 'refunded',
-                'notes' => 'Refunded ' . $payment->currency . ' ' . number_format($refundAmount, 2) . ': ' . $request->input('reason'),
+                'notes' => 'Refunded ' . $payment->currency . ' ' . number_format($refundAmount, 2, '.', ',') . ': ' . $request->input('reason'),
             ]);
 
             // Update booking payment status if applicable

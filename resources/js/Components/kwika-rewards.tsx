@@ -1,6 +1,10 @@
 import { Button } from "@/Components/ui/button"
 import { motion } from "framer-motion"
 import { Gift, Wallet, Trophy, Tag, Percent } from "lucide-react"
+import { Canvas, useFrame } from "@react-three/fiber"
+import { Html, Environment, ContactShadows } from "@react-three/drei"
+import { useRef, Suspense } from "react"
+import * as THREE from "three"
 
 // Sticker badge component with scalloped edge effect
 function StickerBadge({ children, className = "", rotate = 0 }: { children: React.ReactNode; className?: string; rotate?: number }) {
@@ -34,6 +38,144 @@ function RoundedSticker({ children, className = "", rotate = 0 }: { children: Re
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       {children}
+    </div>
+  )
+}
+
+// 3D Phone Component
+function Phone3D() {
+  const phoneRef = useRef<THREE.Group>(null)
+
+  // Subtle floating animation
+  useFrame((state) => {
+    if (phoneRef.current) {
+      phoneRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.05
+    }
+  })
+
+  return (
+    <group ref={phoneRef} rotation={[0.15, -0.4, 0.05]} position={[0, 0, 0]}>
+      {/* Phone Frame - Back */}
+      <mesh position={[0, 0, -0.06]}>
+        <boxGeometry args={[2.2, 4.4, 0.12]} />
+        <meshStandardMaterial color="#1a1a1a" metalness={0.7} roughness={0.3} />
+      </mesh>
+
+      {/* Phone Frame - Bezel/Border */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[2.3, 4.5, 0.24]} />
+        <meshStandardMaterial color="#2a2a2a" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Screen bezel inner */}
+      <mesh position={[0, 0, 0.11]}>
+        <boxGeometry args={[2.1, 4.2, 0.02]} />
+        <meshStandardMaterial color="#111111" />
+      </mesh>
+
+      {/* Screen Content using Html */}
+      <Html
+        transform
+        position={[0, 0, 0.13]}
+        distanceFactor={2.7}
+        style={{
+          width: '210px',
+          height: '420px',
+          background: 'white',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+        }}
+      >
+        <div className="w-full h-full bg-white p-3">
+          {/* Status bar */}
+          <div className="flex justify-between items-center text-gray-500 px-2 pt-1 mb-3">
+            <span className="font-semibold text-xs">9:41</span>
+            <div className="flex gap-1 items-center">
+              <div className="w-5 h-2 bg-gray-400 rounded-sm"></div>
+            </div>
+          </div>
+
+          {/* Welcome offer banner */}
+          <div className="bg-[#84cc16]/20 rounded-lg p-3 mb-3">
+            <p className="text-[#166534] font-bold text-sm">MWK 5,000 Welcome Offer</p>
+            <p className="text-gray-500 text-xs">Applies to Services</p>
+          </div>
+
+          {/* Service card */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 mb-3">
+            <img
+              src="/resized-win/wedding-photo-1.jpg"
+              alt="Service"
+              className="w-full h-24 object-cover"
+            />
+            <div className="p-2">
+              <p className="font-bold text-sm text-gray-900">Premium Photography</p>
+              <p className="text-xs text-gray-500">Lilongwe</p>
+            </div>
+          </div>
+
+          {/* Rewards indicator */}
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
+            <div className="w-8 h-8 bg-[#84cc16] rounded-full flex items-center justify-center">
+              <Gift className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-600">Your Rewards</p>
+              <p className="text-sm font-bold text-[#166534]">2,500 Points</p>
+            </div>
+          </div>
+        </div>
+      </Html>
+
+      {/* Notch/Dynamic Island */}
+      <mesh position={[0, 1.85, 0.13]}>
+        <boxGeometry args={[0.6, 0.18, 0.02]} />
+        <meshStandardMaterial color="#000000" />
+      </mesh>
+
+      {/* Side buttons - Volume */}
+      <mesh position={[-1.18, 0.8, 0]}>
+        <boxGeometry args={[0.06, 0.4, 0.08]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.9} roughness={0.1} />
+      </mesh>
+      <mesh position={[-1.18, 0.3, 0]}>
+        <boxGeometry args={[0.06, 0.4, 0.08]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.9} roughness={0.1} />
+      </mesh>
+
+      {/* Side button - Power */}
+      <mesh position={[1.18, 0.6, 0]}>
+        <boxGeometry args={[0.06, 0.5, 0.08]} />
+        <meshStandardMaterial color="#3a3a3a" metalness={0.9} roughness={0.1} />
+      </mesh>
+    </group>
+  )
+}
+
+// Canvas wrapper with loading fallback
+function PhoneCanvas() {
+  return (
+    <div className="w-full h-[400px] lg:h-[450px]">
+      <Canvas
+        camera={{ position: [0, 0, 6], fov: 45 }}
+        dpr={[1, 2]}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+          <directionalLight position={[-5, 5, 5]} intensity={0.5} />
+          <Phone3D />
+          <ContactShadows
+            position={[0, -2.5, 0]}
+            opacity={0.4}
+            scale={8}
+            blur={2}
+            far={4}
+          />
+          <Environment preset="city" />
+        </Suspense>
+      </Canvas>
     </div>
   )
 }
@@ -138,70 +280,9 @@ export function KwikaRewards() {
 
           {/* Content */}
           <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-center gap-8 lg:gap-12 h-full">
-            {/* Phone Mockup and Icons - Left Side (60%) */}
-            <div className="flex-shrink-0 w-full lg:w-3/5 flex justify-center order-1 lg:order-1" style={{ perspective: '1000px' }}>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="relative w-64 lg:w-72"
-                style={{ 
-                  transform: 'rotateY(-15deg) rotateX(5deg)',
-                  transformStyle: 'preserve-3d'
-                }}
-              >
-                {/* Phone frame */}
-                <div className="relative bg-gray-900 rounded-[2.5rem] p-1.5 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)]" style={{ transform: 'translateZ(20px)' }}>
-                  <div className="bg-white rounded-[2rem] overflow-hidden">
-                    {/* Phone screen content */}
-                    <div className="aspect-[9/17] bg-white">
-                      {/* Status bar mockup */}
-                      <div className="flex justify-between items-center text-[10px] text-gray-500 px-4 pt-2">
-                        <span>9:41</span>
-                        <div className="flex gap-1">
-                          <div className="w-4 h-2 bg-gray-400 rounded-sm"></div>
-                        </div>
-                      </div>
-
-                      {/* App content mockup */}
-                      <div className="p-3 space-y-2">
-                        {/* Welcome offer banner */}
-                        <div className="bg-[#84cc16]/15 rounded-lg p-2">
-                          <p className="text-[#166534] font-bold text-[10px]">MWK 5,000 Welcome Offer</p>
-                          <p className="text-gray-500 text-[8px]">Applies to Services</p>
-                        </div>
-
-                        {/* Service card */}
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-                          <img
-                            src="/resized-win/wedding-photo-1.jpg"
-                            alt="Service preview"
-                            className="w-full h-20 object-cover"
-                          />
-                          <div className="p-2">
-                            <p className="font-bold text-[10px] text-gray-900">Premium Photography</p>
-                            <p className="text-[8px] text-gray-500">Lilongwe</p>
-                          </div>
-                        </div>
-
-                        {/* Rewards indicator */}
-                        <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
-                          <div className="w-5 h-5 bg-[#84cc16] rounded-full flex items-center justify-center">
-                            <Gift className="w-2.5 h-2.5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-[8px] text-gray-600">Your Rewards</p>
-                            <p className="text-[10px] font-bold text-[#166534]">2,500 Points</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Notch */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-b-xl"></div>
-                </div>
-              </motion.div>
+            {/* Phone Mockup - Left Side (60%) */}
+            <div className="flex-shrink-0 w-full lg:w-3/5 flex justify-center order-1 lg:order-1">
+              <PhoneCanvas />
             </div>
 
             {/* Text Content - Right Side (40%) */}

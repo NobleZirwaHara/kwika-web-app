@@ -89,9 +89,9 @@ class Product extends Model
     public function getDisplayPriceAttribute(): string
     {
         if ($this->sale_price && $this->sale_price < $this->price) {
-            return "{$this->currency} " . number_format($this->sale_price, 2);
+            return "{$this->currency} " . number_format($this->sale_price, 2, '.', ',');
         }
-        return "{$this->currency} " . number_format($this->price, 2);
+        return "{$this->currency} " . number_format($this->price, 2, '.', ',');
     }
 
     public function getIsOnSaleAttribute(): bool

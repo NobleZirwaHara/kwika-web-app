@@ -3,6 +3,7 @@
 use App\Http\Controllers\Provider\DashboardController;
 use App\Http\Controllers\Provider\ListingsController;
 use App\Http\Controllers\Provider\MediaController;
+use App\Http\Controllers\Provider\PackageController;
 use App\Http\Controllers\Provider\ServiceController;
 use App\Http\Controllers\Provider\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,18 @@ Route::middleware(['auth', 'provider'])->prefix('provider')->name('provider.')->
     Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::put('/services/{id}/toggle', [ServiceController::class, 'toggle'])->name('services.toggle');
+
+    // Package Management
+    Route::prefix('packages')->name('packages.')->group(function () {
+        Route::get('/', [PackageController::class, 'index'])->name('index');
+        Route::get('/create', [PackageController::class, 'create'])->name('create');
+        Route::post('/', [PackageController::class, 'store'])->name('store');
+        Route::get('/{package}/edit', [PackageController::class, 'edit'])->name('edit');
+        Route::put('/{package}', [PackageController::class, 'update'])->name('update');
+        Route::delete('/{package}', [PackageController::class, 'destroy'])->name('destroy');
+        Route::put('/{package}/toggle', [PackageController::class, 'toggle'])->name('toggle');
+        Route::post('/reorder', [PackageController::class, 'reorder'])->name('reorder');
+    });
 
     // Media Management
     Route::get('/media', [MediaController::class, 'index'])->name('media');

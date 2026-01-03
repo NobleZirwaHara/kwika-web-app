@@ -80,7 +80,7 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
           <FeaturedProviders providers={topProviders} title="Top Providers" />
           <FeaturedProviders providers={newProviders} title="New to the Platform" />
           <KwikaRewards />
-          <EventHighlight
+          {/* <EventHighlight
             eyebrowLabel="Kwika"
             eyebrowText="Service Partner Series"
             title="Lunch Tasting for Culinary Creators"
@@ -93,7 +93,7 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
             ctaLabel="RSVP to Attend"
             imageSrc="/elegant-catering-food-display.jpg"
             imageAlt="Kwika lunch tasting setup"
-          />
+          /> */}
           {/* <BenefitsSection /> */}
           <PromotionsSection />
           

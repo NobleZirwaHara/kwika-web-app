@@ -1,0 +1,527 @@
+import { useState } from 'react'
+import { Head, Link, router } from '@inertiajs/react'
+import { SearchHeader } from '@/Components/search-header'
+import { Footer } from '@/Components/footer'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
+import { Button } from '@/Components/ui/button'
+import { Badge } from '@/Components/ui/badge'
+import { Input } from '@/Components/ui/input'
+import { Label } from '@/Components/ui/label'
+import { Textarea } from '@/Components/ui/textarea'
+import {
+  ArrowLeft,
+  Plus,
+  Minus,
+  Trash2,
+  CheckCircle,
+  ShoppingCart,
+  DollarSign,
+  Calendar,
+  Package as PackageIcon,
+} from 'lucide-react'
+import { format } from 'date-fns'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+
+interface Service {
+  id: number
+  slug: string
+  name: string
+  description: string
+  base_price: number
+  price_type: string
+  currency: string
+  primary_image: string | null
+  max_attendees: number | null
+}
+
+interface Provider {
+  id: number
+  slug: string
+  business_name: string
+  description: string
+  city: string
+  location: string
+  phone: string
+  email: string
+  rating: number
+  logo: string | null
+}
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description: string
+  icon: string
+}
+
+interface Props {
+  provider: Provider
+  services: Service[]
+  categories?: Category[]
+  auth?: {
+    user?: any
+  }
+}
+
+interface SelectedService {
+  service: Service
+  quantity: number
+  notes: string
+}
+
+export default function CreateCustom({ provider, services, categories = [], auth }: Props) {
+  const [selectedServices, setSelectedServices] = useState<Map<number, SelectedService>>(new Map())
+  const [eventDate, setEventDate] = useState<Date | undefined>()
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
+  const [eventLocation, setEventLocation] = useState('')
+  const [specialRequests, setSpecialRequests] = useState('')
+  const [processing, setProcessing] = useState(false)
+
+  const addService = (service: Service) => {
+    const newSelected = new Map(selectedServices)
+    newSelected.set(service.id, {
+      service,
+      quantity: 1,
+      notes: '',
+    })
+    setSelectedServices(newSelected)
+  }
+
+  const removeService = (serviceId: number) => {
+    const newSelected = new Map(selectedServices)
+    newSelected.delete(serviceId)
+    setSelectedServices(newSelected)
+  }
+
+  const updateQuantity = (serviceId: number, delta: number) => {
+    const newSelected = new Map(selectedServices)
+    const item = newSelected.get(serviceId)
+    if (item) {
+      const newQuantity = Math.max(1, item.quantity + delta)
+      newSelected.set(serviceId, { ...item, quantity: newQuantity })
+      setSelectedServices(newSelected)
+    }
+  }
+
+  const updateNotes = (serviceId: number, notes: string) => {
+    const newSelected = new Map(selectedServices)
+    const item = newSelected.get(serviceId)
+    if (item) {
+      newSelected.set(serviceId, { ...item, notes })
+      setSelectedServices(newSelected)
+    }
+  }
+
+  const calculateTotal = () => {
+    let total = 0
+    selectedServices.forEach(({ service, quantity }) => {
+      total += service.base_price * quantity
+    })
+    return total
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (selectedServices.size === 0) {
+      alert('Please select at least one service')
+      return
+    }
+
+    if (!eventDate || !startTime || !endTime || !eventLocation) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    setProcessing(true)
+
+    const services = Array.from(selectedServices.values()).map(({ service, quantity, notes }) => ({
+      service_id: service.id,
+      quantity,
+      notes,
+    }))
+
+    router.post(
+      '/bookings/custom',
+      {
+        provider_id: provider.id,
+        event_date: format(eventDate, 'yyyy-MM-dd'),
+        start_time: startTime,
+        end_time: endTime,
+        event_location: eventLocation,
+        special_requests: specialRequests,
+        services,
+      },
+      {
+        preserveScroll: true,
+        onFinish: () => setProcessing(false),
+      }
+    )
+  }
+
+  const currency = services[0]?.currency || 'MWK'
+  const selectedCount = selectedServices.size
+
+  return (
+    <>
+      <Head title={`Build Custom Package - ${provider.business_name}`} />
+      <SearchHeader categories={categories} />
+
+      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-24 pb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back Button */}
+          <Button variant="ghost" asChild className="mb-6">
+            <Link href={`/providers/${provider.slug}`}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Provider
+            </Link>
+          </Button>
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <PackageIcon className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Build Your Custom Package</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Select services from <span className="font-semibold">{provider.business_name}</span> and customize quantities to create your perfect package
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Service Selection */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Available Services */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Available Services</CardTitle>
+                    <CardDescription>
+                      Click "Add" to include a service in your custom package
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {services.map((service) => {
+                        const isSelected = selectedServices.has(service.id)
+
+                        return (
+                          <div
+                            key={service.id}
+                            className={`border rounded-lg p-4 transition-all ${
+                              isSelected ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+                            }`}
+                          >
+                            {service.primary_image && (
+                              <img
+                                src={service.primary_image}
+                                alt={service.name}
+                                className="w-full h-32 object-cover rounded-md mb-3"
+                              />
+                            )}
+                            <h4 className="font-semibold mb-1">{service.name}</h4>
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              {service.description}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-lg font-bold text-primary">
+                                {service.currency} {service.base_price.toLocaleString()}
+                                <span className="text-xs text-muted-foreground font-normal">
+                                  /{service.price_type}
+                                </span>
+                              </p>
+                              {isSelected ? (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => removeService(service.id)}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1 text-green-600" />
+                                  Added
+                                </Button>
+                              ) : (
+                                <Button
+                                  type="button"
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => addService(service)}
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Selected Services */}
+                {selectedCount > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <ShoppingCart className="h-5 w-5" />
+                        Selected Services ({selectedCount})
+                      </CardTitle>
+                      <CardDescription>
+                        Adjust quantities and add notes for each service
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {Array.from(selectedServices.values()).map(({ service, quantity, notes }) => (
+                          <div key={service.id} className="border rounded-lg p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="font-semibold">{service.name}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {service.currency} {service.base_price.toLocaleString()} / {service.price_type}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeService(service.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                              {/* Quantity Controls */}
+                              <div>
+                                <Label className="text-xs text-muted-foreground mb-2">Quantity</Label>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => updateQuantity(service.id, -1)}
+                                    disabled={quantity <= 1}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <Input
+                                    type="number"
+                                    value={quantity}
+                                    onChange={(e) => {
+                                      const val = Math.max(1, parseInt(e.target.value) || 1)
+                                      updateQuantity(service.id, val - quantity)
+                                    }}
+                                    className="w-20 text-center"
+                                    min="1"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => updateQuantity(service.id, 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="text-sm font-medium ml-2">
+                                    = {service.currency} {(service.base_price * quantity).toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Notes */}
+                              <div>
+                                <Label htmlFor={`notes-${service.id}`} className="text-xs text-muted-foreground mb-2">
+                                  Special Notes (Optional)
+                                </Label>
+                                <Input
+                                  id={`notes-${service.id}`}
+                                  placeholder="e.g., color preferences, specific requirements"
+                                  value={notes}
+                                  onChange={(e) => updateNotes(service.id, e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Event Details */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Event Details
+                    </CardTitle>
+                    <CardDescription>
+                      When and where do you need these services?
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Event Date */}
+                    <div>
+                      <Label htmlFor="event_date">Event Date *</Label>
+                      <DatePicker
+                        selected={eventDate}
+                        onChange={(date: Date | null) => setEventDate(date || undefined)}
+                        minDate={new Date()}
+                        placeholderText="Select event date"
+                        dateFormat="MMMM dd, yyyy"
+                        className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      />
+                    </div>
+
+                    {/* Time Range */}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="start_time">Start Time *</Label>
+                        <Input
+                          id="start_time"
+                          type="time"
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="end_time">End Time *</Label>
+                        <Input
+                          id="end_time"
+                          type="time"
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Event Location */}
+                    <div>
+                      <Label htmlFor="event_location">Event Location *</Label>
+                      <Input
+                        id="event_location"
+                        placeholder="e.g., Area 47, Lilongwe"
+                        value={eventLocation}
+                        onChange={(e) => setEventLocation(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    {/* Special Requests */}
+                    <div>
+                      <Label htmlFor="special_requests">Special Requests (Optional)</Label>
+                      <Textarea
+                        id="special_requests"
+                        placeholder="Any additional information or special requirements..."
+                        rows={4}
+                        value={specialRequests}
+                        onChange={(e) => setSpecialRequests(e.target.value)}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Summary Sidebar */}
+              <div className="lg:col-span-1">
+                <Card className="sticky top-24">
+                  <CardHeader>
+                    <CardTitle>Package Summary</CardTitle>
+                    <CardDescription>Review your custom package</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Provider Info */}
+                    <div className="pb-4 border-b">
+                      <p className="text-sm text-muted-foreground mb-1">Provider</p>
+                      <p className="font-semibold">{provider.business_name}</p>
+                      <p className="text-sm text-muted-foreground">{provider.city}</p>
+                    </div>
+
+                    {/* Selected Items */}
+                    {selectedCount > 0 ? (
+                      <div className="space-y-3">
+                        <p className="text-sm font-medium">Items ({selectedCount})</p>
+                        {Array.from(selectedServices.values()).map(({ service, quantity }) => (
+                          <div key={service.id} className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              {quantity}x {service.name}
+                            </span>
+                            <span className="font-medium">
+                              {currency} {(service.base_price * quantity).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">No services selected yet</p>
+                      </div>
+                    )}
+
+                    {/* Total */}
+                    {selectedCount > 0 && (
+                      <div className="pt-4 border-t">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold">Total</span>
+                          <span className="text-2xl font-bold text-primary">
+                            {currency} {calculateTotal().toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-right">
+                          Estimated total based on selected services
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      disabled={selectedCount === 0 || processing}
+                    >
+                      {processing ? 'Submitting...' : 'Request Booking'}
+                    </Button>
+
+                    {!auth?.user && (
+                      <p className="text-xs text-center text-muted-foreground">
+                        You'll need to{' '}
+                        <Link href="/login" className="text-primary hover:underline">
+                          sign in
+                        </Link>{' '}
+                        to complete your booking request
+                      </p>
+                    )}
+
+                    {/* Info */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-xs text-blue-800">
+                      <p className="font-semibold mb-1">📋 How it works:</p>
+                      <ul className="space-y-1 ml-4 list-disc">
+                        <li>Select the services you need</li>
+                        <li>Adjust quantities as needed</li>
+                        <li>Fill in event details</li>
+                        <li>Submit your booking request</li>
+                        <li>Provider will review and confirm</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  )
+}

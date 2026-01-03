@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\BookingController;
@@ -40,6 +41,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Products page
 Route::get('/products', [\App\Http\Controllers\ProductController::class, 'index'])->name('products');
 Route::get('/products/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+
+// Package routes
+Route::get('/packages/{slug}', [PackageController::class, 'show'])->name('packages.show');
 
 // Cart routes (works for both guests and authenticated users)
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -104,9 +108,17 @@ Route::get('/api/providers/{providerId}/availability', [BookingController::class
 
 // Booking routes (authenticated users)
 Route::middleware(['auth'])->group(function () {
-    // Create booking
+    // Single service booking
     Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+
+    // Package booking
+    Route::get('/bookings/package', [BookingController::class, 'createFromPackage'])->name('bookings.package.create');
+    Route::post('/bookings/package', [BookingController::class, 'storePackageBooking'])->name('bookings.package.store');
+
+    // Custom package booking
+    Route::get('/bookings/custom', [BookingController::class, 'createCustom'])->name('bookings.custom.create');
+    Route::post('/bookings/custom', [BookingController::class, 'storeCustomBooking'])->name('bookings.custom.store');
 
     // Payment selection
     Route::get('/bookings/{booking}/payment/select', [BookingController::class, 'selectPaymentMethod'])->name('bookings.payment.select');

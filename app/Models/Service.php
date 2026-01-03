@@ -61,6 +61,16 @@ class Service extends Model
         return $this->morphMany(Media::class, 'mediable');
     }
 
+    public function packages()
+    {
+        return $this->hasMany(ServicePackage::class, 'base_service_id');
+    }
+
+    public function packageItems()
+    {
+        return $this->hasMany(ServicePackageItem::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('services.is_active', true);
@@ -69,8 +79,8 @@ class Service extends Model
     public function getFormattedPrice(): string
     {
         if ($this->price_type === 'custom' && $this->max_price) {
-            return "{$this->currency} " . number_format($this->base_price, 2) . " - " . number_format($this->max_price, 2);
+            return "{$this->currency} " . number_format($this->base_price, 2, '.', ',') . " - " . number_format($this->max_price, 2, '.', ',');
         }
-        return "{$this->currency} " . number_format($this->base_price, 2) . " per " . $this->price_type;
+        return "{$this->currency} " . number_format($this->base_price, 2, '.', ',') . " per " . $this->price_type;
     }
 }

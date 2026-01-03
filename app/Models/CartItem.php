@@ -38,12 +38,12 @@ class CartItem extends Model
     public function getFormattedUnitPriceAttribute(): string
     {
         $currency = $this->cart?->currency ?? 'MWK';
-        return $currency . ' ' . number_format($this->unit_price, 0);
+        return $currency . ' ' . number_format($this->unit_price, 0, '.', ',');
     }
 
     public function getFormattedTotalPriceAttribute(): string
     {
         $currency = $this->cart?->currency ?? 'MWK';
-        return $currency . ' ' . number_format($this->total_price, 0);
+        return $currency . ' ' . number_format($this->total_price, 0, '.', ',');
     }
 }

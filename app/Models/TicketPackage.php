@@ -77,7 +77,7 @@ class TicketPackage extends Model
     // Accessors
     public function getFormattedPriceAttribute(): string
     {
-        return "{$this->currency} " . number_format($this->price, 2);
+        return "{$this->currency} " . number_format($this->price, 2, '.', ',');
     }
 
     public function getRemainingQuantityAttribute(): ?int

@@ -371,7 +371,7 @@ export default function TicketingIndex({
           <section className="py-12 bg-[#2b6068]">
             <div className="container mx-auto px-6 lg:px-20">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Trending Events</h2>
+                <h2 className="text-2xl font-bold">Upcoming Events</h2>
                 <Button variant="ghost" className="text-sm text-gray-300 hover:text-white">
                   See all <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
@@ -483,9 +483,9 @@ export default function TicketingIndex({
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     onClick={() => router.get(`/ticketing/organizer/${organizer.slug}`)}
                   >
-                    <Card className="overflow-hidden bg-[#1a365d] border-[#234e7a] hover:border-primary/50 transition-all group cursor-pointer">
+                    <Card className="overflow-hidden hover:border-primary/50 transition-all group cursor-pointer">
                       {/* Cover Image */}
-                      <div className="relative h-32 bg-[#234e7a]">
+                      <div className="relative h-32 bg-muted">
                         {organizer.image ? (
                           <img
                             src={organizer.image}
@@ -495,12 +495,12 @@ export default function TicketingIndex({
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a365d]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                       </div>
 
                       <CardContent className="p-4 relative">
                         {/* Logo */}
-                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-[#234e7a] border-4 border-[#1a365d] overflow-hidden shadow-lg">
+                        <div className="absolute -top-8 left-4 w-16 h-16 rounded-xl bg-muted border-4 border-background overflow-hidden shadow-lg">
                           {organizer.logo ? (
                             <img src={organizer.logo} alt={organizer.name} className="w-full h-full object-cover" />
                           ) : (
@@ -513,7 +513,7 @@ export default function TicketingIndex({
                         <div className="pt-6">
                           {/* Name & Verified Badge */}
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-lg text-white group-hover:text-primary transition-colors">
+                            <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
                               {organizer.name}
                             </h3>
                             {organizer.is_verified && (
@@ -522,7 +522,7 @@ export default function TicketingIndex({
                           </div>
 
                           {/* Location */}
-                          <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                             <MapPin className="w-4 h-4" />
                             <span>{organizer.location}</span>
                           </div>
@@ -531,11 +531,11 @@ export default function TicketingIndex({
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1">
                               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              <span className="font-medium text-white">{organizer.rating.toFixed(1)}</span>
-                              <span className="text-gray-500">({organizer.reviews})</span>
+                              <span className="font-medium text-foreground">{organizer.rating != null ? Number(organizer.rating).toFixed(1) : 'N/A'}</span>
+                              <span className="text-muted-foreground">({(organizer.reviews || 0).toLocaleString()})</span>
                             </div>
-                            <Badge variant="secondary" className="bg-[#234e7a] text-gray-300">
-                              {organizer.event_count} events
+                            <Badge variant="secondary">
+                              {organizer.event_count.toLocaleString()} events
                             </Badge>
                           </div>
                         </div>

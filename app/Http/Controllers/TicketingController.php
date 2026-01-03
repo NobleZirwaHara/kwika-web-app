@@ -31,7 +31,7 @@ class TicketingController extends Controller
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j • g:i A'),
-                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice) : 'TBA',
+                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
                     'image' => $event->cover_image,
                     'category' => ucfirst($event->category),
                     'venue' => $event->venue_name . ', ' . $event->venue_city,
@@ -72,9 +72,32 @@ class TicketingController extends Controller
             ],
         ];
 
+        // Fetch top organizers (providers who have events)
+        $topOrganizers = ServiceProvider::with(['user'])
+            ->active()
+            ->whereHas('events')
+            ->orderBy('average_rating', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(function ($provider) {
+                return [
+                    'id' => $provider->id,
+                    'slug' => $provider->slug,
+                    'name' => $provider->business_name,
+                    'location' => $provider->city,
+                    'rating' => (float) ($provider->average_rating ?? 4.5),
+                    'reviews' => $provider->total_reviews ?? 0,
+                    'image' => $provider->cover_image ? asset('storage/' . $provider->cover_image) : null,
+                    'logo' => $provider->logo ? asset('storage/' . $provider->logo) : null,
+                    'event_count' => $provider->events()->count(),
+                    'is_verified' => $provider->verification_status === 'approved',
+                ];
+            });
+
         return Inertia::render('Ticketing/Index', [
             'trendingEvents' => $trendingEvents,
             'categories' => $categories,
+            'topOrganizers' => $topOrganizers,
             'location' => 'Lilongwe, MW',
         ]);
     }
@@ -99,7 +122,7 @@ class TicketingController extends Controller
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j • g:i A'),
-                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice) : 'TBA',
+                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
                     'image' => $event->cover_image,
                     'category' => ucfirst($event->category),
                     'venue' => $event->venue_name . ', ' . $event->venue_city,
@@ -120,7 +143,7 @@ class TicketingController extends Controller
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j, Y'),
-                    'price' => $minPrice ? 'MWK ' . number_format($minPrice) : 'TBA',
+                    'price' => $minPrice ? 'MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
                     'image' => $event->cover_image,
                     'category' => ucfirst($event->category),
                     'venue' => $event->venue_name . ', ' . $event->venue_city,
@@ -142,7 +165,7 @@ class TicketingController extends Controller
                 'reviews' => $organizer->reviews()->count(),
                 'image' => $organizer->cover_photo,
                 'logo' => $organizer->logo,
-                'is_verified' => $organizer->is_verified ?? false,
+                'is_verified' => $organizer->verification_status === 'approved',
                 'event_count' => $totalEvents,
                 'total_attendees' => $totalAttendees,
                 'website' => $organizer->website,

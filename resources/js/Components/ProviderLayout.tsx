@@ -10,7 +10,8 @@ import {
   HelpCircle,
   Calendar,
   MessageSquare,
-  ListChecks
+  ListChecks,
+  Boxes
 } from 'lucide-react'
 import { Button } from '@/Components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar'
@@ -35,6 +36,7 @@ interface ProviderLayoutProps {
 const primaryNavigation = [
   { name: 'Overview', href: '/provider/dashboard', icon: LayoutDashboard },
   { name: 'Listings', href: '/provider/listings', icon: ListChecks },
+  { name: 'Packages', href: '/provider/packages', icon: Boxes },
   { name: 'Bookings', href: '/provider/bookings', icon: Calendar },
   { name: 'Messages', href: '/provider/messages', icon: MessageSquare },
 ]
