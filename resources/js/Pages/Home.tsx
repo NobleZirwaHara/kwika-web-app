@@ -11,6 +11,7 @@ import { EventHighlight } from "@/components/event-highlight"
 import { KwikaRewards } from "@/components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
 import { SEO } from "@/components/seo"
+import MobileBottomNav from "@/components/MobileBottomNav"
 
 interface Category {
   id: number
@@ -74,7 +75,7 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
         description="Discover top-rated photographers, caterers, venues, decorators, DJs, and more for your wedding, corporate event, or celebration in Malawi. Book trusted providers in Lilongwe, Blantyre, and across the country."
         keywords="events Malawi, wedding services Lilongwe, event planning Blantyre, photographers, caterers, venues, decorators, DJ services, event rentals, wedding planner, party supplies Malawi"
       />
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-20 md:pb-0">
         <Header />
         <main>
           <HeroFeatured />
@@ -100,11 +101,14 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
           /> */}
           {/* <BenefitsSection /> */}
           <PromotionsSection />
-          
+
           <Testimonials />
         </main>
         <Footer />
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </HeroCarouselProvider>
   )
 }

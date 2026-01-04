@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { RefObject, useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 
 interface ScrollArrowsProps {
   scrollRef: RefObject<HTMLDivElement>
+  className?: string
 }
 
-export function ScrollArrows({ scrollRef }: ScrollArrowsProps) {
+export function ScrollArrows({ scrollRef, className }: ScrollArrowsProps) {
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
 
@@ -46,7 +48,7 @@ export function ScrollArrows({ scrollRef }: ScrollArrowsProps) {
   }
 
   return (
-    <>
+    <div className={className}>
       {/* Left Arrow */}
       {showLeftArrow && (
         <Button
@@ -72,6 +74,6 @@ export function ScrollArrows({ scrollRef }: ScrollArrowsProps) {
           <ChevronRight className="h-6 w-6" />
         </Button>
       )}
-    </>
+    </div>
   )
 }

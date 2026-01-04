@@ -15,17 +15,19 @@ interface ServiceCategoriesProps {
 
 export function ServiceCategories({ categories }: ServiceCategoriesProps) {
   return (
-    <section className="pt-4 pb-10 lg:pt-6 lg:pb-14">
-      <div className="container mx-auto px-6 lg:px-20">
+    <section className="pt-4 pb-6 md:pb-10 lg:pt-6 lg:pb-14">
+      <div className="container mx-auto px-4 md:px-6 lg:px-20">
         {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-xl lg:text-2xl font-semibold text-foreground font-[family-name:var(--font-heading)] tracking-tight">
+        <div className="mb-4 md:mb-6">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-foreground font-[family-name:var(--font-heading)] tracking-tight">
             Browse by category
           </h2>
         </div>
 
-        {/* Category Tags */}
-        <div className="flex flex-wrap gap-2 lg:gap-3">
+        {/* Category Tags - Horizontal scroll on mobile, wrap on desktop */}
+        <div className="flex md:flex-wrap gap-2 lg:gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {categories.map((category, index) => (
             <motion.div
               key={category.slug}
@@ -36,13 +38,14 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
                 delay: index * 0.02,
                 ease: [0.25, 0.46, 0.45, 0.94]
               }}
+              className="shrink-0 md:shrink"
             >
               <Link
                 href={`/providers?category=${category.id}`}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium
+                className="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm font-medium whitespace-nowrap
                   bg-muted/50 text-foreground border border-border/50
                   hover:bg-primary hover:text-primary-foreground hover:border-primary
-                  transition-all duration-200 ease-out"
+                  active:scale-95 transition-all duration-200 ease-out"
               >
                 {category.name}
               </Link>
