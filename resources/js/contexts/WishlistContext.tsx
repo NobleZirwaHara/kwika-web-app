@@ -86,6 +86,24 @@ interface WishlistIds {
   providerIds: number[]
   packageIds: number[]
   serviceIds: number[]
+  customPackageIds: number[]
+}
+
+interface CustomPackageService {
+  service_id: number
+  service_name: string
+  quantity: number
+  unit_price: number
+  subtotal: number
+}
+
+interface AddCustomPackageData {
+  wishlist_id: number
+  provider_id: number
+  name?: string
+  services: CustomPackageService[]
+  total_amount: number
+  currency?: string
 }
 
 interface WishlistContextType {
@@ -109,6 +127,7 @@ interface WishlistContextType {
   addProvider: (id: number, wishlistId?: number) => Promise<boolean>
   addPackage: (id: number, wishlistId?: number) => Promise<boolean>
   addService: (id: number, wishlistId?: number) => Promise<boolean>
+  addCustomPackage: (data: AddCustomPackageData) => Promise<{ success: boolean; customPackageId?: number }>
 
   // Management
   removeItem: (itemId: number) => Promise<boolean>
@@ -125,6 +144,7 @@ const defaultIds: WishlistIds = {
   providerIds: [],
   packageIds: [],
   serviceIds: [],
+  customPackageIds: [],
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined)
@@ -155,6 +175,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
           providerIds: toArray(data.providerIds),
           packageIds: toArray(data.packageIds),
           serviceIds: toArray(data.serviceIds),
+          customPackageIds: toArray(data.customPackageIds),
         })
       }
     } catch (error) {
@@ -415,6 +436,37 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshWishlists])
 
+  const addCustomPackage = useCallback(async (data: AddCustomPackageData): Promise<{ success: boolean; customPackageId?: number }> => {
+    try {
+      const response = await fetch('/api/wishlist/custom-package', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': getCsrfToken(),
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        setWishlistIds(prev => ({
+          ...prev,
+          customPackageIds: [...prev.customPackageIds, result.custom_package_id],
+        }))
+        refreshWishlists()
+        return { success: true, customPackageId: result.custom_package_id }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error('Failed to add custom package:', error)
+      return { success: false }
+    }
+  }, [refreshWishlists])
+
   // Management methods
   const removeItem = useCallback(async (itemId: number): Promise<boolean> => {
     try {
@@ -564,6 +616,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         addProvider,
         addPackage,
         addService,
+        addCustomPackage,
         removeItem,
         moveItem,
         createWishlist,

@@ -11,6 +11,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { ErrorDisplay, FieldError } from '@/components/ui/error-display'
 import { InspirationUpload } from '@/components/InspirationUpload'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { useWishlist } from '@/contexts/WishlistContext'
+import {
   ArrowLeft,
   Plus,
   Minus,
@@ -21,6 +31,10 @@ import {
   Calendar,
   Package as PackageIcon,
   ImageIcon,
+  Heart,
+  FolderPlus,
+  Check,
+  Loader2,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import DatePicker from 'react-datepicker'
@@ -86,6 +100,14 @@ export default function CreateCustom({ provider, services, categories = [], auth
   const [inspirationImages, setInspirationImages] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [wishlistDialogOpen, setWishlistDialogOpen] = useState(false)
+  const [selectedWishlistId, setSelectedWishlistId] = useState<string>('')
+  const [newWishlistName, setNewWishlistName] = useState('')
+  const [savingToWishlist, setSavingToWishlist] = useState(false)
+  const [creatingWishlist, setCreatingWishlist] = useState(false)
+  const [wishlistSaved, setWishlistSaved] = useState(false)
+
+  const { wishlists, addCustomPackage, createWishlist, defaultWishlist } = useWishlist()
 
   const addService = (service: Service) => {
     const newSelected = new Map(selectedServices)
@@ -183,6 +205,70 @@ export default function CreateCustom({ provider, services, categories = [], auth
         setFormError('There was an error submitting your booking request. Please check the form and try again.')
       },
     })
+  }
+
+  const openWishlistDialog = () => {
+    if (selectedServices.size === 0) return
+    // Pre-select default wishlist if available
+    if (defaultWishlist) {
+      setSelectedWishlistId(defaultWishlist.id.toString())
+    }
+    setWishlistDialogOpen(true)
+  }
+
+  const handleCreateNewWishlist = async () => {
+    if (!newWishlistName.trim()) return
+
+    setCreatingWishlist(true)
+    try {
+      const newWishlist = await createWishlist(newWishlistName.trim())
+      if (newWishlist) {
+        setSelectedWishlistId(newWishlist.id.toString())
+        setNewWishlistName('')
+      }
+    } catch (error) {
+      console.error('Failed to create wishlist:', error)
+    } finally {
+      setCreatingWishlist(false)
+    }
+  }
+
+  const handleSaveToWishlist = async () => {
+    if (selectedServices.size === 0 || !selectedWishlistId) return
+
+    setSavingToWishlist(true)
+    setWishlistSaved(false)
+
+    try {
+      // Build the services data for the custom package
+      const servicesData = Array.from(selectedServices.values()).map(({ service, quantity }) => ({
+        service_id: service.id,
+        service_name: service.name,
+        quantity,
+        unit_price: service.base_price,
+        subtotal: service.base_price * quantity,
+      }))
+
+      const result = await addCustomPackage({
+        wishlist_id: parseInt(selectedWishlistId),
+        provider_id: provider.id,
+        name: `Custom Package from ${provider.business_name}`,
+        services: servicesData,
+        total_amount: calculateTotal(),
+        currency: currency,
+      })
+
+      if (result.success) {
+        setWishlistSaved(true)
+        setWishlistDialogOpen(false)
+        // Reset after 3 seconds
+        setTimeout(() => setWishlistSaved(false), 3000)
+      }
+    } catch (error) {
+      console.error('Failed to save to wishlist:', error)
+    } finally {
+      setSavingToWishlist(false)
+    }
   }
 
   const currency = services[0]?.currency || 'MWK'
@@ -550,6 +636,19 @@ export default function CreateCustom({ provider, services, categories = [], auth
                       {processing ? 'Submitting...' : 'Request Booking'}
                     </Button>
 
+                    {/* Save to Wishlist Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      size="lg"
+                      disabled={selectedCount === 0}
+                      onClick={openWishlistDialog}
+                    >
+                      <Heart className={`h-4 w-4 mr-2 ${wishlistSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
+                      {wishlistSaved ? 'Saved to Wishlist!' : 'Save Package to Wishlist'}
+                    </Button>
+
                     {!auth?.user && (
                       <p className="text-xs text-center text-muted-foreground">
                         You'll need to{' '}
@@ -580,6 +679,134 @@ export default function CreateCustom({ provider, services, categories = [], auth
       </main>
 
       <Footer />
+
+      {/* Wishlist Picker Dialog */}
+      <Dialog open={wishlistDialogOpen} onOpenChange={setWishlistDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-rose-500" />
+              Save Custom Package
+            </DialogTitle>
+            <DialogDescription>
+              Choose which wishlist to save your custom package to
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Package Preview */}
+            <div className="bg-muted/50 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{provider.business_name}</span>
+                <Badge variant="secondary">{selectedCount} services</Badge>
+              </div>
+              <div className="text-lg font-bold text-primary">
+                {formatPrice(calculateTotal(), currency)}
+              </div>
+            </div>
+
+            {/* Wishlist Selection */}
+            {wishlists.length > 0 ? (
+              <RadioGroup
+                value={selectedWishlistId}
+                onValueChange={setSelectedWishlistId}
+                className="space-y-2"
+              >
+                {wishlists.map((wishlist) => (
+                  <div
+                    key={wishlist.id}
+                    className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      selectedWishlistId === wishlist.id.toString()
+                        ? 'border-primary bg-primary/5'
+                        : 'hover:border-primary/50'
+                    }`}
+                    onClick={() => setSelectedWishlistId(wishlist.id.toString())}
+                  >
+                    <RadioGroupItem value={wishlist.id.toString()} id={`wishlist-${wishlist.id}`} />
+                    <div className="flex-1">
+                      <Label
+                        htmlFor={`wishlist-${wishlist.id}`}
+                        className="text-sm font-medium cursor-pointer"
+                      >
+                        {wishlist.name}
+                        {wishlist.is_default && (
+                          <Badge variant="outline" className="ml-2 text-xs">Default</Badge>
+                        )}
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        {wishlist.total_items} items
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </RadioGroup>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No wishlists yet. Create one below!
+              </p>
+            )}
+
+            {/* Create New Wishlist */}
+            <div className="border-t pt-4">
+              <Label className="text-sm font-medium mb-2 block">
+                Or create a new wishlist
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="New wishlist name"
+                  value={newWishlistName}
+                  onChange={(e) => setNewWishlistName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleCreateNewWishlist()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCreateNewWishlist}
+                  disabled={!newWishlistName.trim() || creatingWishlist}
+                >
+                  {creatingWishlist ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FolderPlus className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setWishlistDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveToWishlist}
+              disabled={!selectedWishlistId || savingToWishlist}
+            >
+              {savingToWishlist ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  Save to Wishlist
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

@@ -8,11 +8,19 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class WishlistItem extends Model
 {
+    // Virtual type constant for custom packages (not a real model)
+    public const CUSTOM_PACKAGE_TYPE = 'custom_package';
+
     protected $fillable = [
         'user_wishlist_id',
         'itemable_type',
         'itemable_id',
         'notes',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
     ];
 
     // ==================== Relationships ====================
@@ -44,6 +52,11 @@ class WishlistItem extends Model
         return $this->itemable_type === Service::class;
     }
 
+    public function isCustomPackage(): bool
+    {
+        return $this->itemable_type === self::CUSTOM_PACKAGE_TYPE;
+    }
+
     // ==================== Helper Methods ====================
 
     /**
@@ -55,6 +68,7 @@ class WishlistItem extends Model
             ServiceProvider::class => 'provider',
             ServicePackage::class => 'package',
             Service::class => 'service',
+            self::CUSTOM_PACKAGE_TYPE => 'custom_package',
             default => 'unknown',
         };
     }
@@ -64,6 +78,27 @@ class WishlistItem extends Model
      */
     public function getFormattedItemAttribute(): array
     {
+        // Handle custom packages (no itemable relationship)
+        if ($this->isCustomPackage()) {
+            $metadata = $this->metadata ?? [];
+
+            return [
+                'id' => $this->id,
+                'type' => 'custom_package',
+                'item_id' => $this->itemable_id,
+                'notes' => $this->notes,
+                'added_at' => $this->created_at->toISOString(),
+                'exists' => true,
+                'name' => $metadata['name'] ?? 'Custom Package',
+                'provider_id' => $metadata['provider_id'] ?? null,
+                'provider_name' => $metadata['provider_name'] ?? null,
+                'provider_slug' => $metadata['provider_slug'] ?? null,
+                'services' => $metadata['services'] ?? [],
+                'total_amount' => $metadata['total_amount'] ?? 0,
+                'currency' => $metadata['currency'] ?? 'MWK',
+            ];
+        }
+
         $item = $this->itemable;
 
         if (! $item) {

@@ -174,6 +174,10 @@ Route::prefix('api/wishlist')->name('api.wishlist.')->group(function () {
     Route::post('/provider', [\App\Http\Controllers\WishlistController::class, 'addProvider'])->name('add.provider');
     Route::post('/package', [\App\Http\Controllers\WishlistController::class, 'addPackage'])->name('add.package');
     Route::post('/service', [\App\Http\Controllers\WishlistController::class, 'addService'])->name('add.service');
+    Route::post('/custom-package', [\App\Http\Controllers\WishlistController::class, 'addCustomPackage'])->name('add.custom-package');
+
+    // Remove custom package
+    Route::delete('/custom-package/{id}', [\App\Http\Controllers\WishlistController::class, 'removeCustomPackage'])->name('remove.custom-package');
 
     // Toggle items (add if not present, remove if present)
     Route::post('/toggle/provider', [\App\Http\Controllers\WishlistController::class, 'toggleProvider'])->name('toggle.provider');

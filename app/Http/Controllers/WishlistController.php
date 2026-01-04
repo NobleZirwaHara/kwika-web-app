@@ -183,6 +183,7 @@ class WishlistController extends Controller
         $providerIds = [];
         $packageIds = [];
         $serviceIds = [];
+        $customPackageIds = [];
 
         foreach ($wishlists as $wishlist) {
             foreach ($wishlist->items as $item) {
@@ -192,6 +193,8 @@ class WishlistController extends Controller
                     $packageIds[] = $item->itemable_id;
                 } elseif ($item->isService()) {
                     $serviceIds[] = $item->itemable_id;
+                } elseif ($item->isCustomPackage()) {
+                    $customPackageIds[] = $item->itemable_id;
                 }
             }
         }
@@ -200,6 +203,7 @@ class WishlistController extends Controller
             'providerIds' => array_values(array_unique($providerIds)),
             'packageIds' => array_values(array_unique($packageIds)),
             'serviceIds' => array_values(array_unique($serviceIds)),
+            'customPackageIds' => array_values(array_unique($customPackageIds)),
         ]);
     }
 
@@ -381,6 +385,100 @@ class WishlistController extends Controller
         return $this->toggleItem($request, Service::class, $validated['id'], $validated['wishlist_id'] ?? null);
     }
 
+    /**
+     * Add a custom package to wishlist
+     */
+    public function addCustomPackage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'wishlist_id' => 'required|integer',
+            'provider_id' => 'required|exists:service_providers,id',
+            'name' => 'nullable|string|max:255',
+            'services' => 'required|array|min:1',
+            'services.*.service_id' => 'required|exists:services,id',
+            'services.*.service_name' => 'required|string',
+            'services.*.quantity' => 'required|integer|min:1',
+            'services.*.unit_price' => 'required|numeric|min:0',
+            'services.*.subtotal' => 'required|numeric|min:0',
+            'total_amount' => 'required|numeric|min:0',
+            'currency' => 'nullable|string|max:10',
+        ]);
+
+        $userId = Auth::id();
+        $guestToken = $userId ? null : WishlistCookieMiddleware::getGuestToken($request);
+
+        $wishlist = $this->findWishlistById($request, $validated['wishlist_id']);
+        if (! $wishlist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Wishlist not found.',
+            ], 404);
+        }
+
+        // Get provider info
+        $provider = ServiceProvider::find($validated['provider_id']);
+
+        // Generate a unique ID for this custom package (timestamp + random)
+        $customPackageId = time().random_int(1000, 9999);
+
+        // Build metadata
+        $metadata = [
+            'name' => $validated['name'] ?? 'Custom Package from '.$provider->business_name,
+            'provider_id' => $provider->id,
+            'provider_name' => $provider->business_name,
+            'provider_slug' => $provider->slug,
+            'services' => $validated['services'],
+            'total_amount' => $validated['total_amount'],
+            'currency' => $validated['currency'] ?? 'MWK',
+        ];
+
+        // Create the wishlist item
+        WishlistItem::create([
+            'user_wishlist_id' => $wishlist->id,
+            'itemable_type' => WishlistItem::CUSTOM_PACKAGE_TYPE,
+            'itemable_id' => $customPackageId,
+            'metadata' => $metadata,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom package saved to wishlist!',
+            'wishlist_id' => $wishlist->id,
+            'custom_package_id' => $customPackageId,
+        ]);
+    }
+
+    /**
+     * Remove a custom package from wishlist
+     */
+    public function removeCustomPackage(Request $request, int $id): JsonResponse
+    {
+        $userId = Auth::id();
+        $guestToken = $userId ? null : WishlistCookieMiddleware::getGuestToken($request);
+
+        $item = WishlistItem::whereHas('wishlist', function ($q) use ($userId, $guestToken) {
+            $q->when($userId, fn ($query) => $query->forUser($userId))
+                ->when(! $userId && $guestToken, fn ($query) => $query->forGuest($guestToken));
+        })
+            ->where('itemable_type', WishlistItem::CUSTOM_PACKAGE_TYPE)
+            ->where('itemable_id', $id)
+            ->first();
+
+        if (! $item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Custom package not found in your wishlists.',
+            ], 404);
+        }
+
+        $item->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom package removed from wishlist.',
+        ]);
+    }
+
     // ==================== Helper Methods ====================
 
     private function getUserWishlists(Request $request)
@@ -388,12 +486,41 @@ class WishlistController extends Controller
         $userId = Auth::id();
         $guestToken = $userId ? null : WishlistCookieMiddleware::getGuestToken($request);
 
-        return UserWishlist::with(['items.itemable'])
+        // Load wishlists with items (no eager loading of itemable to avoid 'custom_package' class error)
+        $wishlists = UserWishlist::with(['items'])
             ->when($userId, fn ($q) => $q->forUser($userId))
             ->when(! $userId && $guestToken, fn ($q) => $q->forGuest($guestToken))
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get();
+
+        // Manually eager load itemable for non-custom-package items
+        $allItems = $wishlists->flatMap->items;
+        $nonCustomItems = $allItems->filter(fn ($item) => ! $item->isCustomPackage());
+
+        if ($nonCustomItems->isNotEmpty()) {
+            // Group items by type for efficient loading
+            $providerIds = $nonCustomItems->filter(fn ($item) => $item->isProvider())->pluck('itemable_id');
+            $packageIds = $nonCustomItems->filter(fn ($item) => $item->isPackage())->pluck('itemable_id');
+            $serviceIds = $nonCustomItems->filter(fn ($item) => $item->isService())->pluck('itemable_id');
+
+            $providers = $providerIds->isNotEmpty() ? ServiceProvider::whereIn('id', $providerIds)->get()->keyBy('id') : collect();
+            $packages = $packageIds->isNotEmpty() ? ServicePackage::whereIn('id', $packageIds)->get()->keyBy('id') : collect();
+            $services = $serviceIds->isNotEmpty() ? Service::whereIn('id', $serviceIds)->get()->keyBy('id') : collect();
+
+            // Assign loaded models to items
+            foreach ($nonCustomItems as $item) {
+                if ($item->isProvider()) {
+                    $item->setRelation('itemable', $providers->get($item->itemable_id));
+                } elseif ($item->isPackage()) {
+                    $item->setRelation('itemable', $packages->get($item->itemable_id));
+                } elseif ($item->isService()) {
+                    $item->setRelation('itemable', $services->get($item->itemable_id));
+                }
+            }
+        }
+
+        return $wishlists;
     }
 
     private function findWishlistById(Request $request, int $id): ?UserWishlist
@@ -412,11 +539,39 @@ class WishlistController extends Controller
         $userId = Auth::id();
         $guestToken = $userId ? null : WishlistCookieMiddleware::getGuestToken($request);
 
-        return UserWishlist::with(['items.itemable'])
+        // Load wishlist with items (no eager loading of itemable to avoid 'custom_package' class error)
+        $wishlist = UserWishlist::with(['items'])
             ->when($userId, fn ($q) => $q->forUser($userId))
             ->when(! $userId && $guestToken, fn ($q) => $q->forGuest($guestToken))
             ->where('slug', $slug)
             ->first();
+
+        if ($wishlist) {
+            // Manually eager load itemable for non-custom-package items
+            $nonCustomItems = $wishlist->items->filter(fn ($item) => ! $item->isCustomPackage());
+
+            if ($nonCustomItems->isNotEmpty()) {
+                $providerIds = $nonCustomItems->filter(fn ($item) => $item->isProvider())->pluck('itemable_id');
+                $packageIds = $nonCustomItems->filter(fn ($item) => $item->isPackage())->pluck('itemable_id');
+                $serviceIds = $nonCustomItems->filter(fn ($item) => $item->isService())->pluck('itemable_id');
+
+                $providers = $providerIds->isNotEmpty() ? ServiceProvider::whereIn('id', $providerIds)->get()->keyBy('id') : collect();
+                $packages = $packageIds->isNotEmpty() ? ServicePackage::whereIn('id', $packageIds)->get()->keyBy('id') : collect();
+                $services = $serviceIds->isNotEmpty() ? Service::whereIn('id', $serviceIds)->get()->keyBy('id') : collect();
+
+                foreach ($nonCustomItems as $item) {
+                    if ($item->isProvider()) {
+                        $item->setRelation('itemable', $providers->get($item->itemable_id));
+                    } elseif ($item->isPackage()) {
+                        $item->setRelation('itemable', $packages->get($item->itemable_id));
+                    } elseif ($item->isService()) {
+                        $item->setRelation('itemable', $services->get($item->itemable_id));
+                    }
+                }
+            }
+        }
+
+        return $wishlist;
     }
 
     private function checkItem(Request $request, string $type, int $id): JsonResponse
@@ -519,6 +674,7 @@ class WishlistController extends Controller
         $providerIds = [];
         $packageIds = [];
         $serviceIds = [];
+        $customPackageIds = [];
 
         foreach ($wishlist->items as $item) {
             if ($item->isProvider()) {
@@ -527,8 +683,12 @@ class WishlistController extends Controller
                 $packageIds[] = $item->itemable_id;
             } elseif ($item->isService()) {
                 $serviceIds[] = $item->itemable_id;
+            } elseif ($item->isCustomPackage()) {
+                $customPackageIds[] = $item->itemable_id;
             }
         }
+
+        $customPackageCount = $wishlist->items->filter(fn ($item) => $item->isCustomPackage())->count();
 
         $data = [
             'id' => $wishlist->id,
@@ -538,7 +698,8 @@ class WishlistController extends Controller
             'provider_count' => $wishlist->provider_count,
             'package_count' => $wishlist->package_count,
             'service_count' => $wishlist->service_count,
-            'total_items' => $wishlist->provider_count + $wishlist->package_count + $wishlist->service_count,
+            'custom_package_count' => $customPackageCount,
+            'total_items' => $wishlist->provider_count + $wishlist->package_count + $wishlist->service_count + $customPackageCount,
             'total_package_price' => $wishlist->total_package_price,
             'formatted_total' => $wishlist->formatted_total,
             'created_at' => $wishlist->created_at->toISOString(),
@@ -546,6 +707,7 @@ class WishlistController extends Controller
             'provider_ids' => $providerIds,
             'package_ids' => $packageIds,
             'service_ids' => $serviceIds,
+            'custom_package_ids' => $customPackageIds,
         ];
 
         if ($includeItems) {
@@ -561,6 +723,11 @@ class WishlistController extends Controller
 
             $data['services'] = $wishlist->items
                 ->filter(fn ($item) => $item->isService())
+                ->map(fn ($item) => $item->formatted_item)
+                ->values();
+
+            $data['custom_packages'] = $wishlist->items
+                ->filter(fn ($item) => $item->isCustomPackage())
                 ->map(fn ($item) => $item->formatted_item)
                 ->values();
         }
