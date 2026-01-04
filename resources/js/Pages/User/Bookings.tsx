@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 import { useState } from 'react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatPrice } from '@/lib/utils'
 
 interface Props {
   bookings: Array<{
@@ -160,7 +160,7 @@ export default function Bookings({ bookings, filters }: Props) {
                         <div className="flex items-center gap-2 text-sm">
                           <DollarSign className="h-4 w-4 text-muted-foreground" />
                           <span className="font-medium">
-                            MWK {booking.total_amount.toLocaleString()}
+                            {formatPrice(booking.total_amount)}
                           </span>
                           <Badge className={getPaymentStatusColor(booking.payment_status)} variant="outline">
                             {booking.payment_status}

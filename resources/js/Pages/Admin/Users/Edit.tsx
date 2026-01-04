@@ -32,6 +32,7 @@ import {
   Star,
   Key
 } from 'lucide-react'
+import { formatDate, formatPrice } from '@/lib/utils'
 import { useState } from 'react'
 
 interface Admin {
@@ -352,7 +353,7 @@ export default function UserEdit({ admin, user }: Props) {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">MWK {booking.total_amount.toLocaleString()}</p>
+                          <p className="font-medium">{formatPrice(booking.total_amount)}</p>
                           <Badge variant="outline" className="mt-1">
                             {booking.status}
                           </Badge>

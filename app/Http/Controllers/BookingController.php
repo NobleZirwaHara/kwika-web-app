@@ -848,7 +848,13 @@ class BookingController extends Controller
             return redirect()->route('bookings.payment.select', $booking->id);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to create booking. Please try again.']);
+            \Log::error('Custom booking creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'provider_id' => $validated['provider_id'] ?? null,
+                'user_id' => Auth::id(),
+            ]);
+            return back()->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()]);
         }
     }
 }

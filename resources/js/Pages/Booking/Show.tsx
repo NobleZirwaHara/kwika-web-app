@@ -26,6 +26,7 @@ import {
   AlertCircle,
   CreditCard,
 } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 interface Booking {
   id: number
@@ -217,7 +218,7 @@ export default function ShowBooking({ booking }: Props) {
                             </div>
                             <div className="text-right">
                               <p className="font-semibold">
-                                {booking.currency} {payment.amount.toLocaleString()}
+                                {formatPrice(payment.amount, booking.currency)}
                               </p>
                               <Badge variant="outline" className="text-xs">
                                 {payment.status}
@@ -275,7 +276,7 @@ export default function ShowBooking({ booking }: Props) {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Total Amount</span>
                         <span className="font-medium">
-                          {booking.currency} {booking.total_amount.toLocaleString()}
+                          {formatPrice(booking.total_amount, booking.currency)}
                         </span>
                       </div>
 
@@ -284,13 +285,13 @@ export default function ShowBooking({ booking }: Props) {
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Deposit Paid</span>
                             <span className="font-medium text-green-600 dark:text-green-400">
-                              {booking.currency} {booking.deposit_amount.toLocaleString()}
+                              {formatPrice(booking.deposit_amount, booking.currency)}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Remaining</span>
                             <span className="font-medium">
-                              {booking.currency} {booking.remaining_amount.toLocaleString()}
+                              {formatPrice(booking.remaining_amount, booking.currency)}
                             </span>
                           </div>
                         </>
@@ -311,7 +312,7 @@ export default function ShowBooking({ booking }: Props) {
                           <p className="text-yellow-800 dark:text-yellow-200">
                             Outstanding balance of{' '}
                             <span className="font-semibold">
-                              {booking.currency} {booking.remaining_amount.toLocaleString()}
+                              {formatPrice(booking.remaining_amount, booking.currency)}
                             </span>{' '}
                             due before event
                           </p>

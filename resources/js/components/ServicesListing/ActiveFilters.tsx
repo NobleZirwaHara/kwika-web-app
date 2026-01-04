@@ -2,6 +2,7 @@ import { X, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
+import { formatDate } from "@/lib/utils"
 
 export interface FilterState {
   query?: string
@@ -81,11 +82,10 @@ export function ActiveFilters({
   }
 
   if (filters.available_date) {
-    const date = new Date(filters.available_date)
     activeFilters.push({
       key: 'available_date',
       label: 'Available',
-      value: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      value: formatDate(filters.available_date)
     })
   }
 

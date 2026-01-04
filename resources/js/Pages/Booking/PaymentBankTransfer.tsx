@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Building2, Upload, X, Copy, CheckCircle2, AlertCircle } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 interface Booking {
   id: number
@@ -333,7 +334,7 @@ export default function PaymentBankTransfer({ booking, bankDetails }: Props) {
                     <div className="border-t pt-4">
                       <p className="text-sm text-muted-foreground mb-2">Amount to Transfer</p>
                       <p className="text-3xl font-bold text-primary">
-                        {booking.currency} {booking.total_amount.toLocaleString()}
+                        {formatPrice(booking.total_amount, booking.currency)}
                       </p>
                     </div>
 

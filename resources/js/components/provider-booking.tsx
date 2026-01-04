@@ -4,6 +4,7 @@ import { TimeSlotPicker } from "@/components/time-slot-picker"
 import { Calendar, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
+import { formatDate as formatDisplayDate } from "@/lib/utils"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
@@ -138,7 +139,7 @@ export function ProviderBooking({
 
               {selectedDate && (
                 <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
-                  Selected: <strong>{format(selectedDate, 'MMM dd, yyyy')}</strong>
+                  Selected: <strong>{formatDisplayDate(selectedDate)}</strong>
                 </div>
               )}
 

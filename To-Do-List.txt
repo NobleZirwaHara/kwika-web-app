@@ -4,7 +4,7 @@ Wishlist
 Recently Viewed
 Build your own package experience
 Ticket Experience
-Fix
+Provider checklist
 
 Check on wishlist functionality and implementation
 Restyle onboarding
@@ -22,3 +22,4 @@ Add Ably as a realtime driver and alternative to Supabase
 Add payment breakdown setting in provider panel and admin panel.. and show the breakdown in pages
 Events will come later
 Media Gallery will not be shown for now
+Favicon

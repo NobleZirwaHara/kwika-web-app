@@ -27,7 +27,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 
 interface Admin {
   id: number
@@ -321,7 +321,7 @@ export default function BookingsIndex({ admin, bookings, stats, providers, servi
                 <p className="text-sm font-medium text-muted-foreground">Revenue</p>
                 <DollarSign className="h-5 w-5 text-purple-600" />
               </div>
-              <p className="text-2xl font-bold text-purple-600">MWK {stats.total_revenue.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-purple-600">{formatPrice(stats.total_revenue)}</p>
             </CardContent>
           </Card>
 
@@ -331,7 +331,7 @@ export default function BookingsIndex({ admin, bookings, stats, providers, servi
                 <p className="text-sm font-medium text-muted-foreground">Pending $</p>
                 <AlertCircle className="h-5 w-5 text-orange-600" />
               </div>
-              <p className="text-2xl font-bold text-orange-600">MWK {stats.pending_amount.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-orange-600">{formatPrice(stats.pending_amount)}</p>
             </CardContent>
           </Card>
         </div>
@@ -483,15 +483,15 @@ export default function BookingsIndex({ admin, bookings, stats, providers, servi
                         </div>
                         <div>
                           <span className="text-muted-foreground">Total Amount:</span>
-                          <p className="font-semibold text-lg">MWK {booking.total_amount.toLocaleString()}</p>
+                          <p className="font-semibold text-lg">{formatPrice(booking.total_amount)}</p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Deposit:</span>
-                          <p className="font-medium">MWK {booking.deposit_amount.toLocaleString()}</p>
+                          <p className="font-medium">{formatPrice(booking.deposit_amount)}</p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Remaining:</span>
-                          <p className="font-medium">MWK {booking.remaining_amount.toLocaleString()}</p>
+                          <p className="font-medium">{formatPrice(booking.remaining_amount)}</p>
                         </div>
                         {booking.event_location && (
                           <div>

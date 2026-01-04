@@ -108,12 +108,19 @@ class MessageService
             $booking->id
         );
 
-        $content = "New booking request for {$booking->service->name}";
+        // Determine the booking name based on booking type
+        $bookingName = match ($booking->booking_type) {
+            'package' => $booking->servicePackage?->name ?? 'Package Booking',
+            'custom' => 'Custom Package',
+            default => $booking->service?->name ?? 'Service Booking',
+        };
+
+        $content = "New booking request for {$bookingName}";
 
         $metadata = [
             'booking_id' => $booking->id,
             'booking_number' => $booking->booking_number,
-            'service_name' => $booking->service->name,
+            'service_name' => $bookingName,
             'event_date' => $booking->event_date->format('F d, Y'),
             'buttons' => [
                 [

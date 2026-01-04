@@ -17,7 +17,7 @@ import {
   TrendingUp,
   BarChart,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatDate, formatPrice } from '@/lib/utils'
 
 interface Admin {
   id: number
@@ -201,7 +201,7 @@ export default function SubscriptionPlansIndex({ admin, plans, stats }: Props) {
                     <div className="border-t border-b py-4">
                       <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold">
-                          MWK {plan.price.toLocaleString()}
+                          {formatPrice(plan.price)}
                         </span>
                         <span className="text-muted-foreground">
                           / {getBillingCycleLabel(plan.billing_cycle).toLowerCase()}

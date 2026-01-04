@@ -2,8 +2,8 @@ import { Link, router } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
-import { format } from 'date-fns'
 import { SEO, createEventSchema } from '@/components/seo'
+import { formatDate, formatPrice, formatTime } from '@/lib/utils'
 
 interface TicketPackage {
   id: number
@@ -152,11 +152,11 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
                   <div className="flex items-center gap-4 text-white/90">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      <span>{format(new Date(event.start_datetime), 'EEEE, MMMM d, yyyy')}</span>
+                      <span>{formatDate(event.start_datetime)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
-                      <span>{format(new Date(event.start_datetime), 'h:mm a')}</span>
+                      <span>{formatTime(event.start_datetime)}</span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +300,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
                         <div>
                           <div className="text-sm text-muted-foreground">Total ({getTotalTickets()} tickets)</div>
                           <div className="text-2xl font-bold">
-                            MWK {getTotalPrice().toLocaleString()}
+                            {formatPrice(getTotalPrice())}
                           </div>
                         </div>
                       </div>
@@ -350,7 +350,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
                       />
                       <div className="p-4">
                         <div className="text-sm text-primary font-medium mb-1">
-                          {format(new Date(similarEvent.start_datetime), 'MMM d, yyyy')}
+                          {formatDate(similarEvent.start_datetime)}
                         </div>
                         <h3 className="font-semibold mb-2 line-clamp-2">
                           {similarEvent.title}

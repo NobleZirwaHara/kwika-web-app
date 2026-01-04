@@ -4,6 +4,7 @@ import { Footer } from '@/components/footer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CreditCard, Building2, Smartphone, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 interface Booking {
   id: number
@@ -156,7 +157,7 @@ export default function PaymentSelect({ booking }: Props) {
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Total Amount</span>
                         <span className="font-medium">
-                          {booking.currency} {booking.total_amount.toLocaleString()}
+                          {formatPrice(booking.total_amount, booking.currency)}
                         </span>
                       </div>
 
@@ -165,13 +166,13 @@ export default function PaymentSelect({ booking }: Props) {
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Deposit Required</span>
                             <span className="font-medium">
-                              {booking.currency} {booking.deposit_amount.toLocaleString()}
+                              {formatPrice(booking.deposit_amount, booking.currency)}
                             </span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Remaining Balance</span>
                             <span className="font-medium">
-                              {booking.currency} {booking.remaining_amount.toLocaleString()}
+                              {formatPrice(booking.remaining_amount, booking.currency)}
                             </span>
                           </div>
                         </>
@@ -181,7 +182,7 @@ export default function PaymentSelect({ booking }: Props) {
                         <div className="flex justify-between items-baseline">
                           <span className="font-semibold">Amount to Pay Now</span>
                           <span className="text-2xl font-bold text-primary">
-                            {booking.currency} {amountToPay.toLocaleString()}
+                            {formatPrice(amountToPay, booking.currency)}
                           </span>
                         </div>
                       </div>
@@ -192,7 +193,7 @@ export default function PaymentSelect({ booking }: Props) {
                         <p className="text-muted-foreground">
                           Remaining balance of{' '}
                           <span className="font-semibold text-foreground">
-                            {booking.currency} {booking.remaining_amount.toLocaleString()}
+                            {formatPrice(booking.remaining_amount, booking.currency)}
                           </span>{' '}
                           will be due before the event.
                         </p>

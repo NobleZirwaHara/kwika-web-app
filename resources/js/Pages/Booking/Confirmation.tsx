@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Download,
 } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 interface Booking {
   id: number
@@ -182,20 +183,20 @@ export default function Confirmation({ booking }: Props) {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Total Amount</span>
                         <span className="font-medium">
-                          {booking.currency} {booking.total_amount.toLocaleString()}
+                          {formatPrice(booking.total_amount, booking.currency)}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Amount Paid</span>
                         <span className="font-semibold text-green-600 dark:text-green-400">
-                          {booking.currency} {booking.payment.amount.toLocaleString()}
+                          {formatPrice(booking.payment.amount, booking.currency)}
                         </span>
                       </div>
                       {booking.remaining_amount > 0 && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Remaining Balance</span>
                           <span className="font-medium">
-                            {booking.currency} {booking.remaining_amount.toLocaleString()}
+                            {formatPrice(booking.remaining_amount, booking.currency)}
                           </span>
                         </div>
                       )}

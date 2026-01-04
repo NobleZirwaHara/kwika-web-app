@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 import { CreditCard, Smartphone, Building2, Loader2, Calendar, MapPin, Ticket } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDate, formatTime } from '@/lib/utils'
 
 interface TicketOrder {
   id: number
@@ -196,7 +196,7 @@ export default function Payment({ order, paymentMethods }: Props) {
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         <span>
-                          {format(new Date(order.event.start_datetime), 'MMM d, yyyy • h:mm a')}
+                          {formatDate(order.event.start_datetime)} • {formatTime(order.event.start_datetime)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">

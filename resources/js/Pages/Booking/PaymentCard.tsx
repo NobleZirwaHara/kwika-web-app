@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CreditCard, Lock, Shield } from 'lucide-react'
+import { Lock, CreditCard, Calendar, User, Shield } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 
 interface Booking {
   id: number
@@ -270,7 +271,7 @@ export default function PaymentCard({ booking }: Props) {
                           ) : (
                             <>
                               <Lock className="h-4 w-4 mr-2" />
-                              Pay {booking.currency} {amountToPay.toLocaleString()}
+                              Pay {formatPrice(amountToPay, booking.currency)}
                             </>
                           )}
                         </Button>
@@ -318,7 +319,7 @@ export default function PaymentCard({ booking }: Props) {
                     <div className="border-t pt-4">
                       <p className="text-sm text-muted-foreground mb-2">Amount to Pay</p>
                       <p className="text-3xl font-bold text-primary">
-                        {booking.currency} {amountToPay.toLocaleString()}
+                        {formatPrice(amountToPay, booking.currency)}
                       </p>
                     </div>
 
@@ -327,8 +328,7 @@ export default function PaymentCard({ booking }: Props) {
                         <p className="text-muted-foreground">
                           This is a deposit payment. Remaining balance:{' '}
                           <span className="font-semibold text-foreground">
-                            {booking.currency}{' '}
-                            {(booking.total_amount - booking.deposit_amount).toLocaleString()}
+                            {formatPrice(booking.total_amount - booking.deposit_amount, booking.currency)}
                           </span>
                         </p>
                       </div>

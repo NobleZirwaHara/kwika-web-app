@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Calendar, Clock, MapPin, Users, DollarSign, CreditCard, Star, MessageSquare, CheckCircle, XCircle } from 'lucide-react'
 import { useState } from 'react'
+import { formatPrice } from '@/lib/utils'
 
 interface Admin { id: number; name: string; email: string; admin_role: string }
 interface Payment { id: number; amount: number; payment_method: string; status: string; transaction_id: string | null; created_at: string }
@@ -227,15 +228,15 @@ export default function BookingShow({ admin, booking }: Props) {
             <div className="grid gap-4 md:grid-cols-3 mb-6">
               <div>
                 <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="text-2xl font-bold">MWK {booking.total_amount.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{formatPrice(booking.total_amount)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Deposit Paid</p>
-                <p className="text-2xl font-bold text-green-600">MWK {booking.deposit_amount.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-green-600">{formatPrice(booking.deposit_amount)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Remaining</p>
-                <p className="text-2xl font-bold text-orange-600">MWK {booking.remaining_amount.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-orange-600">{formatPrice(booking.remaining_amount)}</p>
               </div>
             </div>
 
@@ -246,7 +247,7 @@ export default function BookingShow({ admin, booking }: Props) {
                   {booking.payments.map((payment) => (
                     <div key={payment.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div>
-                        <p className="font-medium">MWK {payment.amount.toLocaleString()}</p>
+                        <p className="font-medium">{formatPrice(payment.amount)}</p>
                         <p className="text-sm text-muted-foreground">
                           {payment.payment_method} • {payment.created_at}
                         </p>

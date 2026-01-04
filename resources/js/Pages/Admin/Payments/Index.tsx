@@ -38,7 +38,7 @@ import {
   Smartphone,
 } from 'lucide-react'
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 
 interface Admin {
   id: number
@@ -341,7 +341,7 @@ export default function PaymentsIndex({ admin, payments, stats, filters }: Props
                 <DollarSign className="h-5 w-5 text-blue-600" />
               </div>
               <p className="text-3xl font-bold text-blue-600">
-                MWK {stats.total_amount.toLocaleString()}
+                {formatPrice(stats.total_amount)}
               </p>
             </CardContent>
           </Card>

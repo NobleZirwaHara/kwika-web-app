@@ -3,6 +3,7 @@ import AdminLayout from '@/components/AdminLayout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { formatPrice } from '@/lib/utils'
 import {
   Users,
   Building2,
@@ -199,9 +200,9 @@ export default function AdminDashboard({
                 <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
-              <p className="text-3xl font-bold">MWK {stats.total_revenue.toLocaleString()}</p>
+              <p className="text-3xl font-bold">{formatPrice(stats.total_revenue)}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                This month: MWK {stats.this_month_revenue.toLocaleString()}
+                This month: {formatPrice(stats.this_month_revenue)}
               </p>
             </CardContent>
           </Card>
@@ -250,7 +251,7 @@ export default function AdminDashboard({
                 <TrendingUp className="h-5 w-5 text-muted-foreground" />
               </div>
               <p className="text-3xl font-bold">
-                MWK {stats.total_bookings > 0 ? (stats.total_revenue / stats.total_bookings).toLocaleString() : 0}
+                {formatPrice(stats.total_bookings > 0 ? (stats.total_revenue / stats.total_bookings) : 0)}
               </p>
             </CardContent>
           </Card>
@@ -408,7 +409,7 @@ export default function AdminDashboard({
                         </div>
                         <span className="font-medium">{provider.business_name}</span>
                       </div>
-                      <span className="font-semibold">MWK {provider.revenue.toLocaleString()}</span>
+                      <span className="font-semibold">{formatPrice(provider.revenue)}</span>
                     </div>
                   ))
                 ) : (
@@ -510,7 +511,7 @@ export default function AdminDashboard({
                         <p className="text-sm text-muted-foreground">{payment.service_name}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{payment.currency} {payment.amount.toLocaleString()}</p>
+                        <p className="font-semibold">{formatPrice(payment.amount, payment.currency)}</p>
                         <Badge variant={payment.status === 'completed' ? 'default' : 'secondary'} className="mt-1">
                           {payment.status}
                         </Badge>

@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, MapPin, Ticket, Download, QrCode, CheckCircle2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDate } from '@/lib/utils'
 import { useState } from 'react'
 import {
   Dialog,
@@ -100,7 +100,7 @@ export default function MyTickets({ upcomingTickets, pastTickets }: Props) {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    {format(new Date(ticket.event.start_datetime), 'EEEE, MMM d, yyyy')}
+                    {formatDate(ticket.event.start_datetime)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">

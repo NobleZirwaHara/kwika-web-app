@@ -12,7 +12,7 @@ import {
   Search
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatPrice } from '@/lib/utils'
 
 interface Props {
   user: {
@@ -74,7 +74,7 @@ export default function Dashboard({ user, stats, upcoming_bookings, recent_booki
     },
     {
       title: 'Total Spent',
-      value: `MWK ${stats.total_spent.toLocaleString()}`,
+      value: formatPrice(stats.total_spent),
       description: 'All time',
       icon: Package,
       iconBg: 'bg-green-500/10 text-green-600',
@@ -233,7 +233,7 @@ export default function Dashboard({ user, stats, upcoming_bookings, recent_booki
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         <div className="text-right">
-                          <p className="font-medium">MWK {booking.total_amount.toLocaleString()}</p>
+                          <p className="font-medium">{formatPrice(booking.total_amount)}</p>
                           <Badge className={getStatusColor(booking.status)}>
                             {booking.status}
                           </Badge>

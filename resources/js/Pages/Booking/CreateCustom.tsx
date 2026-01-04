@@ -23,6 +23,7 @@ import {
 import { format } from 'date-fns'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { formatPrice } from '@/lib/utils'
 
 interface Service {
   id: number
@@ -162,7 +163,15 @@ export default function CreateCustom({ provider, services, categories = [], auth
       {
         preserveScroll: true,
         onFinish: () => setProcessing(false),
-        onError: () => {
+        onError: (errors) => {
+          // Check if it's a 419 CSRF token error (session expired)
+          if (errors && Object.keys(errors).length === 0) {
+            setFormError('Your session has expired. The page will refresh - please try again.')
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
+            return
+          }
           setFormError('There was an error submitting your booking request. Please check the form and try again.')
         },
       }
@@ -244,7 +253,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                             </p>
                             <div className="flex items-center justify-between">
                               <p className="text-lg font-bold text-primary">
-                                {service.currency} {service.base_price.toLocaleString()}
+                                {formatPrice(service.base_price, service.currency)}
                                 <span className="text-xs text-muted-foreground font-normal">
                                   /{service.price_type}
                                 </span>
@@ -298,7 +307,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                               <div className="flex-1">
                                 <h4 className="font-semibold">{service.name}</h4>
                                 <p className="text-sm text-muted-foreground">
-                                  {service.currency} {service.base_price.toLocaleString()} / {service.price_type}
+                                  {formatPrice(service.base_price, service.currency)} / {service.price_type}
                                 </p>
                               </div>
                               <Button
@@ -344,7 +353,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                                     <Plus className="h-4 w-4" />
                                   </Button>
                                   <span className="text-sm font-medium ml-2">
-                                    = {service.currency} {(service.base_price * quantity).toLocaleString()}
+                                    = {formatPrice(service.base_price * quantity, service.currency)}
                                   </span>
                                 </div>
                               </div>
@@ -476,7 +485,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                               {quantity}x {service.name}
                             </span>
                             <span className="font-medium">
-                              {currency} {(service.base_price * quantity).toLocaleString()}
+                              {formatPrice(service.base_price * quantity, currency)}
                             </span>
                           </div>
                         ))}
@@ -494,7 +503,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-semibold">Total</span>
                           <span className="text-2xl font-bold text-primary">
-                            {currency} {calculateTotal().toLocaleString()}
+                            {formatPrice(calculateTotal(), currency)}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground text-right">

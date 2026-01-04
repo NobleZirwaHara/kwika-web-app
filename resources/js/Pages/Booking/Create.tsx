@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { LocationPicker } from '@/components/location-picker'
 import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDate } from '@/lib/utils'
 
 interface Service {
   id: number
@@ -133,7 +133,7 @@ export default function CreateBooking({ service }: Props) {
                             <CheckCircle className="h-5 w-5 text-green-600" />
                             <div>
                               <p className="font-semibold text-green-900">
-                                {format(new Date(data.event_date), 'EEEE, MMMM dd, yyyy')}
+                                {formatDate(data.event_date)}
                               </p>
                               <p className="text-sm text-green-700">
                                 This date is available for booking

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDate, formatPrice } from '@/lib/utils'
 
 interface TicketPackage {
   id: number
@@ -264,7 +264,7 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
                         <h3 className="font-semibold">{event.title}</h3>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                           <Calendar className="w-4 h-4" />
-                          <span>{format(new Date(event.start_datetime), 'MMM d, yyyy')}</span>
+                          <span>{formatDate(event.start_datetime)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                           <MapPin className="w-4 h-4" />
@@ -297,7 +297,7 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span>MWK {totalAmount.toLocaleString()}</span>
+                        <span>{formatPrice(totalAmount)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Total Tickets</span>
@@ -306,7 +306,7 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
                       <Separator />
                       <div className="flex justify-between font-bold text-lg">
                         <span>Total</span>
-                        <span>MWK {totalAmount.toLocaleString()}</span>
+                        <span>{formatPrice(totalAmount)}</span>
                       </div>
                     </div>
                   </CardContent>

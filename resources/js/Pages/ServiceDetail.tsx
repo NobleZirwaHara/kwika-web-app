@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
+import { formatDate as formatDisplayDate } from '@/lib/utils'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import {
@@ -718,7 +719,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
                         {selectedDate && (
                           <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
                             <p className="text-sm text-green-800">
-                              Selected: <strong>{format(selectedDate, 'MMMM dd, yyyy')}</strong>
+                              Selected: <strong>{formatDisplayDate(selectedDate)}</strong>
                             </p>
                           </div>
                         )}

@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Calendar, MapPin, Ticket, Download, Mail, Share2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatDate, formatTime } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
 interface TicketOrder {
@@ -143,11 +143,10 @@ export default function Confirmation({ order }: Props) {
                     <Calendar className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
                       <div className="font-medium text-foreground">
-                        {format(new Date(order.event.start_datetime), 'EEEE, MMMM d, yyyy')}
+                        {formatDate(order.event.start_datetime)}
                       </div>
                       <div className="text-sm">
-                        {format(new Date(order.event.start_datetime), 'h:mm a')} -{' '}
-                        {format(new Date(order.event.end_datetime), 'h:mm a')}
+                        {formatTime(order.event.start_datetime)} - {formatTime(order.event.end_datetime)}
                       </div>
                     </div>
                   </div>

@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Calendar, Plus, Trash2, Edit, Clock, Filter } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
 
 interface AvailabilitySlot {
   id: number
@@ -501,12 +502,7 @@ export default function AvailabilityIndex({ availabilities, services, filters }:
                           disabled={slot.availability_type === 'booked'}
                         />
                         <CardTitle className="text-lg">
-                          {new Date(slot.date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {formatDate(slot.date)}
                         </CardTitle>
                       </div>
                       <div className="flex gap-2 mt-2">

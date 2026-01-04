@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatPrice } from '@/lib/utils'
 
 interface Props {
   provider: {
@@ -86,7 +86,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
   const statCards = [
     {
       title: 'Total Revenue',
-      value: `MWK ${stats.total_revenue.toLocaleString()}`,
+      value: formatPrice(stats.total_revenue),
       change: `+${stats.revenue_change}% from last month`,
       changeType: stats.revenue_change >= 0 ? 'positive' : 'negative',
       icon: DollarSign,
@@ -252,7 +252,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         <div className="text-right">
-                          <p className="font-medium">MWK {booking.total_amount.toLocaleString()}</p>
+                          <p className="font-medium">{formatPrice(booking.total_amount)}</p>
                           <Badge className={getStatusColor(booking.status)}>
                             {booking.status}
                           </Badge>
@@ -293,7 +293,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                           Client: {event.client_name}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          {new Date(event.event_date).toLocaleDateString()} at {event.event_time}
+                          {formatDate(event.event_date)} at {event.event_time}
                         </p>
                       </div>
                     </div>
@@ -333,7 +333,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                      formatter={(value: number) => [`MWK ${value.toLocaleString()}`, 'Revenue']}
+                      formatter={(value: number) => [formatPrice(value), 'Revenue']}
                     />
                     <Line
                       type="monotone"
@@ -451,7 +451,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                   <span>This Month</span>
                 </div>
                 <p className="text-3xl font-bold">
-                  MWK {stats.this_month_revenue.toLocaleString()}
+                  {formatPrice(stats.this_month_revenue)}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {stats.this_month_bookings} bookings

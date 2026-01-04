@@ -6,12 +6,22 @@
 import './bootstrap';
 
 import { createRoot } from 'react-dom/client';
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { route as ziggyRoute } from 'ziggy-js';
 import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import MobileBottomNav from '@/components/MobileBottomNav';
+
+// Global handler for 419 CSRF token errors (session expired)
+router.on('invalid', (event) => {
+    // 419 Page Expired - CSRF token mismatch
+    if (event.detail.response.status === 419) {
+        event.preventDefault()
+        alert('Your session has expired. The page will reload.')
+        window.location.reload()
+    }
+})
 
 const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
 

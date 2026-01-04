@@ -1,8 +1,7 @@
 import { Message } from '@/hooks/useMessages'
-import { cn } from '@/lib/utils'
+import { cn, formatTime } from '@/lib/utils'
 import { FileAttachment } from './FileAttachment'
 import { ActionButton } from './ActionButton'
-import { format } from 'date-fns'
 
 interface MessageBubbleProps {
   message: Message
@@ -113,7 +112,7 @@ export function MessageBubble({ message, isOwnMessage, showSender = true }: Mess
               isOwnMessage ? 'justify-end opacity-70' : 'opacity-60'
             )}
           >
-            <span>{format(new Date(message.created_at), 'HH:mm')}</span>
+            <span>{formatTime(message.created_at)}</span>
             {isOwnMessage && (
               <span>
                 {message.is_read ? (
