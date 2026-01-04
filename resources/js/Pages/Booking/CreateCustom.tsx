@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ErrorDisplay, FieldError } from '@/components/ui/error-display'
+import { InspirationUpload } from '@/components/InspirationUpload'
 import {
   ArrowLeft,
   Plus,
@@ -19,6 +20,7 @@ import {
   DollarSign,
   Calendar,
   Package as PackageIcon,
+  ImageIcon,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import DatePicker from 'react-datepicker'
@@ -81,6 +83,7 @@ export default function CreateCustom({ provider, services, categories = [], auth
   const [endTime, setEndTime] = useState('')
   const [eventLocation, setEventLocation] = useState('')
   const [specialRequests, setSpecialRequests] = useState('')
+  const [inspirationImages, setInspirationImages] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -143,39 +146,43 @@ export default function CreateCustom({ provider, services, categories = [], auth
 
     setProcessing(true)
 
-    const services = Array.from(selectedServices.values()).map(({ service, quantity, notes }) => ({
+    const servicesData = Array.from(selectedServices.values()).map(({ service, quantity, notes }) => ({
       service_id: service.id,
       quantity,
       notes,
     }))
 
-    router.post(
-      '/bookings/custom',
-      {
-        provider_id: provider.id,
-        event_date: format(eventDate, 'yyyy-MM-dd'),
-        start_time: startTime,
-        end_time: endTime,
-        event_location: eventLocation,
-        special_requests: specialRequests,
-        services,
+    // Use FormData to support file uploads
+    const formData = new FormData()
+    formData.append('provider_id', provider.id.toString())
+    formData.append('event_date', format(eventDate, 'yyyy-MM-dd'))
+    formData.append('start_time', startTime)
+    formData.append('end_time', endTime)
+    formData.append('event_location', eventLocation)
+    formData.append('special_requests', specialRequests)
+    formData.append('services', JSON.stringify(servicesData))
+
+    // Append inspiration images
+    inspirationImages.forEach((file, index) => {
+      formData.append(`inspiration_images[${index}]`, file)
+    })
+
+    router.post('/bookings/custom', formData, {
+      forceFormData: true,
+      preserveScroll: true,
+      onFinish: () => setProcessing(false),
+      onError: (errors) => {
+        // Check if it's a 419 CSRF token error (session expired)
+        if (errors && Object.keys(errors).length === 0) {
+          setFormError('Your session has expired. The page will refresh - please try again.')
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
+          return
+        }
+        setFormError('There was an error submitting your booking request. Please check the form and try again.')
       },
-      {
-        preserveScroll: true,
-        onFinish: () => setProcessing(false),
-        onError: (errors) => {
-          // Check if it's a 419 CSRF token error (session expired)
-          if (errors && Object.keys(errors).length === 0) {
-            setFormError('Your session has expired. The page will refresh - please try again.')
-            setTimeout(() => {
-              window.location.reload()
-            }, 2000)
-            return
-          }
-          setFormError('There was an error submitting your booking request. Please check the form and try again.')
-        },
-      }
-    )
+    })
   }
 
   const currency = services[0]?.currency || 'MWK'
@@ -377,6 +384,27 @@ export default function CreateCustom({ provider, services, categories = [], auth
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Inspiration Photos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5" />
+                      Inspiration Photos (Optional)
+                    </CardTitle>
+                    <CardDescription>
+                      Upload reference images to show the provider what you're envisioning for your event
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <InspirationUpload
+                      images={inspirationImages}
+                      onChange={setInspirationImages}
+                      maxImages={5}
+                      maxSizeMB={5}
+                    />
+                  </CardContent>
+                </Card>
 
                 {/* Event Details */}
                 <Card>

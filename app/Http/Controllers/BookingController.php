@@ -85,6 +85,8 @@ class BookingController extends Controller
             'event_longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'attendees' => ['nullable', 'integer', 'min:1'],
             'special_requests' => ['nullable', 'string', 'max:2000'],
+            'inspiration_images' => ['nullable', 'array', 'max:5'],
+            'inspiration_images.*' => ['image', 'mimes:jpeg,png,gif,webp', 'max:5120'],
         ]);
 
         $service = Service::with('serviceProvider')
@@ -128,6 +130,15 @@ class BookingController extends Controller
             'status' => 'pending',
             'payment_status' => 'pending',
         ]);
+
+        // Handle inspiration images upload
+        if ($request->hasFile('inspiration_images')) {
+            $paths = [];
+            foreach ($request->file('inspiration_images') as $file) {
+                $paths[] = $file->store('booking-inspiration/' . $booking->id, 'public');
+            }
+            $booking->update(['inspiration_images' => $paths]);
+        }
 
         // Load the service relationship for the message
         $booking->load('service');
@@ -439,6 +450,7 @@ class BookingController extends Controller
                 'event_location' => $booking->event_location,
                 'attendees' => $booking->attendees,
                 'special_requests' => $booking->special_requests,
+                'inspiration_image_urls' => $booking->inspiration_image_urls,
                 'service' => [
                     'name' => $booking->service->name,
                     'description' => $booking->service->description,
@@ -757,6 +769,12 @@ class BookingController extends Controller
      */
     public function storeCustomBooking(Request $request)
     {
+        // Parse services from JSON if sent as string (FormData submission)
+        $servicesInput = $request->input('services');
+        if (is_string($servicesInput)) {
+            $request->merge(['services' => json_decode($servicesInput, true)]);
+        }
+
         $validated = $request->validate([
             'provider_id' => ['required', 'exists:service_providers,id'],
             'services' => ['required', 'array', 'min:1'],
@@ -771,6 +789,8 @@ class BookingController extends Controller
             'event_longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'attendees' => ['nullable', 'integer', 'min:1'],
             'special_requests' => ['nullable', 'string', 'max:2000'],
+            'inspiration_images' => ['nullable', 'array', 'max:5'],
+            'inspiration_images.*' => ['image', 'mimes:jpeg,png,gif,webp', 'max:5120'],
         ]);
 
         $provider = \App\Models\ServiceProvider::where('id', $validated['provider_id'])
@@ -838,6 +858,15 @@ class BookingController extends Controller
                     'unit_price' => $data['unit_price'],
                     'subtotal' => $data['subtotal'],
                 ]);
+            }
+
+            // Handle inspiration images upload
+            if ($request->hasFile('inspiration_images')) {
+                $paths = [];
+                foreach ($request->file('inspiration_images') as $file) {
+                    $paths[] = $file->store('booking-inspiration/' . $booking->id, 'public');
+                }
+                $booking->update(['inspiration_images' => $paths]);
             }
 
             // Send booking request message to provider

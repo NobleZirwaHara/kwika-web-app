@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Booking extends Model
 {
@@ -14,7 +15,7 @@ class Booking extends Model
         'booking_number', 'user_id', 'service_id', 'service_provider_id', 'booking_type', 'service_package_id',
         'event_date', 'start_time', 'end_time', 'event_end_date', 'event_location',
         'event_latitude', 'event_longitude',
-        'attendees', 'special_requests', 'total_amount', 'subtotal', 'discount_amount', 'deposit_amount',
+        'attendees', 'special_requests', 'inspiration_images', 'total_amount', 'subtotal', 'discount_amount', 'deposit_amount',
         'remaining_amount', 'status', 'payment_status', 'cancellation_reason',
         'cancelled_at', 'confirmed_at', 'completed_at',
     ];
@@ -32,7 +33,20 @@ class Booking extends Model
             'cancelled_at' => 'datetime',
             'confirmed_at' => 'datetime',
             'completed_at' => 'datetime',
+            'inspiration_images' => 'array',
         ];
+    }
+
+    /**
+     * Get the full URLs for inspiration images.
+     */
+    public function getInspirationImageUrlsAttribute(): array
+    {
+        if (! $this->inspiration_images) {
+            return [];
+        }
+
+        return array_map(fn ($path) => Storage::disk('public')->url($path), $this->inspiration_images);
     }
 
     public function user()

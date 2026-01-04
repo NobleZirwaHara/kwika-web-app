@@ -1,5 +1,5 @@
 import { useForm, Head, router } from '@inertiajs/react'
-import { FormEvent, useEffect } from 'react'
+import { FormEvent, useState } from 'react'
 import {Header} from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { LocationPicker } from '@/components/location-picker'
-import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
+import { InspirationUpload } from '@/components/InspirationUpload'
+import { Calendar, MapPin, Users, DollarSign, CheckCircle, AlertTriangle, Clock, ImageIcon } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface Service {
@@ -41,7 +42,7 @@ export default function CreateBooking({ service }: Props) {
   const preSelectedStartTime = urlParams.get('start_time')
   const preSelectedEndTime = urlParams.get('end_time')
 
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, processing, errors, setError } = useForm({
     service_id: service.id,
     event_date: preSelectedDate || '',
     start_time: preSelectedStartTime || '',
@@ -54,9 +55,35 @@ export default function CreateBooking({ service }: Props) {
     special_requests: '',
   })
 
+  const [inspirationImages, setInspirationImages] = useState<File[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    post('/bookings')
+    setIsSubmitting(true)
+
+    // Use FormData to support file uploads
+    const formData = new FormData()
+    formData.append('service_id', data.service_id.toString())
+    formData.append('event_date', data.event_date)
+    formData.append('start_time', data.start_time)
+    formData.append('end_time', data.end_time)
+    formData.append('event_end_date', data.event_end_date)
+    formData.append('event_location', data.event_location)
+    if (data.event_latitude) formData.append('event_latitude', data.event_latitude.toString())
+    if (data.event_longitude) formData.append('event_longitude', data.event_longitude.toString())
+    formData.append('attendees', data.attendees)
+    formData.append('special_requests', data.special_requests)
+
+    // Append inspiration images
+    inspirationImages.forEach((file, index) => {
+      formData.append(`inspiration_images[${index}]`, file)
+    })
+
+    router.post('/bookings', formData, {
+      forceFormData: true,
+      onFinish: () => setIsSubmitting(false),
+    })
   }
 
   // Format time from 24h to 12h format
@@ -267,15 +294,32 @@ export default function CreateBooking({ service }: Props) {
                         </p>
                       </div>
 
+                      {/* Inspiration Photos */}
+                      <div className="space-y-2 border-t pt-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                          <Label>Inspiration Photos (Optional)</Label>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Upload reference images to show the provider what you're envisioning
+                        </p>
+                        <InspirationUpload
+                          images={inspirationImages}
+                          onChange={setInspirationImages}
+                          maxImages={5}
+                          maxSizeMB={5}
+                        />
+                      </div>
+
                       {/* Submit Button */}
                       <div className="pt-4">
                         <Button
                           type="submit"
                           className="w-full"
                           size="lg"
-                          disabled={processing}
+                          disabled={processing || isSubmitting}
                         >
-                          {processing ? 'Processing...' : 'Continue to Payment'}
+                          {processing || isSubmitting ? 'Processing...' : 'Continue to Payment'}
                         </Button>
                       </div>
                     </form>

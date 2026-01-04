@@ -86,6 +86,7 @@ interface Booking {
   event_location: string
   attendees: number | null
   special_requests: string | null
+  inspiration_image_urls: string[] | null
   total_amount: number
   deposit_amount: number
   remaining_amount: number
@@ -428,6 +429,40 @@ export default function BookingShow({ booking }: Props) {
             </CardHeader>
             <CardContent>
               <p className="whitespace-pre-wrap">{booking.special_requests}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Inspiration Photos */}
+        {booking.inspiration_image_urls && booking.inspiration_image_urls.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Inspiration Photos from Customer
+              </CardTitle>
+              <CardDescription>
+                Reference images the customer shared to show what they're envisioning
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {booking.inspiration_image_urls.map((url, index) => (
+                  <a
+                    key={index}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block aspect-square rounded-lg overflow-hidden border hover:ring-2 hover:ring-primary transition-all"
+                  >
+                    <img
+                      src={url}
+                      alt={`Inspiration ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
             </CardContent>
           </Card>
         )}

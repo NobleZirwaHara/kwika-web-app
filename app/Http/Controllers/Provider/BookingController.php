@@ -168,6 +168,7 @@ class BookingController extends Controller
                 'event_location' => $booking->event_location,
                 'attendees' => $booking->attendees,
                 'special_requests' => $booking->special_requests,
+                'inspiration_image_urls' => $booking->inspiration_image_urls,
 
                 // Financial information
                 'total_amount' => $booking->total_amount,
