@@ -82,7 +82,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
               <Link
                 key={product.id}
                 href={`/products/${product.slug}`}
-                className="group shrink-0 snap-start w-[47vw] sm:w-[45vw] md:w-auto"
+                className="group shrink-0 snap-start w-[42vw] sm:w-[45vw] md:w-auto"
               >
                 <div className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
                   <div className="relative aspect-square overflow-hidden bg-muted rounded-xl">

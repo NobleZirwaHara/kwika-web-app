@@ -56,7 +56,7 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
             <Link
               key={provider.id}
               href={`/providers/${provider.slug}`}
-              className="group cursor-pointer shrink-0 snap-start w-[47vw] sm:w-[45vw] md:w-72 relative z-0"
+              className="group cursor-pointer shrink-0 snap-start w-[42vw] sm:w-[45vw] md:w-72 relative z-0"
             >
               {/* Mobile: square aspect ratio like Airbnb, Desktop: square */}
               <div className="relative aspect-square overflow-hidden rounded-xl mb-2 md:mb-3">
