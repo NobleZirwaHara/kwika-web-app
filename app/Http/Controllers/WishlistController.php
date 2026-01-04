@@ -197,9 +197,9 @@ class WishlistController extends Controller
         }
 
         return response()->json([
-            'providerIds' => array_unique($providerIds),
-            'packageIds' => array_unique($packageIds),
-            'serviceIds' => array_unique($serviceIds),
+            'providerIds' => array_values(array_unique($providerIds)),
+            'packageIds' => array_values(array_unique($packageIds)),
+            'serviceIds' => array_values(array_unique($serviceIds)),
         ]);
     }
 

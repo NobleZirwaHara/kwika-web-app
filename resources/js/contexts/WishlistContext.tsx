@@ -149,10 +149,12 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json()
+        // Ensure arrays (PHP can return objects if array keys are non-sequential)
+        const toArray = (val: unknown): number[] => Array.isArray(val) ? val : Object.values(val || {})
         setWishlistIds({
-          providerIds: data.providerIds || [],
-          packageIds: data.packageIds || [],
-          serviceIds: data.serviceIds || [],
+          providerIds: toArray(data.providerIds),
+          packageIds: toArray(data.packageIds),
+          serviceIds: toArray(data.serviceIds),
         })
       }
     } catch (error) {
