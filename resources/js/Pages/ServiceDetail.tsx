@@ -373,8 +373,8 @@ export default function ServiceDetail({ service, relatedServices, similarService
                     </div>
                     <div className="flex flex-col items-end gap-3">
                       <WishlistButton
-                        serviceId={service.id}
-                        isAuthenticated={!!auth?.user}
+                        itemType="service"
+                        itemId={service.id}
                         variant="detail"
                       />
                       <div className="text-right">

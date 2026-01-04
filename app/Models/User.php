@@ -69,14 +69,36 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
+    /**
+     * @deprecated Use userWishlists() instead - keeping for backward compatibility during migration
+     */
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
     }
 
+    /**
+     * @deprecated Use userWishlists() instead - keeping for backward compatibility during migration
+     */
     public function wishlistedServices()
     {
         return $this->belongsToMany(Service::class, 'wishlists')->withTimestamps();
+    }
+
+    /**
+     * Get all user's wishlists (new system)
+     */
+    public function userWishlists()
+    {
+        return $this->hasMany(UserWishlist::class);
+    }
+
+    /**
+     * Get user's default wishlist (new system)
+     */
+    public function defaultWishlist()
+    {
+        return $this->hasOne(UserWishlist::class)->where('is_default', true);
     }
 
     public function adminLogs()

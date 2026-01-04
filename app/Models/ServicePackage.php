@@ -67,6 +67,11 @@ class ServicePackage extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function wishlistItems()
+    {
+        return $this->morphMany(WishlistItem::class, 'itemable');
+    }
+
     // Scopes
     public function scopeActive($query)
     {

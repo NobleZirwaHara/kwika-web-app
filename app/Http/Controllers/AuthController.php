@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\WishlistCookieMiddleware;
 use App\Models\User;
+use App\Models\UserWishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -33,6 +36,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            // Merge guest wishlists to user account
+            $this->mergeGuestWishlists($request, Auth::id());
 
             // Redirect to admin dashboard if user is admin
             if (Auth::user()->is_admin) {
@@ -80,6 +86,24 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Merge guest wishlists to new user account
+        $this->mergeGuestWishlists($request, $user->id);
+
         return redirect()->route('home');
+    }
+
+    /**
+     * Merge guest wishlists to user account after login/register
+     */
+    private function mergeGuestWishlists(Request $request, int $userId): void
+    {
+        $guestToken = $request->cookie(WishlistCookieMiddleware::COOKIE_NAME);
+
+        if ($guestToken) {
+            UserWishlist::mergeGuestToUser($guestToken, $userId);
+
+            // Clear the guest cookie
+            Cookie::queue(Cookie::forget(WishlistCookieMiddleware::COOKIE_NAME));
+        }
     }
 }

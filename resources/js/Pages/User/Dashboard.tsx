@@ -12,6 +12,7 @@ import {
   Search
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
+import { formatDate } from '@/lib/utils'
 
 interface Props {
   user: {
@@ -189,7 +190,7 @@ export default function Dashboard({ user, stats, upcoming_bookings, recent_booki
                           By {booking.provider_name}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          {new Date(booking.event_date).toLocaleDateString()} at {booking.event_time}
+                          {formatDate(booking.event_date)} at {booking.event_time}
                         </p>
                         <Badge className={`${getStatusColor(booking.status)} mt-2`}>
                           {booking.status}
@@ -227,7 +228,7 @@ export default function Dashboard({ user, stats, upcoming_bookings, recent_booki
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{booking.service_name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {booking.provider_name} • {new Date(booking.event_date).toLocaleDateString()}
+                          {booking.provider_name} • {formatDate(booking.event_date)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">

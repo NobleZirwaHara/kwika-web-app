@@ -6,9 +6,9 @@ import { ProviderPackagesSection } from "@/components/provider-packages-section"
 import { ProviderReviews } from "@/components/provider-reviews"
 import { SimilarProviders } from "@/components/similar-providers"
 import { Footer } from "@/components/footer"
-import { Share2, Heart, MapPin } from "lucide-react"
-import { useState } from "react"
+import { Share2, MapPin } from "lucide-react"
 import { SEO, createLocalBusinessSchema, createBreadcrumbSchema } from "@/components/seo"
+import { WishlistButton } from "@/components/wishlist-button"
 
 interface ProviderData {
   id: string | number
@@ -98,8 +98,6 @@ interface Props {
 }
 
 export default function ProviderDetail({ provider, services, packages, reviews, similarProviders, categories = [], auth }: Props) {
-  const [isFavorite, setIsFavorite] = useState(false)
-
   const businessSchema = createLocalBusinessSchema({
     name: provider.name,
     description: provider.description,
@@ -155,13 +153,11 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
                       <Share2 className="h-4 w-4" />
                       <span className="hidden sm:inline">Share</span>
                     </button>
-                    <button
-                      onClick={() => setIsFavorite(!isFavorite)}
-                      className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border hover:bg-accent transition-colors"
-                    >
-                      <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
-                      <span className="hidden sm:inline">Save</span>
-                    </button>
+                    <WishlistButton
+                      itemType="provider"
+                      itemId={typeof provider.id === 'string' ? parseInt(provider.id) : provider.id}
+                      variant="detail"
+                    />
                   </div>
                 </div>
 

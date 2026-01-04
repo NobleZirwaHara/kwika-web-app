@@ -1,8 +1,9 @@
 import { Badge } from "@/components/ui/badge"
-import { Star, Heart } from "lucide-react"
-import { useRef, useState } from "react"
+import { Star } from "lucide-react"
+import { useRef } from "react"
 import { Link } from "@inertiajs/react"
 import { ScrollArrows } from "@/components/ui/scroll-arrows"
+import { WishlistButton } from "@/components/wishlist-button"
 
 interface Provider {
   id: number
@@ -24,19 +25,6 @@ interface FeaturedProvidersProps {
 
 export function FeaturedProviders({ providers, title = "Top-rated providers" }: FeaturedProvidersProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [favorites, setFavorites] = useState<Set<number>>(new Set())
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
-  }
 
   return (
     <section className="py-4 md:py-12 relative z-0">
@@ -70,18 +58,12 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
                     Featured
                   </Badge>
                 )}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    toggleFavorite(provider.id)
-                  }}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-background/80 hover:bg-background transition-colors hover:scale-110 active:scale-95"
-                >
-                  <Heart
-                    className={`h-5 w-5 md:h-4 md:w-4 transition-colors ${favorites.has(provider.id) ? "fill-primary text-primary" : "text-foreground/70"}`}
-                  />
-                </button>
+                <WishlistButton
+                  itemType="provider"
+                  itemId={provider.id}
+                  variant="small"
+                  className="absolute top-3 right-3"
+                />
               </div>
 
               <div className="space-y-0.5 md:space-y-1">

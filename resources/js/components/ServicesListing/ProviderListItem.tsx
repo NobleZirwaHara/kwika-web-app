@@ -1,31 +1,22 @@
 import { Link } from '@inertiajs/react'
-import { Star, Heart, MapPin } from "lucide-react"
+import { Star, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Provider } from "./ProviderCard"
+import { WishlistButton } from "@/components/wishlist-button"
 
 interface ProviderListItemProps {
   provider: Provider
-  isFavorite?: boolean
-  onToggleFavorite?: (id: number) => void
   className?: string
 }
 
 export function ProviderListItem({
   provider,
-  isFavorite = false,
-  onToggleFavorite,
   className
 }: ProviderListItemProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onToggleFavorite?.(provider.id)
-  }
 
   const formatPrice = (price?: number) => {
     if (!price) return null
@@ -89,21 +80,12 @@ export function ProviderListItem({
               </div>
             </Link>
 
-            {/* Favorite button */}
-            {onToggleFavorite && (
-              <button
-                onClick={handleFavoriteClick}
-                className="p-2 rounded-full hover:bg-muted transition-colors shrink-0"
-                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-              >
-                <Heart
-                  className={cn(
-                    "h-5 w-5 transition-colors",
-                    isFavorite ? "fill-primary text-primary" : "text-foreground/70"
-                  )}
-                />
-              </button>
-            )}
+            {/* Wishlist button */}
+            <WishlistButton
+              itemType="provider"
+              itemId={provider.id}
+              variant="small"
+            />
           </div>
 
           {/* Description */}

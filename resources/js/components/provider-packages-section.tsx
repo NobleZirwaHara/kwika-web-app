@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "@inertiajs/react"
 import { Package, Plus, CheckCircle, Star } from "lucide-react"
+import { WishlistButton } from "@/components/wishlist-button"
 
 interface PackageItem {
   quantity: number
@@ -95,6 +96,12 @@ export function ProviderPackagesSection({ packages, providerId }: ProviderPackag
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <WishlistButton
+                    itemType="package"
+                    itemId={pkg.id}
+                    variant="small"
+                    className="absolute top-3 left-3 z-20"
+                  />
                   <div className="absolute bottom-3 left-3 right-3">
                     <Badge
                       variant={pkg.package_type === 'bundle' ? 'default' : 'secondary'}
@@ -107,6 +114,12 @@ export function ProviderPackagesSection({ packages, providerId }: ProviderPackag
               ) : (
                 <div className="relative h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                   <Package className="h-16 w-16 text-primary/30" />
+                  <WishlistButton
+                    itemType="package"
+                    itemId={pkg.id}
+                    variant="small"
+                    className="absolute top-3 left-3 z-20"
+                  />
                   <div className="absolute bottom-3 left-3 right-3">
                     <Badge
                       variant={pkg.package_type === 'bundle' ? 'default' : 'secondary'}

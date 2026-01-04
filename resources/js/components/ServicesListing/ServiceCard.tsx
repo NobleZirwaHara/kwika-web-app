@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react'
-import { Heart } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { WishlistButton } from "@/components/wishlist-button"
 
 export interface Service {
   id: number
@@ -33,23 +33,14 @@ export interface Service {
 
 interface ServiceCardProps {
   service: Service
-  isFavorite?: boolean
-  onToggleFavorite?: (id: number) => void
   onBookClick?: (service: Service) => void
   className?: string
 }
 
 export function ServiceCard({
   service,
-  isFavorite = false,
-  onToggleFavorite,
   className
 }: ServiceCardProps) {
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onToggleFavorite?.(service.id)
-  }
 
   return (
     <Link
@@ -75,20 +66,12 @@ export function ServiceCard({
             {service.category.name}
           </Badge>
         )}
-        {onToggleFavorite && (
-          <button
-            onClick={handleFavoriteClick}
-            className="absolute top-3 right-3 p-2 rounded-full bg-background/90 hover:bg-background transition-colors shadow-sm hover:shadow-md"
-            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            <Heart
-              className={cn(
-                "h-4 w-4 transition-colors",
-                isFavorite ? "fill-primary text-primary" : "text-foreground/70"
-              )}
-            />
-          </button>
-        )}
+        <WishlistButton
+          itemType="service"
+          itemId={service.id}
+          variant="small"
+          className="absolute top-3 right-3"
+        />
       </div>
 
       <div className="space-y-1">

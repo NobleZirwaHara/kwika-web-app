@@ -51,7 +51,7 @@ export default function MobileBottomNav({ user }: MobileBottomNavProps) {
       label: 'Wishlists',
       icon: <Heart className="h-6 w-6" strokeWidth={1.5} />,
       activeIcon: <Heart className="h-6 w-6 fill-current" strokeWidth={2} />,
-      href: '/user/wishlist',
+      href: '/wishlist',
     },
     {
       id: 'bookings',
@@ -101,7 +101,7 @@ export default function MobileBottomNav({ user }: MobileBottomNavProps) {
       label: 'Wishlists',
       icon: <Heart className="h-6 w-6" strokeWidth={1.5} />,
       activeIcon: <Heart className="h-6 w-6 fill-current" strokeWidth={2} />,
-      href: '/login?redirect=/user/wishlist',
+      href: '/wishlist',
     },
     {
       id: 'login',
@@ -125,7 +125,7 @@ export default function MobileBottomNav({ user }: MobileBottomNavProps) {
   // Determine active item based on URL
   const getActiveItem = () => {
     if (currentUrl === '/' || currentUrl.startsWith('/search') || currentUrl.startsWith('/providers') || currentUrl.startsWith('/services')) return 'explore'
-    if (currentUrl.startsWith('/user/wishlist')) return 'wishlists'
+    if (currentUrl.startsWith('/wishlist')) return 'wishlists'
     if (currentUrl.startsWith('/user/bookings')) return 'bookings'
     if (currentUrl.startsWith('/user/messages')) return 'messages'
     if (currentUrl.startsWith('/user/profile') || currentUrl.startsWith('/user/settings')) return 'profile'

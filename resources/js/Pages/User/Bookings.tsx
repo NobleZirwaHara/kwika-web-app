@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 import { useState } from 'react'
+import { formatDate } from '@/lib/utils'
 
 interface Props {
   bookings: Array<{
@@ -139,14 +140,7 @@ export default function Bookings({ bookings, filters }: Props) {
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>
-                            {new Date(booking.event_date).toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </span>
+                          <span>{formatDate(booking.event_date)}</span>
                         </div>
 
                         {booking.event_time && (

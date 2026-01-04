@@ -148,6 +148,11 @@ class ServiceProvider extends Model
         return $this->belongsToMany(ServiceCategory::class, 'category_service_provider');
     }
 
+    public function wishlistItems()
+    {
+        return $this->morphMany(WishlistItem::class, 'itemable');
+    }
+
     // Scopes
     public function scopeVerified($query)
     {

@@ -71,6 +71,11 @@ class Service extends Model
         return $this->hasMany(ServicePackageItem::class);
     }
 
+    public function wishlistItems()
+    {
+        return $this->morphMany(WishlistItem::class, 'itemable');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('services.is_active', true);

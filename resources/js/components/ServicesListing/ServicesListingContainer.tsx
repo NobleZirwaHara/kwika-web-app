@@ -62,7 +62,6 @@ export function ServicesListingContainer({
   hideListingTypeToggle = false
 }: ServicesListingContainerProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [favorites, setFavorites] = useState<Set<number>>(new Set())
   const [hoveredMapId, setHoveredMapId] = useState<number | null>(null)
 
   const isDesktop = useMediaQuery({ minWidth: 1024 })
@@ -125,19 +124,6 @@ export function ServicesListingContainer({
     })
   }, [searchParams.listing_type])
 
-  // Handle favorite toggle
-  const handleToggleFavorite = useCallback((id: number) => {
-    setFavorites(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
-    // TODO: Persist to backend
-  }, [])
 
   const isProviderListing = listingType === 'providers'
   const items = results.data
@@ -245,15 +231,11 @@ export function ServicesListingContainer({
                   <ProviderListItem
                     key={item.id}
                     provider={item as Provider}
-                    isFavorite={favorites.has(item.id)}
-                    onToggleFavorite={handleToggleFavorite}
                   />
                 ) : (
                   <ServiceListItem
                     key={item.id}
                     service={item as Service}
-                    isFavorite={favorites.has(item.id)}
-                    onToggleFavorite={handleToggleFavorite}
                   />
                 )
               )}
@@ -265,15 +247,11 @@ export function ServicesListingContainer({
                   <ProviderCard
                     key={item.id}
                     provider={item as Provider}
-                    isFavorite={favorites.has(item.id)}
-                    onToggleFavorite={handleToggleFavorite}
                   />
                 ) : (
                   <ServiceCard
                     key={item.id}
                     service={item as Service}
-                    isFavorite={favorites.has(item.id)}
-                    onToggleFavorite={handleToggleFavorite}
                   />
                 )
               )}

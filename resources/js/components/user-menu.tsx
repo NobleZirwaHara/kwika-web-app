@@ -197,7 +197,7 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                         It's easy to start hosting and earn extra income.
                       </div>
                     </div>
-                    <div className="text-2xl">🎉</div>
+                    <img src="/icons/platter.png" alt="Become a provider" className="w-6 h-6" />
                   </div>
                 </Link>
               ) : null}
@@ -212,10 +212,17 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
           ) : (
             <>
               {/* Not logged in menu */}
+              <Link href="/wishlist" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <Heart className="h-5 w-5" />
+                  <span className="font-medium">Wishlist</span>
+                </div>
+              </Link>
+
               <Link href="/help" className="block px-4 py-3 hover:bg-primary/10 transition-colors border-b border-border cursor-pointer">
                 <div className="flex items-center gap-3">
                   <HelpCircle className="h-5 w-5" />
-                  <span className="font-semibold">Help Center</span>
+                  <span className="font-medium">Help Center</span>
                 </div>
               </Link>
 

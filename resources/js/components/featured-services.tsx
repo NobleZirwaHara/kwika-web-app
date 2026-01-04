@@ -83,8 +83,8 @@ export function FeaturedServices({ services, isAuthenticated = false }: Featured
                 )}
                 <div className="absolute top-3 right-3">
                   <WishlistButton
-                    serviceId={service.id}
-                    isAuthenticated={isAuthenticated}
+                    itemType="service"
+                    itemId={service.id}
                     variant="default"
                   />
                 </div>

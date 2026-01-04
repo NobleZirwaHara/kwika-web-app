@@ -10,6 +10,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { route as ziggyRoute } from 'ziggy-js';
 import { CartProvider } from '@/contexts/CartContext';
+import { WishlistProvider } from '@/contexts/WishlistContext';
 import MobileBottomNav from '@/components/MobileBottomNav';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
@@ -47,7 +48,9 @@ createInertiaApp({
 
         root.render(
             <CartProvider>
-                <AppWrapper App={App} props={props} />
+                <WishlistProvider>
+                    <AppWrapper App={App} props={props} />
+                </WishlistProvider>
             </CartProvider>
         );
     },

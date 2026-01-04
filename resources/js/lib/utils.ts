@@ -47,3 +47,60 @@ export function formatNumber(amount: number | string, decimals: number = 0): str
 export function formatPrice(price: number | string, currency: string = 'MWK'): string {
   return formatCurrency(price, currency, 0)
 }
+
+/**
+ * Format a date as dd-mmmm-yy (e.g., "04-January-26")
+ * @param date - The date to format (string, Date, or null/undefined)
+ * @returns Formatted date string or empty string if invalid
+ */
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return ''
+
+  const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return ''
+
+  const day = d.getDate().toString().padStart(2, '0')
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ]
+  const month = months[d.getMonth()]
+  const year = d.getFullYear().toString().slice(-2)
+
+  return `${day}-${month}-${year}`
+}
+
+/**
+ * Format a date and time as dd-mmmm-yy HH:MM (e.g., "04-January-26 14:30")
+ * @param date - The date to format (string, Date, or null/undefined)
+ * @returns Formatted datetime string or empty string if invalid
+ */
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return ''
+
+  const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return ''
+
+  const dateStr = formatDate(d)
+  const hours = d.getHours().toString().padStart(2, '0')
+  const minutes = d.getMinutes().toString().padStart(2, '0')
+
+  return `${dateStr} ${hours}:${minutes}`
+}
+
+/**
+ * Format a time as HH:MM (e.g., "14:30")
+ * @param date - The date to extract time from (string, Date, or null/undefined)
+ * @returns Formatted time string or empty string if invalid
+ */
+export function formatTime(date: string | Date | null | undefined): string {
+  if (!date) return ''
+
+  const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return ''
+
+  const hours = d.getHours().toString().padStart(2, '0')
+  const minutes = d.getMinutes().toString().padStart(2, '0')
+
+  return `${hours}:${minutes}`
+}

@@ -143,8 +143,8 @@ export function ProviderServices({ services, currency = 'MWK', providerId }: Pro
                   </Badge>
                 </div>
                 <WishlistButton
-                  serviceId={service.id}
-                  isAuthenticated={isAuthenticated}
+                  itemType="service"
+                  itemId={service.id}
                   variant="small"
                 />
               </div>

@@ -1,34 +1,25 @@
 import { Link } from '@inertiajs/react'
-import { Star, Clock, Tag, MapPin, Heart } from "lucide-react"
+import { Star, Clock, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Service } from "./ServiceCard"
+import { WishlistButton } from "@/components/wishlist-button"
 
 interface ServiceListItemProps {
   service: Service
-  isFavorite?: boolean
-  onToggleFavorite?: (id: number) => void
   onBookClick?: (service: Service) => void
   className?: string
 }
 
 export function ServiceListItem({
   service,
-  isFavorite = false,
-  onToggleFavorite,
   onBookClick,
   className
 }: ServiceListItemProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onToggleFavorite?.(service.id)
-  }
 
   const handleBookClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -134,21 +125,12 @@ export function ServiceListItem({
               </Link>
             </div>
 
-            {/* Favorite button */}
-            {onToggleFavorite && (
-              <button
-                onClick={handleFavoriteClick}
-                className="p-2 rounded-full hover:bg-muted transition-colors shrink-0"
-                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-              >
-                <Heart
-                  className={cn(
-                    "h-5 w-5 transition-colors",
-                    isFavorite ? "fill-primary text-primary" : "text-foreground/70"
-                  )}
-                />
-              </button>
-            )}
+            {/* Wishlist button */}
+            <WishlistButton
+              itemType="service"
+              itemId={service.id}
+              variant="small"
+            />
           </div>
 
           {/* Description */}

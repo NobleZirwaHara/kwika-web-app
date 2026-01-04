@@ -149,16 +149,41 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
-// Wishlist routes (authenticated users)
-Route::middleware(['auth'])->prefix('wishlist')->name('wishlist.')->group(function () {
+// Wishlist routes (works for both guests and authenticated users)
+Route::prefix('wishlist')->name('wishlist.')->group(function () {
+    // Page routes
     Route::get('/', [\App\Http\Controllers\WishlistController::class, 'index'])->name('index');
-    Route::post('/', [\App\Http\Controllers\WishlistController::class, 'store'])->name('store');
-    Route::delete('/{serviceId}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('destroy');
+    Route::get('/{slug}', [\App\Http\Controllers\WishlistController::class, 'show'])->name('show');
+    Route::post('/create', [\App\Http\Controllers\WishlistController::class, 'create'])->name('create');
+    Route::patch('/{id}', [\App\Http\Controllers\WishlistController::class, 'update'])->name('update');
+    Route::delete('/{id}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('destroy');
 });
 
-// Wishlist API routes (for checking wishlist status)
-Route::get('/api/wishlist/check/{serviceId}', [\App\Http\Controllers\WishlistController::class, 'check'])->name('api.wishlist.check');
-Route::get('/api/wishlist/ids', [\App\Http\Controllers\WishlistController::class, 'getWishlistIds'])->name('api.wishlist.ids');
+// Wishlist API routes (for frontend context and item management)
+Route::prefix('api/wishlist')->name('api.wishlist.')->group(function () {
+    // Get data
+    Route::get('/data', [\App\Http\Controllers\WishlistController::class, 'getData'])->name('data');
+    Route::get('/ids', [\App\Http\Controllers\WishlistController::class, 'getIds'])->name('ids');
+
+    // Check if items are wishlisted
+    Route::get('/check/provider/{id}', [\App\Http\Controllers\WishlistController::class, 'checkProvider'])->name('check.provider');
+    Route::get('/check/package/{id}', [\App\Http\Controllers\WishlistController::class, 'checkPackage'])->name('check.package');
+    Route::get('/check/service/{id}', [\App\Http\Controllers\WishlistController::class, 'checkService'])->name('check.service');
+
+    // Add items
+    Route::post('/provider', [\App\Http\Controllers\WishlistController::class, 'addProvider'])->name('add.provider');
+    Route::post('/package', [\App\Http\Controllers\WishlistController::class, 'addPackage'])->name('add.package');
+    Route::post('/service', [\App\Http\Controllers\WishlistController::class, 'addService'])->name('add.service');
+
+    // Toggle items (add if not present, remove if present)
+    Route::post('/toggle/provider', [\App\Http\Controllers\WishlistController::class, 'toggleProvider'])->name('toggle.provider');
+    Route::post('/toggle/package', [\App\Http\Controllers\WishlistController::class, 'togglePackage'])->name('toggle.package');
+    Route::post('/toggle/service', [\App\Http\Controllers\WishlistController::class, 'toggleService'])->name('toggle.service');
+
+    // Item management
+    Route::delete('/item/{id}', [\App\Http\Controllers\WishlistController::class, 'removeItem'])->name('remove');
+    Route::patch('/item/{id}/move', [\App\Http\Controllers\WishlistController::class, 'moveItem'])->name('move');
+});
 
 // Provider Onboarding Routes
 Route::prefix('onboarding')->name('onboarding.')->group(function () {

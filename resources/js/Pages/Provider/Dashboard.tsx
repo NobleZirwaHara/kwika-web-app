@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { formatDate } from '@/lib/utils'
 
 interface Props {
   provider: {
@@ -246,7 +247,7 @@ export default function Dashboard({ provider, stats, recent_bookings, upcoming_e
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{booking.service_name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {booking.user_name} • {new Date(booking.event_date).toLocaleDateString()}
+                          {booking.user_name} • {formatDate(booking.event_date)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
