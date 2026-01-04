@@ -101,7 +101,7 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
           {/* <BenefitsSection /> */}
           <PromotionsSection />
 
-          <Testimonials />
+          {/* <Testimonials /> */}
         </main>
         <Footer />
       </div>

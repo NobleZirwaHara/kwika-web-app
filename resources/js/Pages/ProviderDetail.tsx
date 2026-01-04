@@ -129,7 +129,7 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
         structuredData={{ ...businessSchema, ...breadcrumbs }}
       />
       <div className="min-h-screen overflow-x-hidden pb-20 md:pb-0">
-        <SearchHeader categories={categories} />
+        <SearchHeader categories={categories} variant="detail" />
         <main className="pt-16">
           {/* Cover Image with Logo */}
           <ProviderCover

@@ -1,6 +1,6 @@
-import { Link, usePage } from "@inertiajs/react"
+import { Link, usePage, router } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
-import { Globe } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useState, useEffect } from "react"
 import { CompactSearchBar } from "./compact-search-bar"
 import { UserMenu } from "./user-menu"
@@ -15,9 +15,10 @@ interface Category {
 
 interface SearchHeaderProps {
   categories?: Category[]
+  variant?: 'detail' | 'search'
 }
 
-export function SearchHeader({ categories = [] }: SearchHeaderProps) {
+export function SearchHeader({ categories = [], variant = 'search' }: SearchHeaderProps) {
   const { auth } = usePage().props as any
   const user = auth?.user
   const isProvider = auth?.user?.is_provider || false
@@ -36,7 +37,9 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md' : 'bg-background border-b'
+        isScrolled
+          ? 'bg-background/95 backdrop-blur-md shadow-md md:shadow-md'
+          : 'bg-white dark:bg-background shadow-sm md:shadow-none md:border-b'
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 lg:px-20">
@@ -69,11 +72,23 @@ export function SearchHeader({ categories = [] }: SearchHeaderProps) {
 
         {/* Mobile Layout */}
         <div className="flex md:hidden flex-col gap-3 py-3">
-          {/* Top row: Logo and User Menu */}
+          {/* Top row: Back button, Logo (optional), and User Menu */}
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <img src="/kwika-logo.png" alt="Logo" width={80} />
-            </Link>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => window.history.back()}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              {variant === 'search' && (
+                <Link href="/" className="flex items-center shrink-0">
+                  <img src="/kwika-logo.png" alt="Logo" width={70} />
+                </Link>
+              )}
+            </div>
             <UserMenu user={user} isProvider={isProvider} isAdmin={isAdmin} />
           </div>
 
