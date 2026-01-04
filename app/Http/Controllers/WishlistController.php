@@ -515,6 +515,21 @@ class WishlistController extends Controller
 
     private function formatWishlistForResponse(UserWishlist $wishlist, bool $includeItems = false): array
     {
+        // Get item IDs grouped by type for quick lookup
+        $providerIds = [];
+        $packageIds = [];
+        $serviceIds = [];
+
+        foreach ($wishlist->items as $item) {
+            if ($item->isProvider()) {
+                $providerIds[] = $item->itemable_id;
+            } elseif ($item->isPackage()) {
+                $packageIds[] = $item->itemable_id;
+            } elseif ($item->isService()) {
+                $serviceIds[] = $item->itemable_id;
+            }
+        }
+
         $data = [
             'id' => $wishlist->id,
             'name' => $wishlist->name,
@@ -527,6 +542,10 @@ class WishlistController extends Controller
             'total_package_price' => $wishlist->total_package_price,
             'formatted_total' => $wishlist->formatted_total,
             'created_at' => $wishlist->created_at->toISOString(),
+            // Include item IDs for quick lookup
+            'provider_ids' => $providerIds,
+            'package_ids' => $packageIds,
+            'service_ids' => $serviceIds,
         ];
 
         if ($includeItems) {

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Link } from "@inertiajs/react"
 import { Package, Plus, CheckCircle, Star } from "lucide-react"
 import { WishlistButton } from "@/components/wishlist-button"
+import { formatPrice } from "@/lib/utils"
 
 interface PackageItem {
   quantity: number
@@ -172,7 +173,7 @@ export function ProviderPackagesSection({ packages, providerId }: ProviderPackag
                     <span className="text-sm text-muted-foreground">Total Price</span>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-primary">
-                        {currency} {pkg.final_price.toLocaleString()}
+                        {formatPrice(pkg.final_price, currency)}
                       </p>
                     </div>
                   </div>

@@ -72,6 +72,11 @@ interface WishlistData {
   total_package_price: number
   formatted_total: string
   created_at: string
+  // Item IDs for quick lookup
+  provider_ids: number[]
+  package_ids: number[]
+  service_ids: number[]
+  // Full item details (only when loaded)
   providers?: WishlistProvider[]
   packages?: WishlistPackage[]
   services?: WishlistService[]
