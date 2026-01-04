@@ -145,7 +145,7 @@ export default function Search({
         keywords={`${listingType} Malawi, ${searchParams.city || 'Lilongwe Blantyre'}, event services, ${searchParams.query || 'wedding corporate party'}`}
         structuredData={createBreadcrumbSchema(breadcrumbs)}
       />
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-20 md:pb-0">
         <SearchHeader />
 
         <main className="pt-24 pb-12">

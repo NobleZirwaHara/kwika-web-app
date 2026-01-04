@@ -84,7 +84,7 @@ export default function Cart({ cart: initialCart }: CartPageProps) {
       <Head title="Shopping Cart - Kwika Events" />
       <Header />
 
-      <main className="min-h-screen bg-muted/30 py-8">
+      <main className="min-h-screen bg-muted/30 pt-8 pb-20 md:pb-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">

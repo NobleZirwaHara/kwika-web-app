@@ -62,7 +62,7 @@ export default function Listings({
   return (
     <>
       <Head title={listingType === 'providers' ? 'Browse Providers' : 'Browse Services'} />
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-20 md:pb-0">
         <Header />
 
         <main className="pt-24 pb-12">

@@ -1,7 +1,7 @@
 import { motion, useAnimationControls } from 'framer-motion'
-import { Link, usePage } from '@inertiajs/react'
-import { Search, Heart, CalendarDays, MessageCircle, User, LogIn } from 'lucide-react'
-import { useEffect, useState, useRef } from 'react'
+import { Link, router } from '@inertiajs/react'
+import { Search, Heart, CalendarDays, MessageCircle, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -12,14 +12,30 @@ interface NavItem {
   activeIcon?: React.ReactNode
 }
 
-export default function MobileBottomNav() {
-  const { props, url } = usePage()
-  const auth = (props as any).auth
-  const user = auth?.user
+interface MobileBottomNavProps {
+  user?: any
+}
+
+export default function MobileBottomNav({ user }: MobileBottomNavProps) {
+  const [currentUrl, setCurrentUrl] = useState(typeof window !== 'undefined' ? window.location.pathname : '/')
   const [isVisible, setIsVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const controls = useAnimationControls()
   const scrollThreshold = 10 // Minimum scroll distance to trigger show/hide
+
+  // Listen for Inertia navigation events
+  useEffect(() => {
+    const handleNavigate = () => {
+      setCurrentUrl(window.location.pathname)
+    }
+
+    // Listen to Inertia's navigate event
+    const removeListener = router.on('navigate', handleNavigate)
+
+    return () => {
+      removeListener()
+    }
+  }, [])
 
   // Define nav items based on auth status
   const loggedInItems: NavItem[] = [
@@ -108,12 +124,12 @@ export default function MobileBottomNav() {
 
   // Determine active item based on URL
   const getActiveItem = () => {
-    if (url === '/' || url.startsWith('/search') || url.startsWith('/providers') || url.startsWith('/services')) return 'explore'
-    if (url.startsWith('/user/wishlist')) return 'wishlists'
-    if (url.startsWith('/user/bookings')) return 'bookings'
-    if (url.startsWith('/user/messages')) return 'messages'
-    if (url.startsWith('/user/profile') || url.startsWith('/user/settings')) return 'profile'
-    if (url.startsWith('/login') || url.startsWith('/register')) return 'login'
+    if (currentUrl === '/' || currentUrl.startsWith('/search') || currentUrl.startsWith('/providers') || currentUrl.startsWith('/services')) return 'explore'
+    if (currentUrl.startsWith('/user/wishlist')) return 'wishlists'
+    if (currentUrl.startsWith('/user/bookings')) return 'bookings'
+    if (currentUrl.startsWith('/user/messages')) return 'messages'
+    if (currentUrl.startsWith('/user/profile') || currentUrl.startsWith('/user/settings')) return 'profile'
+    if (currentUrl.startsWith('/login') || currentUrl.startsWith('/register')) return 'login'
     return 'explore'
   }
 

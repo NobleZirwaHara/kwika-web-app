@@ -79,7 +79,7 @@ export default function Products({
     <>
       <Head title="Products - Kwika Events" />
 
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pb-20 md:pb-0">
         <Header />
 
         <main className="flex-1">

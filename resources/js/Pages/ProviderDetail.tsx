@@ -128,7 +128,7 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
         type="profile"
         structuredData={{ ...businessSchema, ...breadcrumbs }}
       />
-      <div className="min-h-screen">
+      <div className="min-h-screen overflow-x-hidden pb-20 md:pb-0">
         <SearchHeader categories={categories} />
         <main className="pt-16">
           {/* Cover Image with Logo */}
@@ -143,21 +143,21 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
             <div className="flex flex-col gap-6">
               {/* Name and basic info */}
               <div>
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <h1 className="text-4xl md:text-5xl font-bold font-heading text-balance">
+                <div className="flex flex-col gap-3 mb-3">
+                  <h1 className="text-3xl md:text-5xl font-bold font-heading text-balance">
                     {provider.name}
                   </h1>
-                  <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                     {provider.images && provider.images.length > 0 && (
                       <ProviderGalleryLightbox images={provider.images} providerName={provider.name} />
                     )}
-                    <button className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-accent transition-colors">
+                    <button className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border hover:bg-accent transition-colors">
                       <Share2 className="h-4 w-4" />
                       <span className="hidden sm:inline">Share</span>
                     </button>
                     <button
                       onClick={() => setIsFavorite(!isFavorite)}
-                      className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border hover:bg-accent transition-colors"
+                      className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border hover:bg-accent transition-colors"
                     >
                       <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
                       <span className="hidden sm:inline">Save</span>

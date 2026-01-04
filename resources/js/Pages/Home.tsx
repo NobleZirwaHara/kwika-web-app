@@ -11,7 +11,6 @@ import { EventHighlight } from "@/components/event-highlight"
 import { KwikaRewards } from "@/components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
 import { SEO } from "@/components/seo"
-import MobileBottomNav from "@/components/MobileBottomNav"
 
 interface Category {
   id: number
@@ -106,9 +105,6 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
         </main>
         <Footer />
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
     </HeroCarouselProvider>
   )
 }

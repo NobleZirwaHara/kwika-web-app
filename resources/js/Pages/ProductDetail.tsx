@@ -123,7 +123,7 @@ export default function ProductDetail({ product, relatedProducts, similarProduct
       <Head title={`${product.name} - ${product.provider.business_name}`} />
       <Header />
 
-      <main className="min-h-screen bg-background pt-4 pb-12">
+      <main className="min-h-screen bg-background pt-4 pb-20 md:pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">

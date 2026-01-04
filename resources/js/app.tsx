@@ -10,6 +10,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { route as ziggyRoute } from 'ziggy-js';
 import { CartProvider } from '@/contexts/CartContext';
+import MobileBottomNav from '@/components/MobileBottomNav';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
 
@@ -21,6 +22,18 @@ declare global {
 globalThis.route = (name, params, absolute) => {
   return ziggyRoute(name, params, absolute, (globalThis as any).Ziggy);
 };
+
+// Wrapper component to include MobileBottomNav within Inertia context
+function AppWrapper({ App, props }: { App: any; props: any }) {
+  const user = props?.initialPage?.props?.auth?.user;
+
+  return (
+    <>
+      <App {...props} />
+      <MobileBottomNav user={user} />
+    </>
+  );
+}
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -34,7 +47,7 @@ createInertiaApp({
 
         root.render(
             <CartProvider>
-                <App {...props} />
+                <AppWrapper App={App} props={props} />
             </CartProvider>
         );
     },

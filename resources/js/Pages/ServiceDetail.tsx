@@ -202,7 +202,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
       <Head title={`${service.name} - ${service.provider.business_name}`} />
       <SearchHeader categories={categories} />
 
-      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-24 pb-12">
+      <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-24 pb-20 md:pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">
