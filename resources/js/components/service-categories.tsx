@@ -15,7 +15,7 @@ interface ServiceCategoriesProps {
 
 export function ServiceCategories({ categories }: ServiceCategoriesProps) {
   return (
-    <section className="pt-4 pb-6 md:pb-10 lg:pt-6 lg:pb-14">
+    <section className="pt-4 pb-2 md:pb-10 lg:pt-6 lg:pb-14">
       <div className="container mx-auto px-4 md:px-6 lg:px-20">
         {/* Header */}
         <div className="mb-4 md:mb-6">

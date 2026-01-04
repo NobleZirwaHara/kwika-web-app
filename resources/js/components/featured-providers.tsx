@@ -39,7 +39,7 @@ export function FeaturedProviders({ providers, title = "Top-rated providers" }: 
   }
 
   return (
-    <section className="py-8 md:py-12 relative z-0">
+    <section className="py-4 md:py-12 relative z-0">
       <div className="container mx-auto px-4 md:px-6 lg:px-20">
         <div className="flex items-center justify-between mb-4 md:mb-6">
           <h2 className="text-xl md:text-2xl font-semibold font-[family-name:var(--font-heading)]">{title}</h2>
