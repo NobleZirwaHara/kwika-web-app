@@ -34,6 +34,7 @@ interface WishlistData {
   provider_count: number
   package_count: number
   service_count: number
+  custom_package_count?: number
   total_items: number
   total_package_price: number
   formatted_total: string
@@ -217,7 +218,7 @@ export default function WishlistIndex({ wishlists: initialWishlists, isGuest, ca
                         <div className="text-center p-2 rounded-lg bg-purple-50">
                           <Package className="h-4 w-4 mx-auto text-purple-600 mb-1" />
                           <div className="text-lg font-bold text-purple-700">
-                            {wishlist.package_count}
+                            {wishlist.package_count + (wishlist.custom_package_count || 0)}
                           </div>
                           <div className="text-xs text-purple-600">Packages</div>
                         </div>
@@ -231,7 +232,7 @@ export default function WishlistIndex({ wishlists: initialWishlists, isGuest, ca
                       </div>
 
                       {/* Package total if any */}
-                      {wishlist.package_count > 0 && (
+                      {(wishlist.package_count + (wishlist.custom_package_count || 0)) > 0 && (
                         <div className="pt-3 border-t">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Package Total:</span>

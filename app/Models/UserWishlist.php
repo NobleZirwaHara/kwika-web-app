@@ -67,6 +67,11 @@ class UserWishlist extends Model
         return $this->items()->where('itemable_type', Service::class)->count();
     }
 
+    public function getCustomPackageCountAttribute(): int
+    {
+        return $this->items()->where('itemable_type', WishlistItem::CUSTOM_PACKAGE_TYPE)->count();
+    }
+
     public function getTotalItemCountAttribute(): int
     {
         return $this->items()->count();
@@ -74,14 +79,26 @@ class UserWishlist extends Model
 
     public function getTotalPackagePriceAttribute(): float
     {
+        // Regular packages
         $packageItems = $this->items()
             ->where('itemable_type', ServicePackage::class)
             ->with('itemable')
             ->get();
 
-        return $packageItems->sum(function ($item) {
+        $packageTotal = $packageItems->sum(function ($item) {
             return $item->itemable?->final_price ?? 0;
         });
+
+        // Custom packages (from metadata)
+        $customPackageItems = $this->items()
+            ->where('itemable_type', WishlistItem::CUSTOM_PACKAGE_TYPE)
+            ->get();
+
+        $customTotal = $customPackageItems->sum(function ($item) {
+            return $item->metadata['total_amount'] ?? 0;
+        });
+
+        return $packageTotal + $customTotal;
     }
 
     public function getFormattedTotalAttribute(): string

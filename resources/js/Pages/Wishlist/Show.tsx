@@ -100,6 +100,30 @@ interface ServiceItem {
   exists: boolean
 }
 
+interface CustomPackageService {
+  service_id: number
+  service_name: string
+  quantity: number
+  unit_price: number
+  subtotal: number
+}
+
+interface CustomPackageItem {
+  id: number
+  type: 'custom_package'
+  item_id: number
+  name: string
+  provider_id: number | null
+  provider_name: string | null
+  provider_slug: string | null
+  services: CustomPackageService[]
+  total_amount: number
+  currency: string
+  notes: string | null
+  added_at: string
+  exists: boolean
+}
+
 interface WishlistData {
   id: number
   name: string
@@ -108,6 +132,7 @@ interface WishlistData {
   provider_count: number
   package_count: number
   service_count: number
+  custom_package_count: number
   total_items: number
   total_package_price: number
   formatted_total: string
@@ -115,6 +140,7 @@ interface WishlistData {
   providers: ProviderItem[]
   packages: PackageItem[]
   services: ServiceItem[]
+  custom_packages: CustomPackageItem[]
 }
 
 interface Props {
@@ -172,11 +198,14 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
   // Determine initial tab based on content
   const getInitialTab = () => {
-    if (wishlist.providers.length > 0) return 'providers'
-    if (wishlist.packages.length > 0) return 'packages'
-    if (wishlist.services.length > 0) return 'services'
+    if (wishlist.providers?.length > 0) return 'providers'
+    if (wishlist.packages?.length > 0 || wishlist.custom_packages?.length > 0) return 'packages'
+    if (wishlist.services?.length > 0) return 'services'
     return 'providers'
   }
+
+  const customPackages = wishlist.custom_packages || []
+  const hasPackages = (wishlist.packages?.length || 0) > 0 || customPackages.length > 0
 
   return (
     <>
@@ -287,7 +316,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                   <Package className="h-4 w-4" />
                   <span className="hidden sm:inline">Packages</span>
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-                    {wishlist.package_count}
+                    {wishlist.package_count + (wishlist.custom_package_count || 0)}
                   </Badge>
                 </TabsTrigger>
                 <TabsTrigger value="services" className="flex items-center gap-2">
@@ -301,7 +330,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
               {/* Providers Tab */}
               <TabsContent value="providers">
-                {wishlist.providers.length > 0 ? (
+                {(wishlist.providers?.length || 0) > 0 ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {wishlist.providers.map((provider) => (
                       <Card
@@ -388,11 +417,12 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
               {/* Packages Tab */}
               <TabsContent value="packages">
-                {wishlist.packages.length > 0 ? (
+                {hasPackages ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {wishlist.packages.map((pkg) => (
+                    {/* Regular Packages */}
+                    {wishlist.packages?.map((pkg) => (
                       <Card
-                        key={pkg.id}
+                        key={`pkg-${pkg.id}`}
                         className={cn(
                           'group overflow-hidden hover:shadow-lg transition-all',
                           !pkg.exists && 'opacity-60'
@@ -459,6 +489,60 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                         </CardContent>
                       </Card>
                     ))}
+
+                    {/* Custom Packages */}
+                    {customPackages.map((pkg) => (
+                      <Card
+                        key={`custom-${pkg.id}`}
+                        className="group overflow-hidden hover:shadow-lg transition-all"
+                      >
+                        <div className="relative h-40 bg-gradient-to-br from-rose-100 to-pink-100">
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Heart className="h-12 w-12 text-rose-400" />
+                          </div>
+                          <button
+                            onClick={() => handleRemoveItem(pkg.id)}
+                            disabled={removingId === pkg.id}
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+                          >
+                            <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
+                          </button>
+                          <Badge className="absolute bottom-2 left-2 bg-rose-500">
+                            Custom
+                          </Badge>
+                        </div>
+                        <CardContent className="p-4">
+                          <p className="font-semibold line-clamp-1">
+                            {pkg.name}
+                          </p>
+                          {pkg.provider_name && (
+                            <Link
+                              href={pkg.provider_slug ? `/providers/${pkg.provider_slug}` : '#'}
+                              className="text-sm text-muted-foreground hover:text-primary mt-1 block"
+                            >
+                              by {pkg.provider_name}
+                            </Link>
+                          )}
+                          <div className="mt-2 mb-3">
+                            <p className="text-xs text-muted-foreground">
+                              {pkg.services?.length || 0} services included
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between pt-3 border-t">
+                            <div className="text-lg font-bold text-primary">
+                              {formatPrice(pkg.total_amount, pkg.currency)}
+                            </div>
+                            {pkg.provider_slug && (
+                              <Button size="sm" asChild>
+                                <Link href={`/providers/${pkg.provider_slug}/custom`}>
+                                  Book
+                                </Link>
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 ) : (
                   <EmptySection type="packages" />
@@ -467,7 +551,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
               {/* Services Tab */}
               <TabsContent value="services">
-                {wishlist.services.length > 0 ? (
+                {(wishlist.services?.length || 0) > 0 ? (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {wishlist.services.map((service) => (
                       <Card
