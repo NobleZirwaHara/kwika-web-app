@@ -1,14 +1,19 @@
-
 Overall mobile experience
 Wishlist
-Recently Viewed
 Build your own package experience
+-Add samples or inspo on build your own package
+-Dont forget 
+Minimum quantity feature for each service
+Allows Provider to have multiple bookings 
+-Specify number of bookings allowed per day and time
 Ticket Experience
 Provider checklist
+Recently Viewed
+
+Ticket full module - end to end
 
 Check on wishlist functionality and implementation
 Restyle onboarding
-Similar services and reviews
 Improve service provider view
 
 Email notifications
