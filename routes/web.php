@@ -121,6 +121,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/custom', [BookingController::class, 'createCustom'])->name('bookings.custom.create');
     Route::post('/bookings/custom', [BookingController::class, 'storeCustomBooking'])->name('bookings.custom.store');
 
+    // Bulk booking from wishlist
+    Route::post('/bookings/bulk', [BookingController::class, 'storeBulkBooking'])->name('bookings.bulk.store');
+
     // Payment selection
     Route::get('/bookings/{booking}/payment/select', [BookingController::class, 'selectPaymentMethod'])->name('bookings.payment.select');
 

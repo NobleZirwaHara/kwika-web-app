@@ -1,16 +1,13 @@
-
-UI Changes to the home page
-Highlighting services instead of service providers
-Image Changes
-Homepage Color Change
-Updated the look and feel of the whole site, fonts and others
-Updated the provider panel
-Developed the admin panel
-Developed the user panel
-Optimized the booking process
-Implemented Services Listing
-
-
-Remaining
-=============
-Multiple companies under one user
+05-01-2025
+- Added Request All button for packages and services in wishlist show page
+    - Added bulk booking request dialog component
+    - Added backend endpoint for bulk booking requests
+- Added checklist feature
+- Overall mobile experience
+- Fix wishlist bugs
+- Overall Wishlist
+- Send all requests from this wishlist
+- Send single request from a wishlist for packages or services
+- Build your own package experience
+- Add samples or inspo on build your own package
+- Minimum quantity feature for each service

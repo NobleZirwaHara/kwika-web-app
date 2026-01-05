@@ -1,5 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Head, Link, router, useForm } from '@inertiajs/react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -15,6 +15,11 @@ import {
   Pencil,
   AlertCircle,
   CheckCircle,
+  Calendar,
+  Clock,
+  Users,
+  Send,
+  Loader2,
 } from 'lucide-react'
 import { useState } from 'react'
 import { cn, formatPrice } from '@/lib/utils'
@@ -26,9 +31,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -162,6 +170,75 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [newName, setNewName] = useState(wishlist.name)
   const [isRenaming, setIsRenaming] = useState(false)
+
+  // Bulk booking state
+  const [bulkBookingType, setBulkBookingType] = useState<'packages' | 'services' | null>(null)
+  const bulkBookingForm = useForm({
+    type: '' as 'packages' | 'services',
+    items: [] as Array<{ id: number; provider_id: number; item_type: string }>,
+    event_date: '',
+    start_time: '09:00',
+    end_time: '17:00',
+    event_location: '',
+    attendees: '',
+    special_requests: '',
+  })
+
+  const openBulkBookingDialog = (type: 'packages' | 'services') => {
+    let items: Array<{ id: number; provider_id: number; item_type: string }> = []
+
+    if (type === 'packages') {
+      // Regular packages
+      const regularPackages = wishlist.packages?.filter(p => p.exists).map(p => ({
+        id: p.item_id,
+        provider_id: p.provider?.id || 0,
+        item_type: 'package' as const
+      })) || []
+
+      // Custom packages
+      const customPkgs = wishlist.custom_packages?.filter(p => p.exists).map(p => ({
+        id: p.id, // wishlist item id for custom packages
+        provider_id: p.provider_id || 0,
+        item_type: 'custom_package' as const
+      })) || []
+
+      items = [...regularPackages, ...customPkgs]
+    } else {
+      items = wishlist.services?.filter(s => s.exists).map(s => ({
+        id: s.item_id,
+        provider_id: s.provider?.id || 0,
+        item_type: 'service' as const
+      })) || []
+    }
+
+    bulkBookingForm.setData({
+      type,
+      items,
+      event_date: '',
+      start_time: '09:00',
+      end_time: '17:00',
+      event_location: '',
+      attendees: '',
+      special_requests: '',
+    })
+    setBulkBookingType(type)
+  }
+
+  const handleBulkBookingSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    bulkBookingForm.post('/bookings/bulk', {
+      onSuccess: () => {
+        setBulkBookingType(null)
+      },
+    })
+  }
+
+  const getBookablePackagesCount = () => {
+    const regularCount = wishlist.packages?.filter(p => p.exists).length || 0
+    const customCount = wishlist.custom_packages?.filter(p => p.exists).length || 0
+    return regularCount + customCount
+  }
+  const getBookableServicesCount = () => wishlist.services?.filter(s => s.exists).length || 0
 
   const handleRemoveItem = async (itemId: number) => {
     setRemovingId(itemId)
@@ -418,7 +495,46 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
               {/* Packages Tab */}
               <TabsContent value="packages">
                 {hasPackages ? (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-4">
+                    {/* Request All Packages Button */}
+                    {getBookablePackagesCount() > 0 && (
+                      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                              <Send className="h-5 w-5 text-purple-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium">Request All Packages</p>
+                              <p className="text-sm text-muted-foreground">
+                                Send booking requests for all {getBookablePackagesCount()} available packages
+                              </p>
+                            </div>
+                          </div>
+                          {isGuest ? (
+                            <Button
+                              asChild
+                              className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                            >
+                              <Link href="/login">
+                                <Send className="h-4 w-4 mr-2" />
+                                Login to Request
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => openBulkBookingDialog('packages')}
+                              className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Request All
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {/* Regular Packages */}
                     {wishlist.packages?.map((pkg) => (
                       <Card
@@ -543,6 +659,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                         </CardContent>
                       </Card>
                     ))}
+                    </div>
                   </div>
                 ) : (
                   <EmptySection type="packages" />
@@ -552,7 +669,46 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
               {/* Services Tab */}
               <TabsContent value="services">
                 {(wishlist.services?.length || 0) > 0 ? (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-4">
+                    {/* Request All Services Button */}
+                    {getBookableServicesCount() > 0 && (
+                      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                              <Send className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium">Request All Services</p>
+                              <p className="text-sm text-muted-foreground">
+                                Send booking requests for all {getBookableServicesCount()} available services
+                              </p>
+                            </div>
+                          </div>
+                          {isGuest ? (
+                            <Button
+                              asChild
+                              className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                            >
+                              <Link href="/login">
+                                <Send className="h-4 w-4 mr-2" />
+                                Login to Request
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => openBulkBookingDialog('services')}
+                              className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Request All
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {wishlist.services.map((service) => (
                       <Card
                         key={service.id}
@@ -619,6 +775,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                         </CardContent>
                       </Card>
                     ))}
+                    </div>
                   </div>
                 ) : (
                   <EmptySection type="services" />
@@ -674,6 +831,152 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Booking Dialog */}
+      <Dialog open={bulkBookingType !== null} onOpenChange={(open) => !open && setBulkBookingType(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              Request All {bulkBookingType === 'packages' ? 'Packages' : 'Services'}
+            </DialogTitle>
+            <DialogDescription>
+              Send booking requests for all {bulkBookingForm.data.items.length}{' '}
+              {bulkBookingType === 'packages' ? 'packages' : 'services'} in your wishlist.
+              Each provider will receive a separate booking request.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleBulkBookingSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="event_date">Event Date</Label>
+                <Input
+                  id="event_date"
+                  type="date"
+                  value={bulkBookingForm.data.event_date}
+                  onChange={(e) => bulkBookingForm.setData('event_date', e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
+                {bulkBookingForm.errors.event_date && (
+                  <p className="text-sm text-destructive">{bulkBookingForm.errors.event_date}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="attendees">Number of Guests</Label>
+                <Input
+                  id="attendees"
+                  type="number"
+                  placeholder="e.g., 100"
+                  value={bulkBookingForm.data.attendees}
+                  onChange={(e) => bulkBookingForm.setData('attendees', e.target.value)}
+                  min="1"
+                />
+                {bulkBookingForm.errors.attendees && (
+                  <p className="text-sm text-destructive">{bulkBookingForm.errors.attendees}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="start_time">Start Time</Label>
+                <Input
+                  id="start_time"
+                  type="time"
+                  value={bulkBookingForm.data.start_time}
+                  onChange={(e) => bulkBookingForm.setData('start_time', e.target.value)}
+                  required
+                />
+                {bulkBookingForm.errors.start_time && (
+                  <p className="text-sm text-destructive">{bulkBookingForm.errors.start_time}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end_time">End Time</Label>
+                <Input
+                  id="end_time"
+                  type="time"
+                  value={bulkBookingForm.data.end_time}
+                  onChange={(e) => bulkBookingForm.setData('end_time', e.target.value)}
+                  required
+                />
+                {bulkBookingForm.errors.end_time && (
+                  <p className="text-sm text-destructive">{bulkBookingForm.errors.end_time}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="event_location">Event Location</Label>
+              <Input
+                id="event_location"
+                placeholder="e.g., Lilongwe, Area 43"
+                value={bulkBookingForm.data.event_location}
+                onChange={(e) => bulkBookingForm.setData('event_location', e.target.value)}
+                required
+              />
+              {bulkBookingForm.errors.event_location && (
+                <p className="text-sm text-destructive">{bulkBookingForm.errors.event_location}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="special_requests">Special Requests (Optional)</Label>
+              <Textarea
+                id="special_requests"
+                placeholder="Any special requirements or notes for the providers..."
+                value={bulkBookingForm.data.special_requests}
+                onChange={(e) => bulkBookingForm.setData('special_requests', e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            {/* Items Preview */}
+            <div className="rounded-lg border bg-muted/50 p-3">
+              <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                {bulkBookingForm.data.items.length} {bulkBookingType === 'packages' ? 'packages' : 'services'} will be requested
+              </p>
+              <div className="text-xs text-muted-foreground">
+                {bulkBookingType === 'packages'
+                  ? [
+                      ...(wishlist.packages?.filter(p => p.exists).map(p => p.name) || []),
+                      ...(wishlist.custom_packages?.filter(p => p.exists).map(p => p.name) || [])
+                    ].join(', ')
+                  : wishlist.services?.filter(s => s.exists).map(s => s.name).join(', ')
+                }
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setBulkBookingType(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={bulkBookingForm.processing}
+                className={bulkBookingType === 'packages' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'}
+              >
+                {bulkBookingForm.processing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send {bulkBookingForm.data.items.length} Requests
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

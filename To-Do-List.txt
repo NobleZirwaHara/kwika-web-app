@@ -1,15 +1,8 @@
-Overall mobile experience
-Wishlist
-Build your own package experience
--Add samples or inspo on build your own package
-Minimum quantity feature for each service
 Allows Provider to have multiple bookings 
 -Specify number of bookings allowed per day and time
-Ticket Experience
+Ticket Experience full module - end to end
 Provider checklist
 Recently Viewed
-
-Ticket full module - end to end
 
 Check on wishlist functionality and implementation
 Restyle onboarding

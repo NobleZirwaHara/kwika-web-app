@@ -8,6 +8,8 @@ use App\Models\BookingItem;
 use App\Models\Payment;
 use App\Models\Service;
 use App\Models\ServicePackage;
+use App\Models\ServiceProvider;
+use App\Models\WishlistItem;
 use App\Services\MessageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -935,6 +937,254 @@ class BookingController extends Controller
             ]);
 
             return back()->withErrors(['error' => 'Failed to create booking: '.$e->getMessage()]);
+        }
+    }
+
+    /**
+     * Store bulk booking requests from wishlist
+     */
+    public function storeBulkBooking(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => ['required', 'in:packages,services'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.id' => ['required', 'integer'],
+            'items.*.provider_id' => ['required', 'integer'],
+            'items.*.item_type' => ['required', 'string', 'in:package,custom_package,service'],
+            'event_date' => ['required', 'date', 'after:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'event_location' => ['nullable', 'string', 'max:500'],
+            'attendees' => ['nullable', 'integer', 'min:1'],
+            'special_requests' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $createdBookings = [];
+            $errors = [];
+
+            foreach ($validated['items'] as $item) {
+                try {
+                    $itemType = $item['item_type'] ?? 'package';
+
+                    if ($itemType === 'package') {
+                        // Regular package from service_packages table
+                        $package = ServicePackage::with('serviceProvider')
+                            ->where('id', $item['id'])
+                            ->where('is_active', true)
+                            ->whereHas('serviceProvider', function ($query) {
+                                $query->where('verification_status', 'approved')
+                                    ->where('is_active', true);
+                            })
+                            ->first();
+
+                        if (! $package) {
+                            $errors[] = "Package #{$item['id']} is not available";
+                            continue;
+                        }
+
+                        $totalAmount = (float) $package->final_price;
+
+                        $booking = Booking::create([
+                            'booking_number' => 'BK-'.strtoupper(Str::random(10)),
+                            'user_id' => Auth::id(),
+                            'service_id' => null,
+                            'service_provider_id' => $package->service_provider_id,
+                            'booking_type' => 'package',
+                            'service_package_id' => $package->id,
+                            'event_date' => $validated['event_date'],
+                            'start_time' => $validated['start_time'],
+                            'end_time' => $validated['end_time'],
+                            'event_location' => $validated['event_location'] ?? null,
+                            'attendees' => $validated['attendees'] ?? null,
+                            'special_requests' => $validated['special_requests'] ?? null,
+                            'subtotal' => $totalAmount,
+                            'discount_amount' => 0,
+                            'total_amount' => $totalAmount,
+                            'deposit_amount' => 0,
+                            'remaining_amount' => $totalAmount,
+                            'status' => 'pending',
+                            'payment_status' => 'pending',
+                        ]);
+
+                        // Create booking items from package items
+                        if ($package->items) {
+                            foreach ($package->items as $pkgItem) {
+                                BookingItem::create([
+                                    'booking_id' => $booking->id,
+                                    'service_id' => $pkgItem->service_id,
+                                    'service_package_id' => $package->id,
+                                    'item_type' => 'package',
+                                    'name' => $pkgItem->service?->name ?? $pkgItem->name ?? 'Package Item',
+                                    'description' => $pkgItem->description,
+                                    'quantity' => $pkgItem->quantity ?? 1,
+                                    'unit_price' => $pkgItem->unit_price ?? 0,
+                                    'subtotal' => ($pkgItem->quantity ?? 1) * ($pkgItem->unit_price ?? 0),
+                                ]);
+                            }
+                        }
+
+                        $this->messageService->sendBookingRequestMessage($booking);
+                        $createdBookings[] = $booking;
+                    } elseif ($itemType === 'custom_package') {
+                        // Custom package from wishlist
+                        $wishlistItem = WishlistItem::with('wishlist')
+                            ->where('id', $item['id'])
+                            ->where('item_type', 'custom_package')
+                            ->first();
+
+                        if (! $wishlistItem) {
+                            $errors[] = "Custom package #{$item['id']} not found";
+                            continue;
+                        }
+
+                        $metadata = $wishlistItem->metadata ?? [];
+                        $services = $metadata['services'] ?? [];
+                        $providerId = $metadata['provider_id'] ?? $item['provider_id'];
+
+                        // Verify provider exists and is active
+                        $provider = ServiceProvider::where('id', $providerId)
+                            ->where('verification_status', 'approved')
+                            ->where('is_active', true)
+                            ->first();
+
+                        if (! $provider) {
+                            $errors[] = "Provider for custom package is not available";
+                            continue;
+                        }
+
+                        $totalAmount = (float) ($metadata['total_amount'] ?? 0);
+
+                        $booking = Booking::create([
+                            'booking_number' => 'BK-'.strtoupper(Str::random(10)),
+                            'user_id' => Auth::id(),
+                            'service_id' => null,
+                            'service_provider_id' => $providerId,
+                            'booking_type' => 'custom',
+                            'service_package_id' => null,
+                            'event_date' => $validated['event_date'],
+                            'start_time' => $validated['start_time'],
+                            'end_time' => $validated['end_time'],
+                            'event_location' => $validated['event_location'] ?? null,
+                            'attendees' => $validated['attendees'] ?? null,
+                            'special_requests' => $validated['special_requests'] ?? null,
+                            'subtotal' => $totalAmount,
+                            'discount_amount' => 0,
+                            'total_amount' => $totalAmount,
+                            'deposit_amount' => 0,
+                            'remaining_amount' => $totalAmount,
+                            'status' => 'pending',
+                            'payment_status' => 'pending',
+                            'metadata' => [
+                                'name' => $metadata['name'] ?? 'Custom Package',
+                                'source' => 'wishlist_bulk_booking',
+                                'wishlist_item_id' => $wishlistItem->id,
+                            ],
+                        ]);
+
+                        // Create booking items from custom package services
+                        foreach ($services as $service) {
+                            BookingItem::create([
+                                'booking_id' => $booking->id,
+                                'service_id' => $service['service_id'] ?? null,
+                                'service_package_id' => null,
+                                'item_type' => 'custom',
+                                'name' => $service['service_name'] ?? 'Custom Service',
+                                'description' => null,
+                                'quantity' => $service['quantity'] ?? 1,
+                                'unit_price' => $service['unit_price'] ?? 0,
+                                'subtotal' => $service['subtotal'] ?? 0,
+                            ]);
+                        }
+
+                        $this->messageService->sendBookingRequestMessage($booking);
+                        $createdBookings[] = $booking;
+                    } else {
+                        // Services
+                        $service = Service::with('serviceProvider')
+                            ->where('id', $item['id'])
+                            ->where('is_active', true)
+                            ->whereHas('serviceProvider', function ($query) {
+                                $query->where('verification_status', 'approved')
+                                    ->where('is_active', true);
+                            })
+                            ->first();
+
+                        if (! $service) {
+                            $errors[] = "Service #{$item['id']} is not available";
+                            continue;
+                        }
+
+                        $totalAmount = (float) $service->base_price;
+                        $depositAmount = 0;
+                        $remainingAmount = $totalAmount;
+
+                        if ($service->requires_deposit && $service->deposit_percentage > 0) {
+                            $depositAmount = ($totalAmount * $service->deposit_percentage) / 100;
+                            $remainingAmount = $totalAmount - $depositAmount;
+                        }
+
+                        $booking = Booking::create([
+                            'booking_number' => 'BK-'.strtoupper(Str::random(10)),
+                            'user_id' => Auth::id(),
+                            'service_id' => $service->id,
+                            'service_provider_id' => $service->service_provider_id,
+                            'booking_type' => 'single_service',
+                            'service_package_id' => null,
+                            'event_date' => $validated['event_date'],
+                            'start_time' => $validated['start_time'],
+                            'end_time' => $validated['end_time'],
+                            'event_location' => $validated['event_location'] ?? null,
+                            'attendees' => $validated['attendees'] ?? null,
+                            'special_requests' => $validated['special_requests'] ?? null,
+                            'subtotal' => $totalAmount,
+                            'discount_amount' => 0,
+                            'total_amount' => $totalAmount,
+                            'deposit_amount' => $depositAmount,
+                            'remaining_amount' => $remainingAmount,
+                            'status' => 'pending',
+                            'payment_status' => 'pending',
+                        ]);
+
+                        $booking->load('service');
+                        $this->messageService->sendBookingRequestMessage($booking);
+                        $createdBookings[] = $booking;
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Failed to book item #{$item['id']}: ".$e->getMessage();
+                }
+            }
+
+            if (empty($createdBookings)) {
+                DB::rollBack();
+
+                return back()->withErrors(['error' => 'No bookings could be created. '.implode(', ', $errors)]);
+            }
+
+            DB::commit();
+
+            // If only one booking was created, redirect to payment
+            if (count($createdBookings) === 1) {
+                return redirect()->route('bookings.payment.select', $createdBookings[0]->id);
+            }
+
+            // For multiple bookings, redirect to user bookings page with success message
+            $message = count($createdBookings).' booking requests sent successfully!';
+            if (! empty($errors)) {
+                $message .= ' '.count($errors).' items could not be booked.';
+            }
+
+            return redirect()->route('user.bookings')->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Bulk booking creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->withErrors(['error' => 'Failed to create bookings: '.$e->getMessage()]);
         }
     }
 }

@@ -1,6 +1,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/react'
 import { useState } from 'react'
 import ProviderLayout from '@/components/ProviderLayout'
+import { formatPrice } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -388,32 +389,60 @@ export default function BookingShow({ booking }: Props) {
         {/* Service Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Service Information</CardTitle>
+            <CardTitle>
+              {booking.booking_type === 'custom' ? 'Custom Package' :
+               booking.booking_type === 'package' ? 'Package Details' : 'Service Information'}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Description</p>
-              <p className="mt-1">{booking.service.description}</p>
-            </div>
-            {booking.service.inclusions && booking.service.inclusions.length > 0 && (
+            {booking.service?.description && (
+              <div>
+                <p className="text-sm text-muted-foreground">Description</p>
+                <p className="mt-1">{booking.service.description}</p>
+              </div>
+            )}
+            {booking.service?.inclusions && booking.service.inclusions.length > 0 && (
               <div>
                 <p className="text-sm text-muted-foreground">Inclusions</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
-                  {booking.service.inclusions.map((inclusion, index) => (
+                  {booking.service.inclusions.map((inclusion: string, index: number) => (
                     <li key={index} className="text-sm">{inclusion}</li>
                   ))}
                 </ul>
               </div>
             )}
+            {/* Show booking items for custom/package bookings */}
+            {booking.items && booking.items.length > 0 && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Items</p>
+                <div className="space-y-2">
+                  {booking.items.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                      <div>
+                        <p className="font-medium text-sm">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                      </div>
+                      <p className="font-medium text-sm">{formatPrice(item.subtotal, booking.currency)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex gap-6">
-              <div>
-                <p className="text-sm text-muted-foreground">Base Price</p>
-                <p className="font-medium">{booking.currency} {booking.service.base_price.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Duration</p>
-                <p className="font-medium">{booking.service.duration}</p>
-              </div>
+              {booking.service?.base_price != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {booking.booking_type === 'single_service' ? 'Base Price' : 'Total'}
+                  </p>
+                  <p className="font-medium">{formatPrice(booking.service.base_price, booking.currency)}</p>
+                </div>
+              )}
+              {booking.service?.duration && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Duration</p>
+                  <p className="font-medium">{booking.service.duration}</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -478,15 +507,15 @@ export default function BookingShow({ booking }: Props) {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Total Amount</span>
-              <span className="font-medium">{booking.currency} {booking.total_amount.toLocaleString()}</span>
+              <span className="font-medium">{formatPrice(booking.total_amount, booking.currency)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Deposit Required</span>
-              <span className="font-medium">{booking.currency} {booking.deposit_amount.toLocaleString()}</span>
+              <span className="font-medium">{formatPrice(booking.deposit_amount, booking.currency)}</span>
             </div>
             <div className="flex justify-between pt-3 border-t">
               <span className="text-muted-foreground">Remaining Balance</span>
-              <span className="font-semibold text-lg">{booking.currency} {booking.remaining_amount.toLocaleString()}</span>
+              <span className="font-semibold text-lg">{formatPrice(booking.remaining_amount, booking.currency)}</span>
             </div>
           </CardContent>
         </Card>
@@ -515,7 +544,7 @@ export default function BookingShow({ booking }: Props) {
                             {payment.status}
                           </Badge>
                         </div>
-                        <p className="font-semibold text-lg">{payment.currency} {payment.amount.toLocaleString()}</p>
+                        <p className="font-semibold text-lg">{formatPrice(payment.amount, payment.currency)}</p>
                         {payment.transaction_id && (
                           <p className="text-sm text-muted-foreground">TX: {payment.transaction_id}</p>
                         )}
@@ -758,7 +787,7 @@ export default function BookingShow({ booking }: Props) {
             <div className="space-y-4 py-4">
               <div>
                 <p className="text-sm text-muted-foreground">Amount</p>
-                <p className="font-semibold text-lg">{selectedPayment.currency} {selectedPayment.amount.toLocaleString()}</p>
+                <p className="font-semibold text-lg">{formatPrice(selectedPayment.amount, selectedPayment.currency)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Payment Method</p>

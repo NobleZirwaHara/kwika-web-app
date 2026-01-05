@@ -27,7 +27,9 @@
       "Bash(ls:*)",
       "Bash(powershell -Command \"Rename-Item -Path ''C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\ticketing'' -NewName ''ticket-assets''\")",
       "Bash(findstr:*)",
-      "Bash(git worktree add:*)"
+      "Bash(git worktree add:*)",
+      "Bash(npm install:*)",
+      "Bash(vendor/bin/pint:*)"
     ],
     "deny": [],
     "ask": []
