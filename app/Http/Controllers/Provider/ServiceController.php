@@ -20,7 +20,7 @@ class ServiceController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->route('home')->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -40,6 +40,7 @@ class ServiceController extends Controller
                     'currency' => $service->currency,
                     'duration' => $service->duration,
                     'max_attendees' => $service->max_attendees,
+                    'minimum_quantity' => $service->minimum_quantity ?? 1,
                     'category_name' => $service->category->name,
                     'is_active' => $service->is_active,
                     'bookings_count' => $service->bookings_count,
@@ -87,7 +88,7 @@ class ServiceController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->back()->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -100,6 +101,7 @@ class ServiceController extends Controller
             'max_price' => ['nullable', 'numeric', 'min:0', 'gt:base_price'],
             'duration' => ['nullable', 'integer', 'min:1'],
             'max_attendees' => ['nullable', 'integer', 'min:1'],
+            'minimum_quantity' => ['nullable', 'integer', 'min:1'],
             'inclusions' => ['nullable', 'array'],
             'is_active' => ['boolean'],
             'primary_image' => ['nullable', 'image', 'max:5120'], // 5MB max
@@ -111,12 +113,12 @@ class ServiceController extends Controller
         $selectedCategory = ServiceCategory::find($validated['service_category_id']);
         if ($selectedCategory && $selectedCategory->isParent()) {
             return redirect()->back()->withErrors([
-                'service_category_id' => 'Please select a specific subcategory, not a parent category.'
+                'service_category_id' => 'Please select a specific subcategory, not a parent category.',
             ])->withInput();
         }
 
         // Generate slug
-        $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
+        $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(6);
         $validated['service_provider_id'] = $provider->id;
         $validated['currency'] = 'MWK'; // Default currency
 
@@ -147,7 +149,7 @@ class ServiceController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->back()->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -164,6 +166,7 @@ class ServiceController extends Controller
             'max_price' => ['nullable', 'numeric', 'min:0', 'gt:base_price'],
             'duration' => ['nullable', 'integer', 'min:1'],
             'max_attendees' => ['nullable', 'integer', 'min:1'],
+            'minimum_quantity' => ['nullable', 'integer', 'min:1'],
             'inclusions' => ['nullable', 'array'],
             'is_active' => ['boolean'],
             'primary_image' => ['nullable', 'image', 'max:5120'],
@@ -175,13 +178,13 @@ class ServiceController extends Controller
         $selectedCategory = ServiceCategory::find($validated['service_category_id']);
         if ($selectedCategory && $selectedCategory->isParent()) {
             return redirect()->back()->withErrors([
-                'service_category_id' => 'Please select a specific subcategory, not a parent category.'
+                'service_category_id' => 'Please select a specific subcategory, not a parent category.',
             ])->withInput();
         }
 
         // Update slug if name changed
         if ($validated['name'] !== $service->name) {
-            $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
+            $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(6);
         }
 
         // Handle primary image upload
@@ -216,7 +219,7 @@ class ServiceController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->back()->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -225,7 +228,7 @@ class ServiceController extends Controller
             ->firstOrFail();
 
         $service->update([
-            'is_active' => !$service->is_active,
+            'is_active' => ! $service->is_active,
         ]);
 
         return redirect()->back()->with('success', 'Service status updated');
@@ -238,7 +241,7 @@ class ServiceController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->back()->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -249,7 +252,7 @@ class ServiceController extends Controller
         // Check if service has bookings
         if ($service->bookings()->count() > 0) {
             return redirect()->back()->withErrors([
-                'error' => 'Cannot delete service with existing bookings. Deactivate it instead.'
+                'error' => 'Cannot delete service with existing bookings. Deactivate it instead.',
             ]);
         }
 

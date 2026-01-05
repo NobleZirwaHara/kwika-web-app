@@ -51,6 +51,7 @@ interface Service {
   currency: string
   primary_image: string | null
   max_attendees: number | null
+  minimum_quantity: number
 }
 
 interface Provider {
@@ -111,9 +112,10 @@ export default function CreateCustom({ provider, services, categories = [], auth
 
   const addService = (service: Service) => {
     const newSelected = new Map(selectedServices)
+    const minimumQuantity = service.minimum_quantity || 1
     newSelected.set(service.id, {
       service,
-      quantity: 1,
+      quantity: minimumQuantity,
       notes: '',
     })
     setSelectedServices(newSelected)
@@ -129,7 +131,8 @@ export default function CreateCustom({ provider, services, categories = [], auth
     const newSelected = new Map(selectedServices)
     const item = newSelected.get(serviceId)
     if (item) {
-      const newQuantity = Math.max(1, item.quantity + delta)
+      const minimumQuantity = item.service.minimum_quantity || 1
+      const newQuantity = Math.max(minimumQuantity, item.quantity + delta)
       newSelected.set(serviceId, { ...item, quantity: newQuantity })
       setSelectedServices(newSelected)
     }
@@ -340,7 +343,14 @@ export default function CreateCustom({ provider, services, categories = [], auth
                                 className="w-full h-32 object-cover rounded-md mb-3"
                               />
                             )}
-                            <h4 className="font-semibold mb-1">{service.name}</h4>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold">{service.name}</h4>
+                              {service.minimum_quantity > 1 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Min: {service.minimum_quantity}
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                               {service.description}
                             </p>
@@ -416,14 +426,19 @@ export default function CreateCustom({ provider, services, categories = [], auth
                             <div className="grid sm:grid-cols-2 gap-4">
                               {/* Quantity Controls */}
                               <div>
-                                <Label className="text-xs text-muted-foreground mb-2">Quantity</Label>
+                                <Label className="text-xs text-muted-foreground mb-2">
+                                  Quantity
+                                  {service.minimum_quantity > 1 && (
+                                    <span className="ml-1 text-amber-600">(Min: {service.minimum_quantity})</span>
+                                  )}
+                                </Label>
                                 <div className="flex items-center gap-2">
                                   <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
                                     onClick={() => updateQuantity(service.id, -1)}
-                                    disabled={quantity <= 1}
+                                    disabled={quantity <= (service.minimum_quantity || 1)}
                                   >
                                     <Minus className="h-4 w-4" />
                                   </Button>
@@ -431,11 +446,12 @@ export default function CreateCustom({ provider, services, categories = [], auth
                                     type="number"
                                     value={quantity}
                                     onChange={(e) => {
-                                      const val = Math.max(1, parseInt(e.target.value) || 1)
+                                      const minQty = service.minimum_quantity || 1
+                                      const val = Math.max(minQty, parseInt(e.target.value) || minQty)
                                       updateQuantity(service.id, val - quantity)
                                     }}
                                     className="w-20 text-center"
-                                    min="1"
+                                    min={service.minimum_quantity || 1}
                                   />
                                   <Button
                                     type="button"
