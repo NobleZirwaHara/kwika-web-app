@@ -959,6 +959,13 @@ class BookingController extends Controller
             'special_requests' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        \Log::info('Bulk booking request received', [
+            'type' => $validated['type'],
+            'items_count' => count($validated['items']),
+            'items' => $validated['items'],
+            'user_id' => Auth::id(),
+        ]);
+
         DB::beginTransaction();
         try {
             $createdBookings = [];
@@ -967,6 +974,7 @@ class BookingController extends Controller
             foreach ($validated['items'] as $item) {
                 try {
                     $itemType = $item['item_type'] ?? 'package';
+                    \Log::info('Processing item', ['item' => $item, 'itemType' => $itemType]);
 
                     if ($itemType === 'package') {
                         // Regular package from service_packages table
@@ -980,9 +988,12 @@ class BookingController extends Controller
                             ->first();
 
                         if (! $package) {
+                            \Log::warning('Package not found or not available', ['id' => $item['id']]);
                             $errors[] = "Package #{$item['id']} is not available";
+
                             continue;
                         }
+                        \Log::info('Found package', ['id' => $package->id, 'name' => $package->name]);
 
                         $totalAmount = (float) $package->final_price;
 
@@ -1025,17 +1036,24 @@ class BookingController extends Controller
                             }
                         }
 
-                        $this->messageService->sendBookingRequestMessage($booking);
+                        \Log::info('Booking created', ['booking_id' => $booking->id, 'booking_number' => $booking->booking_number]);
+
+                        try {
+                            $this->messageService->sendBookingRequestMessage($booking);
+                        } catch (\Exception $e) {
+                            \Log::warning('Failed to send booking message', ['error' => $e->getMessage()]);
+                        }
+
                         $createdBookings[] = $booking;
                     } elseif ($itemType === 'custom_package') {
                         // Custom package from wishlist
-                        $wishlistItem = WishlistItem::with('wishlist')
-                            ->where('id', $item['id'])
-                            ->where('item_type', 'custom_package')
+                        $wishlistItem = WishlistItem::where('id', $item['id'])
+                            ->where('itemable_type', 'custom_package')
                             ->first();
 
                         if (! $wishlistItem) {
                             $errors[] = "Custom package #{$item['id']} not found";
+
                             continue;
                         }
 
@@ -1050,7 +1068,8 @@ class BookingController extends Controller
                             ->first();
 
                         if (! $provider) {
-                            $errors[] = "Provider for custom package is not available";
+                            $errors[] = 'Provider for custom package is not available';
+
                             continue;
                         }
 
@@ -1098,7 +1117,14 @@ class BookingController extends Controller
                             ]);
                         }
 
-                        $this->messageService->sendBookingRequestMessage($booking);
+                        \Log::info('Custom booking created', ['booking_id' => $booking->id, 'booking_number' => $booking->booking_number]);
+
+                        try {
+                            $this->messageService->sendBookingRequestMessage($booking);
+                        } catch (\Exception $e) {
+                            \Log::warning('Failed to send custom booking message', ['error' => $e->getMessage()]);
+                        }
+
                         $createdBookings[] = $booking;
                     } else {
                         // Services
@@ -1113,6 +1139,7 @@ class BookingController extends Controller
 
                         if (! $service) {
                             $errors[] = "Service #{$item['id']} is not available";
+
                             continue;
                         }
 
@@ -1152,9 +1179,20 @@ class BookingController extends Controller
                         $createdBookings[] = $booking;
                     }
                 } catch (\Exception $e) {
+                    \Log::error('Failed to create booking for item', [
+                        'item_id' => $item['id'],
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
                     $errors[] = "Failed to book item #{$item['id']}: ".$e->getMessage();
                 }
             }
+
+            \Log::info('Bulk booking processing complete', [
+                'created_count' => count($createdBookings),
+                'errors_count' => count($errors),
+                'errors' => $errors,
+            ]);
 
             if (empty($createdBookings)) {
                 DB::rollBack();

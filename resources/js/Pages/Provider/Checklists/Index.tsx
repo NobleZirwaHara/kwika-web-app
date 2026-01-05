@@ -55,7 +55,7 @@ interface Props {
   }
 }
 
-export default function ChecklistsIndex({ templates, stats }: Props) {
+export default function ChecklistsIndex({ templates = [], stats = { total: 0, active: 0, total_items: 0 } }: Props) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null)

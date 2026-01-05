@@ -226,7 +226,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
   const handleBulkBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    bulkBookingForm.post('/bookings/bulk', {
+    bulkBookingForm.post(route('bookings.bulk.store'), {
       onSuccess: () => {
         setBulkBookingType(null)
       },
