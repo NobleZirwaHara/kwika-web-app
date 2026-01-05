@@ -11,7 +11,8 @@ import {
   Calendar,
   MessageSquare,
   ListChecks,
-  Boxes
+  Boxes,
+  CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -42,6 +43,7 @@ const primaryNavigation = [
 ]
 
 const menuNavigation = [
+  { name: 'Checklists', href: '/provider/checklists', icon: CheckSquare },
   { name: 'Companies', href: '/provider/companies', icon: Building2 },
   { name: 'Promotions', href: '/provider/promotions', icon: Package },
   { name: 'Profile Settings', href: '/provider/settings', icon: Settings },

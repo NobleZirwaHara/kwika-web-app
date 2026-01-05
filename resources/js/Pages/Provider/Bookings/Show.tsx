@@ -31,6 +31,7 @@ import {
   Star,
   Clock
 } from 'lucide-react'
+import { ChecklistSection } from '@/components/Checklists/ChecklistSection'
 
 interface Customer {
   id: number
@@ -72,6 +73,37 @@ interface Review {
   created_at: string
 }
 
+interface ChecklistItem {
+  id: number
+  title: string
+  notes: string | null
+  due_date: string | null
+  due_date_formatted: string | null
+  is_completed: boolean
+  is_overdue: boolean
+  is_due_today: boolean
+  display_order: number
+}
+
+interface Checklist {
+  id: number
+  name: string
+  items: ChecklistItem[]
+  progress: {
+    total: number
+    completed: number
+    percentage: number
+  }
+  overdue_count: number
+}
+
+interface ChecklistTemplate {
+  id: number
+  name: string
+  description: string | null
+  item_count: number
+}
+
 interface Booking {
   id: number
   booking_number: string
@@ -98,13 +130,15 @@ interface Booking {
   cancellation_reason: string | null
   payments: Payment[]
   review: Review | null
+  checklist: Checklist | null
 }
 
 interface Props {
   booking: Booking
+  checklistTemplates: ChecklistTemplate[]
 }
 
-export default function BookingShow({ booking }: Props) {
+export default function BookingShow({ booking, checklistTemplates }: Props) {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
@@ -466,6 +500,14 @@ export default function BookingShow({ booking }: Props) {
             </CardContent>
           </Card>
         )}
+
+        {/* Booking Checklist */}
+        <ChecklistSection
+          bookingId={booking.id}
+          bookingStatus={booking.status}
+          checklist={booking.checklist}
+          templates={checklistTemplates}
+        />
 
         {/* Pricing Breakdown */}
         <Card>
