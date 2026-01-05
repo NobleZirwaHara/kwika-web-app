@@ -26,6 +26,7 @@ import { cn, formatPrice } from '@/lib/utils'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { SearchHeader } from '@/components/search-header'
 import { Footer } from '@/components/footer'
+import CustomerLayout from '@/components/CustomerLayout'
 import {
   Dialog,
   DialogContent,
@@ -284,13 +285,9 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
   const customPackages = wishlist.custom_packages || []
   const hasPackages = (wishlist.packages?.length || 0) > 0 || customPackages.length > 0
 
-  return (
-    <>
-      <Head title={wishlist.name} />
-      <SearchHeader variant="back" />
-
-      <main className="min-h-screen bg-gray-50 pt-32 md:pt-28 pb-6 md:pb-8">
-        <div className="container mx-auto px-4 max-w-6xl">
+  const content = (
+    <div className={isGuest ? "min-h-screen bg-gray-50 pt-32 md:pt-28 pb-6 md:pb-8" : ""}>
+      <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
             <div className="flex items-start gap-3">
@@ -799,7 +796,25 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
             </Card>
           )}
         </div>
-      </main>
+      </div>
+  )
+
+  return (
+    <>
+      <Head title={wishlist.name} />
+      {isGuest ? (
+        <>
+          <SearchHeader variant="back" />
+          <main className="min-h-screen bg-gray-50 pt-32 md:pt-28 pb-6 md:pb-8">
+            {content}
+          </main>
+          <Footer />
+        </>
+      ) : (
+        <CustomerLayout title={wishlist.name}>
+          {content}
+        </CustomerLayout>
+      )}
 
       {/* Rename Dialog */}
       <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
@@ -979,8 +994,6 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
           </form>
         </DialogContent>
       </Dialog>
-
-      <Footer />
     </>
   )
 }

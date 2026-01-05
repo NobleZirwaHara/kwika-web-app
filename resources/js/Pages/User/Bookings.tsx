@@ -16,22 +16,30 @@ import { Link } from '@inertiajs/react'
 import { useState } from 'react'
 import { formatDate, formatPrice } from '@/lib/utils'
 
+interface Booking {
+  id: number
+  booking_number: string
+  service_name: string
+  service_type: string
+  provider_name: string
+  provider_logo?: string | null
+  event_date: string
+  event_time?: string | null
+  event_location?: string | null
+  total_amount: number
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  payment_status: 'pending' | 'paid' | 'refunded'
+  created_at: string
+}
+
 interface Props {
-  bookings: Array<{
-    id: number
-    booking_number: string
-    service_name: string
-    service_type: string
-    provider_name: string
-    provider_logo?: string | null
-    event_date: string
-    event_time?: string | null
-    event_location?: string | null
-    total_amount: number
-    status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-    payment_status: 'pending' | 'paid' | 'refunded'
-    created_at: string
-  }>
+  bookings: {
+    data: Booking[]
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
   filters: {
     status?: string
     date_from?: string
@@ -42,12 +50,14 @@ interface Props {
 export default function Bookings({ bookings, filters }: Props) {
   const [activeFilter, setActiveFilter] = useState(filters.status || 'all')
 
+  const bookingData = bookings.data || []
+
   const filterOptions = [
-    { value: 'all', label: 'All Bookings', count: bookings.length },
-    { value: 'upcoming', label: 'Upcoming', count: bookings.filter(b => b.status === 'confirmed').length },
-    { value: 'pending', label: 'Pending', count: bookings.filter(b => b.status === 'pending').length },
-    { value: 'completed', label: 'Completed', count: bookings.filter(b => b.status === 'completed').length },
-    { value: 'cancelled', label: 'Cancelled', count: bookings.filter(b => b.status === 'cancelled').length },
+    { value: 'all', label: 'All Bookings', count: bookings.total || 0 },
+    { value: 'upcoming', label: 'Upcoming', count: bookingData.filter(b => b.status === 'confirmed').length },
+    { value: 'pending', label: 'Pending', count: bookingData.filter(b => b.status === 'pending').length },
+    { value: 'completed', label: 'Completed', count: bookingData.filter(b => b.status === 'completed').length },
+    { value: 'cancelled', label: 'Cancelled', count: bookingData.filter(b => b.status === 'cancelled').length },
   ]
 
   const getStatusColor = (status: string) => {
@@ -70,10 +80,10 @@ export default function Bookings({ bookings, filters }: Props) {
   }
 
   const filteredBookings = activeFilter === 'all'
-    ? bookings
+    ? bookingData
     : activeFilter === 'upcoming'
-    ? bookings.filter(b => b.status === 'confirmed')
-    : bookings.filter(b => b.status === activeFilter)
+    ? bookingData.filter((b: Booking) => b.status === 'confirmed')
+    : bookingData.filter((b: Booking) => b.status === activeFilter)
 
   return (
     <CustomerLayout title="My Bookings">
@@ -114,7 +124,7 @@ export default function Bookings({ bookings, filters }: Props) {
         {/* Bookings List */}
         <div className="space-y-4">
           {filteredBookings.length > 0 ? (
-            filteredBookings.map((booking) => (
+            filteredBookings.map((booking: Booking) => (
               <Card key={booking.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">

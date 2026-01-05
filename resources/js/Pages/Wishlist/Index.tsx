@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { useWishlist } from '@/contexts/WishlistContext'
 import { SearchHeader } from '@/components/search-header'
 import { Footer } from '@/components/footer'
+import CustomerLayout from '@/components/CustomerLayout'
 import {
   Dialog,
   DialogContent,
@@ -85,13 +86,8 @@ export default function WishlistIndex({ wishlists: initialWishlists, isGuest, ca
 
   const totalItems = displayWishlists.reduce((sum, w) => sum + w.total_items, 0)
 
-  return (
-    <>
-      <Head title="My Wishlists" />
-      <SearchHeader variant="back" />
-
-      <main className="min-h-screen bg-gray-50 pt-32 md:pt-28 pb-6 md:pb-8">
-        <div className="container mx-auto px-4 max-w-6xl">
+  const content = (
+    <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
@@ -270,9 +266,24 @@ export default function WishlistIndex({ wishlists: initialWishlists, isGuest, ca
             </Card>
           )}
         </div>
-      </main>
+  )
 
-      <Footer />
+  return (
+    <>
+      <Head title="My Wishlists" />
+      {isGuest ? (
+        <>
+          <SearchHeader variant="back" />
+          <main className="min-h-screen bg-gray-50 pt-32 md:pt-28 pb-6 md:pb-8">
+            {content}
+          </main>
+          <Footer />
+        </>
+      ) : (
+        <CustomerLayout title="My Wishlists">
+          {content}
+        </CustomerLayout>
+      )}
     </>
   )
 }
