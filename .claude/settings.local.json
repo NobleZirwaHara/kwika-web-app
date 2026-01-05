@@ -26,9 +26,14 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(powershell -Command \"Rename-Item -Path ''C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\\\\public\\\\ticketing'' -NewName ''ticket-assets''\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git worktree add:*)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "laravel-boost",
+    "herd"
+  ]
 }

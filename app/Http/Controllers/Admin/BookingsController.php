@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\ServiceProvider;
 use App\Models\Service;
-use App\Models\User;
+use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +20,7 @@ class BookingsController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->isAdmin()) {
+        if (! $admin->isAdmin()) {
             return redirect()->route('home')->with('error', 'Unauthorized access.');
         }
 
@@ -37,14 +36,14 @@ class BookingsController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
 
         // Build query
-        $query = Booking::with(['user', 'service', 'serviceProvider'])
+        $query = Booking::with(['user', 'service', 'serviceProvider', 'servicePackage', 'items'])
             ->when($search, function ($q) use ($search) {
                 return $q->where(function ($query) use ($search) {
                     $query->where('booking_number', 'like', "%{$search}%")
                         ->orWhere('event_location', 'like', "%{$search}%")
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                                ->orWhere('email', 'like', "%{$search}%");
                         })
                         ->orWhereHas('serviceProvider', function ($q) use ($search) {
                             $q->where('business_name', 'like', "%{$search}%");
@@ -80,6 +79,7 @@ class BookingsController extends Controller
             return [
                 'id' => $booking->id,
                 'booking_number' => $booking->booking_number,
+                'booking_type' => $booking->booking_type,
                 'event_date' => $booking->event_date->format('Y-m-d'),
                 'event_date_formatted' => $booking->event_date->format('M d, Y'),
                 'start_time' => $booking->start_time,
@@ -97,10 +97,9 @@ class BookingsController extends Controller
                     'name' => $booking->user->name,
                     'email' => $booking->user->email,
                 ],
-                'service' => $booking->service ? [
-                    'id' => $booking->service->id,
-                    'name' => $booking->service->name,
-                ] : null,
+                'service' => [
+                    'name' => $booking->display_name,
+                ],
                 'service_provider' => [
                     'id' => $booking->serviceProvider->id,
                     'business_name' => $booking->serviceProvider->business_name,
@@ -162,7 +161,7 @@ class BookingsController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->isAdmin()) {
+        if (! $admin->isAdmin()) {
             return redirect()->route('home')->with('error', 'Unauthorized access.');
         }
 
@@ -170,6 +169,8 @@ class BookingsController extends Controller
             'user',
             'service',
             'serviceProvider',
+            'servicePackage',
+            'items',
             'payments',
             'review',
         ])->findOrFail($id);
@@ -184,6 +185,8 @@ class BookingsController extends Controller
             'booking' => [
                 'id' => $booking->id,
                 'booking_number' => $booking->booking_number,
+                'booking_type' => $booking->booking_type,
+                'display_name' => $booking->display_name,
                 'event_date' => $booking->event_date->format('Y-m-d'),
                 'event_date_formatted' => $booking->event_date->format('F d, Y'),
                 'start_time' => $booking->start_time,
@@ -194,7 +197,10 @@ class BookingsController extends Controller
                 'event_longitude' => $booking->event_longitude,
                 'attendees' => $booking->attendees,
                 'special_requests' => $booking->special_requests,
+                'metadata' => $booking->metadata,
                 'total_amount' => $booking->total_amount,
+                'subtotal' => $booking->subtotal,
+                'discount_amount' => $booking->discount_amount,
                 'deposit_amount' => $booking->deposit_amount,
                 'remaining_amount' => $booking->remaining_amount,
                 'status' => $booking->status,
@@ -211,11 +217,24 @@ class BookingsController extends Controller
                     'email' => $booking->user->email,
                     'phone' => $booking->user->phone,
                 ],
-                'service' => $booking->service ? [
-                    'id' => $booking->service->id,
-                    'name' => $booking->service->name,
-                    'category' => $booking->service->category,
+                'service' => [
+                    'name' => $booking->display_name,
+                ],
+                'service_package' => $booking->servicePackage ? [
+                    'id' => $booking->servicePackage->id,
+                    'name' => $booking->servicePackage->name,
+                    'description' => $booking->servicePackage->description,
                 ] : null,
+                'items' => $booking->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'description' => $item->description,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        'subtotal' => $item->subtotal,
+                    ];
+                }),
                 'service_provider' => [
                     'id' => $booking->serviceProvider->id,
                     'business_name' => $booking->serviceProvider->business_name,
@@ -250,7 +269,7 @@ class BookingsController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_content')) {
+        if (! $admin->canAdmin('manage_content')) {
             return back()->with('error', 'You do not have permission to update booking status.');
         }
 
@@ -271,12 +290,12 @@ class BookingsController extends Controller
             // Set timestamps based on status
             switch ($validated['status']) {
                 case 'confirmed':
-                    if (!$booking->confirmed_at) {
+                    if (! $booking->confirmed_at) {
                         $booking->confirmed_at = now();
                     }
                     break;
                 case 'completed':
-                    if (!$booking->completed_at) {
+                    if (! $booking->completed_at) {
                         $booking->completed_at = now();
                     }
                     break;
@@ -303,7 +322,8 @@ class BookingsController extends Controller
             return back()->with('success', 'Booking status updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to update booking status: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to update booking status: '.$e->getMessage());
         }
     }
 
@@ -314,7 +334,7 @@ class BookingsController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_content')) {
+        if (! $admin->canAdmin('manage_content')) {
             return back()->with('error', 'You do not have permission to update payment status.');
         }
 
@@ -345,7 +365,8 @@ class BookingsController extends Controller
             return back()->with('success', 'Payment status updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to update payment status: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to update payment status: '.$e->getMessage());
         }
     }
 
@@ -356,7 +377,7 @@ class BookingsController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->isSuperAdmin()) {
+        if (! $admin->isSuperAdmin()) {
             return back()->with('error', 'Only super admins can delete bookings.');
         }
 
@@ -389,7 +410,8 @@ class BookingsController extends Controller
                 ->with('success', 'Booking deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to delete booking: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to delete booking: '.$e->getMessage());
         }
     }
 }

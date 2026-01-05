@@ -15,7 +15,7 @@ class Booking extends Model
         'booking_number', 'user_id', 'service_id', 'service_provider_id', 'booking_type', 'service_package_id',
         'event_date', 'start_time', 'end_time', 'event_end_date', 'event_location',
         'event_latitude', 'event_longitude',
-        'attendees', 'special_requests', 'inspiration_images', 'total_amount', 'subtotal', 'discount_amount', 'deposit_amount',
+        'attendees', 'special_requests', 'metadata', 'inspiration_images', 'total_amount', 'subtotal', 'discount_amount', 'deposit_amount',
         'remaining_amount', 'status', 'payment_status', 'cancellation_reason',
         'cancelled_at', 'confirmed_at', 'completed_at',
     ];
@@ -34,6 +34,7 @@ class Booking extends Model
             'confirmed_at' => 'datetime',
             'completed_at' => 'datetime',
             'inspiration_images' => 'array',
+            'metadata' => 'array',
         ];
     }
 
@@ -102,7 +103,7 @@ class Booking extends Model
 
     public function canBeReviewed(): bool
     {
-        return $this->isCompleted() && !$this->review;
+        return $this->isCompleted() && ! $this->review;
     }
 
     public function isSingleService(): bool
@@ -118,5 +119,42 @@ class Booking extends Model
     public function isCustom(): bool
     {
         return $this->booking_type === 'custom';
+    }
+
+    /**
+     * Get the display name for this booking based on type.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->isCustom()) {
+            // First try to get name from metadata (like WishlistItem pattern)
+            $metadata = $this->metadata ?? [];
+            if (! empty($metadata['name'])) {
+                return $metadata['name'];
+            }
+
+            // Fallback: Generate name from booking items
+            $itemNames = $this->items->pluck('name')->filter()->take(2)->toArray();
+            if (count($itemNames) > 0) {
+                $name = implode(' + ', $itemNames);
+                if ($this->items->count() > 2) {
+                    $name .= ' +'.($this->items->count() - 2).' more';
+                }
+
+                return $name;
+            }
+
+            return 'Custom Package';
+        }
+
+        if ($this->isPackage() && $this->servicePackage) {
+            return $this->servicePackage->name;
+        }
+
+        if ($this->service) {
+            return $this->service->name;
+        }
+
+        return 'Booking #'.$this->booking_number;
     }
 }

@@ -19,6 +19,7 @@ use Inertia\Inertia;
 class BookingController extends Controller
 {
     protected MessageService $messageService;
+
     protected RealtimeMessenger $messenger;
 
     public function __construct(MessageService $messageService, RealtimeMessenger $messenger)
@@ -34,7 +35,7 @@ class BookingController extends Controller
     {
         $serviceId = $request->query('service_id');
 
-        if (!$serviceId) {
+        if (! $serviceId) {
             return redirect()->route('home')->withErrors(['error' => 'Service not found']);
         }
 
@@ -43,7 +44,7 @@ class BookingController extends Controller
             ->where('is_active', true)
             ->whereHas('serviceProvider', function ($query) {
                 $query->where('verification_status', 'approved')
-                      ->where('is_active', true);
+                    ->where('is_active', true);
             })
             ->firstOrFail();
 
@@ -93,7 +94,7 @@ class BookingController extends Controller
             ->where('id', $validated['service_id'])
             ->whereHas('serviceProvider', function ($query) {
                 $query->where('verification_status', 'approved')
-                      ->where('is_active', true);
+                    ->where('is_active', true);
             })
             ->firstOrFail();
 
@@ -111,7 +112,7 @@ class BookingController extends Controller
 
         // Create booking
         $booking = Booking::create([
-            'booking_number' => 'BK-' . strtoupper(Str::random(10)),
+            'booking_number' => 'BK-'.strtoupper(Str::random(10)),
             'user_id' => Auth::id(),
             'service_id' => $service->id,
             'service_provider_id' => $service->service_provider_id,
@@ -135,7 +136,7 @@ class BookingController extends Controller
         if ($request->hasFile('inspiration_images')) {
             $paths = [];
             foreach ($request->file('inspiration_images') as $file) {
-                $paths[] = $file->store('booking-inspiration/' . $booking->id, 'public');
+                $paths[] = $file->store('booking-inspiration/'.$booking->id, 'public');
             }
             $booking->update(['inspiration_images' => $paths]);
         }
@@ -167,7 +168,7 @@ class BookingController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $booking->load(['service', 'serviceProvider']);
+        $booking->load(['service', 'serviceProvider', 'servicePackage']);
 
         return Inertia::render('Booking/PaymentSelect', [
             'booking' => [
@@ -178,8 +179,9 @@ class BookingController extends Controller
                 'remaining_amount' => $booking->remaining_amount,
                 'currency' => 'MWK',
                 'event_date' => $booking->event_date->format('M d, Y'),
+                'booking_type' => $booking->booking_type,
                 'service' => [
-                    'name' => $booking->service->name,
+                    'name' => $booking->display_name,
                 ],
                 'provider' => [
                     'business_name' => $booking->serviceProvider->business_name,
@@ -233,12 +235,12 @@ class BookingController extends Controller
 
         // Upload proof of payment
         $file = $request->file('proof_of_payment');
-        $filename = 'payments/' . Str::random(40) . '.' . $file->getClientOriginalExtension();
+        $filename = 'payments/'.Str::random(40).'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('', $filename, 'public');
 
         // Create payment record
         Payment::create([
-            'transaction_id' => 'TXN-' . strtoupper(Str::random(12)),
+            'transaction_id' => 'TXN-'.strtoupper(Str::random(12)),
             'user_id' => Auth::id(),
             'booking_id' => $booking->id,
             'payment_type' => 'booking',
@@ -251,7 +253,7 @@ class BookingController extends Controller
             'notes' => $validated['notes'] ?? null,
         ]);
 
-        //$booking->update(['payment_status' => 'pending_verification']);
+        // $booking->update(['payment_status' => 'pending_verification']);
 
         return redirect()->route('bookings.confirmation', $booking->id);
     }
@@ -299,7 +301,7 @@ class BookingController extends Controller
 
         // Create payment record
         Payment::create([
-            'transaction_id' => 'TXN-' . strtoupper(Str::random(12)),
+            'transaction_id' => 'TXN-'.strtoupper(Str::random(12)),
             'user_id' => Auth::id(),
             'booking_id' => $booking->id,
             'payment_type' => 'booking',
@@ -360,7 +362,7 @@ class BookingController extends Controller
         // For now, simulate successful payment
 
         Payment::create([
-            'transaction_id' => 'TXN-' . strtoupper(Str::random(12)),
+            'transaction_id' => 'TXN-'.strtoupper(Str::random(12)),
             'user_id' => Auth::id(),
             'booking_id' => $booking->id,
             'payment_type' => 'booking',
@@ -369,7 +371,7 @@ class BookingController extends Controller
             'payment_method' => 'card',
             'payment_gateway' => 'stripe',
             'status' => 'completed',
-            'gateway_transaction_id' => 'ch_' . Str::random(24),
+            'gateway_transaction_id' => 'ch_'.Str::random(24),
             'paid_at' => now(),
         ]);
 
@@ -391,7 +393,7 @@ class BookingController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $booking->load(['service', 'serviceProvider', 'payments']);
+        $booking->load(['service', 'serviceProvider', 'servicePackage', 'payments']);
 
         return Inertia::render('Booking/Confirmation', [
             'booking' => [
@@ -408,8 +410,9 @@ class BookingController extends Controller
                 'end_time' => $booking->end_time,
                 'event_location' => $booking->event_location,
                 'attendees' => $booking->attendees,
+                'booking_type' => $booking->booking_type,
                 'service' => [
-                    'name' => $booking->service->name,
+                    'name' => $booking->display_name,
                 ],
                 'provider' => [
                     'business_name' => $booking->serviceProvider->business_name,
@@ -434,7 +437,15 @@ class BookingController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $booking->load(['service', 'serviceProvider', 'payments']);
+        $booking->load(['service', 'serviceProvider', 'servicePackage', 'payments', 'items']);
+
+        // Build description based on booking type
+        $description = $booking->service?->description;
+        if ($booking->isCustom() && $booking->items->isNotEmpty()) {
+            $description = 'Custom package with: '.$booking->items->pluck('name')->join(', ');
+        } elseif ($booking->isPackage() && $booking->servicePackage) {
+            $description = $booking->servicePackage->description;
+        }
 
         return Inertia::render('Booking/Show', [
             'booking' => [
@@ -451,10 +462,17 @@ class BookingController extends Controller
                 'attendees' => $booking->attendees,
                 'special_requests' => $booking->special_requests,
                 'inspiration_image_urls' => $booking->inspiration_image_urls,
+                'booking_type' => $booking->booking_type,
                 'service' => [
-                    'name' => $booking->service->name,
-                    'description' => $booking->service->description,
+                    'name' => $booking->display_name,
+                    'description' => $description,
                 ],
+                'items' => $booking->items->map(fn ($item) => [
+                    'name' => $item->name,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->unit_price,
+                    'subtotal' => $item->subtotal,
+                ]),
                 'provider' => [
                     'business_name' => $booking->serviceProvider->business_name,
                     'phone' => $booking->serviceProvider->phone,
@@ -530,6 +548,7 @@ class BookingController extends Controller
                             $current->modify('+30 minutes');
                         }
                     }
+
                     return $slots;
                 })
                 ->unique()
@@ -600,7 +619,7 @@ class BookingController extends Controller
     {
         $packageId = $request->query('package_id');
 
-        if (!$packageId) {
+        if (! $packageId) {
             return redirect()->route('home')->withErrors(['error' => 'Package not found']);
         }
 
@@ -609,7 +628,7 @@ class BookingController extends Controller
             ->where('is_active', true)
             ->whereHas('serviceProvider', function ($query) {
                 $query->where('verification_status', 'approved')
-                      ->where('is_active', true);
+                    ->where('is_active', true);
             })
             ->firstOrFail();
 
@@ -641,7 +660,7 @@ class BookingController extends Controller
             ->where('id', $validated['package_id'])
             ->whereHas('serviceProvider', function ($query) {
                 $query->where('verification_status', 'approved')
-                      ->where('is_active', true);
+                    ->where('is_active', true);
             })
             ->firstOrFail();
 
@@ -653,7 +672,7 @@ class BookingController extends Controller
 
             // Create booking
             $booking = Booking::create([
-                'booking_number' => 'BK-' . strtoupper(Str::random(10)),
+                'booking_number' => 'BK-'.strtoupper(Str::random(10)),
                 'user_id' => Auth::id(),
                 'service_id' => null, // No single service for package bookings
                 'service_provider_id' => $package->service_provider_id,
@@ -701,6 +720,7 @@ class BookingController extends Controller
             return redirect()->route('bookings.payment.select', $booking->id);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->withErrors(['error' => 'Failed to create booking. Please try again.']);
         }
     }
@@ -712,7 +732,7 @@ class BookingController extends Controller
     {
         $providerId = $request->query('provider_id');
 
-        if (!$providerId) {
+        if (! $providerId) {
             return redirect()->route('home')->withErrors(['error' => 'Provider not found']);
         }
 
@@ -777,6 +797,7 @@ class BookingController extends Controller
 
         $validated = $request->validate([
             'provider_id' => ['required', 'exists:service_providers,id'],
+            'package_name' => ['nullable', 'string', 'max:255'],
             'services' => ['required', 'array', 'min:1'],
             'services.*.service_id' => ['required', 'exists:services,id'],
             'services.*.quantity' => ['required', 'integer', 'min:1'],
@@ -819,13 +840,42 @@ class BookingController extends Controller
                 ];
             }
 
+            // Generate package name if not provided
+            $packageName = $validated['package_name'] ?? null;
+            if (! $packageName && count($servicesData) > 0) {
+                // Auto-generate name from services
+                $serviceNames = array_slice(array_map(fn ($d) => $d['service']->name, $servicesData), 0, 2);
+                $packageName = implode(' + ', $serviceNames);
+                if (count($servicesData) > 2) {
+                    $packageName .= ' +'.(count($servicesData) - 2).' more';
+                }
+            }
+
+            // Build metadata for custom booking (like WishlistItem pattern)
+            $metadata = [
+                'name' => $packageName ?? 'Custom Package from '.$provider->business_name,
+                'provider_id' => $provider->id,
+                'provider_name' => $provider->business_name,
+                'provider_slug' => $provider->slug,
+                'services' => array_map(fn ($d) => [
+                    'service_id' => $d['service']->id,
+                    'service_name' => $d['service']->name,
+                    'quantity' => $d['quantity'],
+                    'unit_price' => $d['unit_price'],
+                    'subtotal' => $d['subtotal'],
+                ], $servicesData),
+                'total_amount' => $totalAmount,
+                'currency' => 'MWK',
+            ];
+
             // Create booking
             $booking = Booking::create([
-                'booking_number' => 'BK-' . strtoupper(Str::random(10)),
+                'booking_number' => 'BK-'.strtoupper(Str::random(10)),
                 'user_id' => Auth::id(),
                 'service_id' => null, // No single service
                 'service_provider_id' => $provider->id,
                 'booking_type' => 'custom',
+                'metadata' => $metadata,
                 'service_package_id' => null,
                 'event_date' => $validated['event_date'],
                 'start_time' => $validated['start_time'],
@@ -864,7 +914,7 @@ class BookingController extends Controller
             if ($request->hasFile('inspiration_images')) {
                 $paths = [];
                 foreach ($request->file('inspiration_images') as $file) {
-                    $paths[] = $file->store('booking-inspiration/' . $booking->id, 'public');
+                    $paths[] = $file->store('booking-inspiration/'.$booking->id, 'public');
                 }
                 $booking->update(['inspiration_images' => $paths]);
             }
@@ -883,7 +933,8 @@ class BookingController extends Controller
                 'provider_id' => $validated['provider_id'] ?? null,
                 'user_id' => Auth::id(),
             ]);
-            return back()->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Failed to create booking: '.$e->getMessage()]);
         }
     }
 }

@@ -9,7 +9,6 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Inertia\Inertia;
 
 class BookingController extends Controller
@@ -21,13 +20,13 @@ class BookingController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->route('onboarding.welcome')
                 ->with('error', 'Please complete provider onboarding first');
         }
 
         $query = Booking::where('service_provider_id', $provider->id)
-            ->with(['user', 'service', 'payments']);
+            ->with(['user', 'service', 'servicePackage', 'items', 'payments']);
 
         // Filter by booking status
         if ($request->filled('status')) {
@@ -55,11 +54,11 @@ class BookingController extends Controller
         // Search by booking number or customer name
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('booking_number', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -74,9 +73,10 @@ class BookingController extends Controller
             return [
                 'id' => $booking->id,
                 'booking_number' => $booking->booking_number,
+                'booking_type' => $booking->booking_type,
                 'customer_name' => $booking->user->name,
                 'customer_email' => $booking->user->email,
-                'service_name' => $booking->service->name,
+                'service_name' => $booking->display_name,
                 'event_date' => $booking->event_date->format('M d, Y g:i A'),
                 'event_location' => $booking->event_location,
                 'attendees' => $booking->attendees,
@@ -85,7 +85,7 @@ class BookingController extends Controller
                 'status' => $booking->status,
                 'payment_status' => $booking->payment_status,
                 'created_at' => $booking->created_at->format('M d, Y'),
-                'has_special_requests' => !empty($booking->special_requests),
+                'has_special_requests' => ! empty($booking->special_requests),
             ];
         });
 
@@ -128,15 +128,18 @@ class BookingController extends Controller
         $provider = Auth::user()->serviceProvider;
 
         $booking = Booking::where('service_provider_id', $provider->id)
-            ->with(['user', 'service', 'payments', 'review'])
+            ->with(['user', 'service', 'servicePackage', 'items', 'payments', 'review'])
             ->findOrFail($id);
 
         return Inertia::render('Provider/Bookings/Show', [
             'booking' => [
                 'id' => $booking->id,
                 'booking_number' => $booking->booking_number,
+                'booking_type' => $booking->booking_type,
+                'display_name' => $booking->display_name,
                 'status' => $booking->status,
                 'payment_status' => $booking->payment_status,
+                'metadata' => $booking->metadata,
 
                 // Customer information
                 'customer' => [
@@ -149,16 +152,28 @@ class BookingController extends Controller
                         ->count(),
                 ],
 
-                // Service information
-                'service' => [
-                    'id' => $booking->service->id,
-                    'name' => $booking->service->name,
-                    'description' => $booking->service->description,
-                    'base_price' => $booking->service->base_price,
-                    'price_type' => $booking->service->price_type,
-                    'duration' => $booking->service->duration,
-                    'inclusions' => $booking->service->inclusions,
-                ],
+                // Service information - provide full data for single service, summary for package/custom
+                'service' => $this->formatServiceInfo($booking),
+
+                // Service package (if package booking)
+                'service_package' => $booking->servicePackage ? [
+                    'id' => $booking->servicePackage->id,
+                    'name' => $booking->servicePackage->name,
+                    'description' => $booking->servicePackage->description,
+                    'final_price' => $booking->servicePackage->final_price,
+                ] : null,
+
+                // Booking items (for custom/package bookings)
+                'items' => $booking->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'description' => $item->description,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        'subtotal' => $item->subtotal,
+                    ];
+                }),
 
                 // Event details
                 'event_date' => $booking->event_date->format('Y-m-d\TH:i'),
@@ -251,7 +266,7 @@ class BookingController extends Controller
         // Check if event date has passed
         if ($booking->event_date->isFuture()) {
             return redirect()->back()->withErrors([
-                'error' => 'Cannot mark booking as completed before the event date.'
+                'error' => 'Cannot mark booking as completed before the event date.',
             ]);
         }
 
@@ -354,7 +369,7 @@ class BookingController extends Controller
         $provider = Auth::user()->serviceProvider;
 
         $query = Booking::where('service_provider_id', $provider->id)
-            ->with(['user', 'service']);
+            ->with(['user', 'service', 'servicePackage', 'items']);
 
         // Apply same filters as index
         if ($request->filled('status')) {
@@ -375,14 +390,14 @@ class BookingController extends Controller
 
         $bookings = $query->orderBy('event_date')->get();
 
-        $filename = 'bookings_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'bookings_'.now()->format('Y-m-d_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ];
 
-        $callback = function() use ($bookings) {
+        $callback = function () use ($bookings) {
             $file = fopen('php://output', 'w');
 
             // Header row
@@ -407,7 +422,7 @@ class BookingController extends Controller
                     $booking->booking_number,
                     $booking->user->name,
                     $booking->user->email,
-                    $booking->service->name,
+                    $booking->display_name,
                     $booking->event_date->format('Y-m-d H:i'),
                     $booking->event_location,
                     $booking->attendees ?? 'N/A',
@@ -423,5 +438,60 @@ class BookingController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Format service information based on booking type
+     */
+    private function formatServiceInfo(Booking $booking): array
+    {
+        // For single service bookings, provide full service details
+        if ($booking->isSingleService() && $booking->service) {
+            return [
+                'id' => $booking->service->id,
+                'name' => $booking->service->name,
+                'description' => $booking->service->description,
+                'base_price' => $booking->service->base_price,
+                'price_type' => $booking->service->price_type,
+                'duration' => $booking->service->duration,
+                'inclusions' => $booking->service->inclusions,
+            ];
+        }
+
+        // For package bookings
+        if ($booking->isPackage() && $booking->servicePackage) {
+            return [
+                'name' => $booking->servicePackage->name,
+                'description' => $booking->servicePackage->description,
+                'base_price' => $booking->servicePackage->final_price,
+                'price_type' => 'package',
+                'duration' => null,
+                'inclusions' => $booking->servicePackage->inclusions,
+            ];
+        }
+
+        // For custom bookings
+        if ($booking->isCustom()) {
+            $metadata = $booking->metadata ?? [];
+
+            return [
+                'name' => $booking->display_name,
+                'description' => 'Custom package with: '.$booking->items->pluck('name')->join(', '),
+                'base_price' => $booking->total_amount,
+                'price_type' => 'custom',
+                'duration' => null,
+                'inclusions' => $booking->items->pluck('name')->toArray(),
+            ];
+        }
+
+        // Fallback
+        return [
+            'name' => $booking->display_name,
+            'description' => null,
+            'base_price' => $booking->total_amount,
+            'price_type' => null,
+            'duration' => null,
+            'inclusions' => [],
+        ];
     }
 }
