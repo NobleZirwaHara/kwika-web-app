@@ -90,6 +90,11 @@ class Booking extends Model
         return $this->hasMany(BookingItem::class);
     }
 
+    public function checklist()
+    {
+        return $this->hasOne(BookingChecklist::class);
+    }
+
     public function scopeUpcoming($query)
     {
         return $query->where('event_date', '>', now())

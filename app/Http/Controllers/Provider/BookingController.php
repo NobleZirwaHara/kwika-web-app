@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\ChecklistTemplate;
 use App\Models\Payment;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -128,8 +129,21 @@ class BookingController extends Controller
         $provider = Auth::user()->serviceProvider;
 
         $booking = Booking::where('service_provider_id', $provider->id)
-            ->with(['user', 'service', 'servicePackage', 'items', 'payments', 'review'])
+            ->with(['user', 'service', 'servicePackage', 'items', 'payments', 'review', 'checklist.items'])
             ->findOrFail($id);
+
+        // Get active checklist templates for the template selector
+        $checklistTemplates = ChecklistTemplate::where('service_provider_id', $provider->id)
+            ->active()
+            ->ordered()
+            ->withCount('items')
+            ->get()
+            ->map(fn ($template) => [
+                'id' => $template->id,
+                'name' => $template->name,
+                'description' => $template->description,
+                'item_count' => $template->items_count,
+            ]);
 
         return Inertia::render('Provider/Bookings/Show', [
             'booking' => [
@@ -223,7 +237,28 @@ class BookingController extends Controller
                     'comment' => $booking->review->comment,
                     'created_at' => $booking->review->created_at->format('M d, Y'),
                 ] : null,
+
+                // Checklist (if exists)
+                'checklist' => $booking->checklist ? [
+                    'id' => $booking->checklist->id,
+                    'name' => $booking->checklist->name,
+                    'items' => $booking->checklist->items->map(fn ($item) => [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'notes' => $item->notes,
+                        'due_date' => $item->due_date?->format('Y-m-d'),
+                        'due_date_formatted' => $item->due_date?->format('M d, Y'),
+                        'is_completed' => $item->is_completed,
+                        'completed_at' => $item->completed_at?->format('M d, Y g:i A'),
+                        'display_order' => $item->display_order,
+                        'is_overdue' => $item->isOverdue(),
+                        'is_due_today' => $item->isDueToday(),
+                    ]),
+                    'progress' => $booking->checklist->getProgress(),
+                    'overdue_count' => $booking->checklist->getOverdueCount(),
+                ] : null,
             ],
+            'checklistTemplates' => $checklistTemplates,
         ]);
     }
 

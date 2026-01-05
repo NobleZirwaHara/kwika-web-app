@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Provider\BookingChecklistController;
+use App\Http\Controllers\Provider\ChecklistTemplateController;
 use App\Http\Controllers\Provider\DashboardController;
 use App\Http\Controllers\Provider\ListingsController;
 use App\Http\Controllers\Provider\MediaController;
@@ -95,6 +97,32 @@ Route::middleware(['auth', 'provider'])->prefix('provider')->name('provider.')->
     Route::post('/bookings/{id}/complete', [\App\Http\Controllers\Provider\BookingController::class, 'complete'])->name('bookings.complete');
     Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Provider\BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/bookings/{bookingId}/payments/{paymentId}/verify', [\App\Http\Controllers\Provider\BookingController::class, 'verifyPayment'])->name('bookings.payments.verify');
+
+    // Booking Checklist routes
+    Route::prefix('bookings/{booking}/checklist')->name('bookings.checklist.')->group(function () {
+        Route::post('/', [BookingChecklistController::class, 'store'])->name('store');
+        Route::delete('/', [BookingChecklistController::class, 'destroy'])->name('destroy');
+        Route::post('/items', [BookingChecklistController::class, 'storeItem'])->name('items.store');
+        Route::put('/items/{item}', [BookingChecklistController::class, 'updateItem'])->name('items.update');
+        Route::post('/items/{item}/toggle', [BookingChecklistController::class, 'toggleItem'])->name('items.toggle');
+        Route::delete('/items/{item}', [BookingChecklistController::class, 'deleteItem'])->name('items.destroy');
+        Route::post('/reorder', [BookingChecklistController::class, 'reorder'])->name('reorder');
+    });
+
+    // Checklist Templates Management
+    Route::prefix('checklists')->name('checklists.')->group(function () {
+        Route::get('/', [ChecklistTemplateController::class, 'index'])->name('index');
+        Route::post('/', [ChecklistTemplateController::class, 'store'])->name('store');
+        Route::get('/{template}', [ChecklistTemplateController::class, 'show'])->name('show');
+        Route::put('/{template}', [ChecklistTemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [ChecklistTemplateController::class, 'destroy'])->name('destroy');
+        Route::put('/{template}/toggle', [ChecklistTemplateController::class, 'toggle'])->name('toggle');
+        Route::post('/{template}/duplicate', [ChecklistTemplateController::class, 'duplicate'])->name('duplicate');
+        Route::post('/{template}/items', [ChecklistTemplateController::class, 'storeItem'])->name('items.store');
+        Route::put('/{template}/items/{item}', [ChecklistTemplateController::class, 'updateItem'])->name('items.update');
+        Route::delete('/{template}/items/{item}', [ChecklistTemplateController::class, 'deleteItem'])->name('items.destroy');
+        Route::post('/{template}/items/reorder', [ChecklistTemplateController::class, 'reorderItems'])->name('items.reorder');
+    });
 
     // Analytics & Reports
     Route::get('/analytics', [\App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics');
