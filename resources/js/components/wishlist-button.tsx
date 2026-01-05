@@ -1,5 +1,6 @@
 import { Heart, Plus, Minus } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, memo } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useWishlist } from '@/contexts/WishlistContext'
 
@@ -12,7 +13,7 @@ interface WishlistButtonProps {
   className?: string
 }
 
-export function WishlistButton({
+function WishlistButtonInner({
   itemType,
   itemId,
   variant = 'default',
@@ -26,13 +27,11 @@ export function WishlistButton({
     toggleProvider,
     togglePackage,
     toggleService,
-    addProvider,
-    addPackage,
-    addService,
   } = useWishlist()
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -69,6 +68,8 @@ export function WishlistButton({
 
   // Close picker when clicking outside
   useEffect(() => {
+    if (!showPicker) return
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
       const isOutsideButton = buttonRef.current && !buttonRef.current.contains(target)
@@ -79,12 +80,20 @@ export function WishlistButton({
       }
     }
 
-    if (showPicker) {
-      document.addEventListener('mousedown', handleClickOutside)
+    const handleScroll = () => {
+      setShowPicker(false)
     }
 
+    // Add listeners after a short delay to prevent immediate closing
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside)
+      window.addEventListener('scroll', handleScroll, true)
+    }, 100)
+
     return () => {
+      clearTimeout(timeoutId)
       document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleScroll, true)
     }
   }, [showPicker])
 
@@ -96,7 +105,20 @@ export function WishlistButton({
 
     // If there are multiple wishlists, always show picker so user can add to other lists
     if (wishlists.length > 1) {
-      setShowPicker(true)
+      // Calculate position before showing dropdown
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect()
+        // Position dropdown below button, aligned to right edge (dropdown extends left)
+        const dropdownWidth = 224 // w-56 = 14rem = 224px
+        let left = rect.right - dropdownWidth
+        // Ensure dropdown doesn't go off-screen on the left
+        if (left < 8) left = 8
+        setDropdownPosition({
+          top: rect.bottom + 8,
+          left: left,
+        })
+      }
+      setShowPicker(!showPicker)
       return
     }
 
@@ -203,16 +225,18 @@ export function WishlistButton({
         />
       </button>
 
-      {/* Wishlist Picker Dropdown */}
-      {showPicker && (
+      {/* Wishlist Picker Dropdown - rendered via Portal to avoid z-index/transform issues */}
+      {showPicker && typeof document !== 'undefined' && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed z-[100] w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2"
+          className="fixed w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-in fade-in-0 zoom-in-95 duration-150"
           style={{
-            top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
-            right: buttonRef.current ? window.innerWidth - buttonRef.current.getBoundingClientRect().right : 0,
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            zIndex: 99999,
           }}
           onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-700">Save to wishlist</p>
@@ -255,11 +279,20 @@ export function WishlistButton({
               )
             })}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
 }
+
+// Memoize to prevent re-renders when context changes but props don't
+export const WishlistButton = memo(WishlistButtonInner, (prevProps, nextProps) => {
+  return prevProps.itemType === nextProps.itemType &&
+         prevProps.itemId === nextProps.itemId &&
+         prevProps.variant === nextProps.variant &&
+         prevProps.className === nextProps.className
+})
 
 // Legacy export for backward compatibility - maps old serviceId prop to new format
 interface LegacyWishlistButtonProps {

@@ -181,23 +181,45 @@ export default function ProviderLayout({ children, title, provider }: ProviderLa
               <SheetTitle className="text-2xl font-bold">Menu</SheetTitle>
             </SheetHeader>
 
-            {/* Featured Card - Optional promotional content */}
-            <div className="mb-6 rounded-xl bg-muted p-4">
-              <div className="flex gap-3 mb-3">
-                <div className="w-20 h-20 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Package className="h-10 w-10 text-primary" />
+            {/* Featured Card - Get Started Section */}
+            <div className="mb-6 rounded-xl bg-muted/30 p-6">
+              <div className="flex justify-center mb-6 relative h-28">
+                <div className="absolute left-4 top-0 w-28 h-20 rounded-2xl overflow-hidden shadow-lg transform -rotate-6">
+                  <img 
+                    src="/resized-win/food-3.jpg" 
+                    alt="Service example" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="w-20 h-20 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <LayoutDashboard className="h-10 w-10 text-accent" />
+                <div className="absolute left-1/2 -translate-x-1/2 top-2 w-28 h-20 rounded-2xl overflow-hidden shadow-lg z-10">
+                  <img 
+                    src="/resized-win/bridal-party-clothes-1.jpg" 
+                    alt="Service example" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute right-4 top-0 w-28 h-20 rounded-2xl overflow-hidden shadow-lg transform rotate-6">
+                  <img 
+                    src="/resized-win/bride-groom-shoot-3.jpg" 
+                    alt="Service example" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
-              <h3 className="font-semibold mb-1">New to Kwika?</h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                Discover tips and best practices to grow your business.
-              </p>
-              <Button variant="outline" size="sm" className="w-full">
-                Get started
-              </Button>
+              
+              <div className="text-center space-y-2">
+                <h3 className="font-bold text-xl text-foreground">New to Kwika?</h3>
+                <p className="text-sm text-muted-foreground leading-snug">
+                  Discover tips and best practices shared by top-rated providers.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3 bg-background hover:bg-background/80 text-foreground border-border shadow-sm font-semibold"
+                  asChild
+                >
+                  <Link href="/help/getting-started">Get started</Link>
+                </Button>
+              </div>
             </div>
 
             {/* Menu Items */}

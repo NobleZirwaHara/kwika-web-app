@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 
 // ==================== Types ====================
 
@@ -599,33 +599,57 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshWishlists])
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    wishlists,
+    defaultWishlist,
+    isLoading,
+    isGuest,
+    wishlistIds,
+    isProviderWishlisted,
+    isPackageWishlisted,
+    isServiceWishlisted,
+    toggleProvider,
+    togglePackage,
+    toggleService,
+    addProvider,
+    addPackage,
+    addService,
+    addCustomPackage,
+    removeItem,
+    moveItem,
+    createWishlist,
+    deleteWishlist,
+    renameWishlist,
+    refreshWishlists,
+    refreshIds,
+  }), [
+    wishlists,
+    defaultWishlist,
+    isLoading,
+    isGuest,
+    wishlistIds,
+    isProviderWishlisted,
+    isPackageWishlisted,
+    isServiceWishlisted,
+    toggleProvider,
+    togglePackage,
+    toggleService,
+    addProvider,
+    addPackage,
+    addService,
+    addCustomPackage,
+    removeItem,
+    moveItem,
+    createWishlist,
+    deleteWishlist,
+    renameWishlist,
+    refreshWishlists,
+    refreshIds,
+  ])
+
   return (
-    <WishlistContext.Provider
-      value={{
-        wishlists,
-        defaultWishlist,
-        isLoading,
-        isGuest,
-        wishlistIds,
-        isProviderWishlisted,
-        isPackageWishlisted,
-        isServiceWishlisted,
-        toggleProvider,
-        togglePackage,
-        toggleService,
-        addProvider,
-        addPackage,
-        addService,
-        addCustomPackage,
-        removeItem,
-        moveItem,
-        createWishlist,
-        deleteWishlist,
-        renameWishlist,
-        refreshWishlists,
-        refreshIds,
-      }}
-    >
+    <WishlistContext.Provider value={contextValue}>
       {children}
     </WishlistContext.Provider>
   )
