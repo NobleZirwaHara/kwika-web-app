@@ -17,12 +17,12 @@ const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
 
 // Make route helper available globally
 declare global {
-  function route(name?: string, params?: any, absolute?: boolean): string;
+  var route: typeof ziggyRoute;
 }
 
-globalThis.route = (name, params, absolute) => {
-  return ziggyRoute(name, params, absolute, (globalThis as any).Ziggy);
-};
+globalThis.route = ((...args: any[]) => 
+  (ziggyRoute as any)(...args, args.length < 4 ? (globalThis as any).Ziggy : undefined)
+) as typeof ziggyRoute;
 
 // Wrapper component to include MobileBottomNav within Inertia context
 function AppWrapper({ App, props }: { App: any; props: any }) {
