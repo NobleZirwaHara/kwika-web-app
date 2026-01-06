@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\ServiceProvider;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -14,9 +13,9 @@ class TicketingController extends Controller
     {
         // Fetch trending events (published, upcoming events with ticket packages)
         $trendingEvents = Event::with(['ticketPackages' => function ($query) {
-                $query->where('is_active', true)
-                      ->orderBy('price', 'asc');
-            }])
+            $query->where('is_active', true)
+                ->orderBy('price', 'asc');
+        }])
             ->where('status', 'published')
             ->where('start_datetime', '>', now())
             ->orderBy('is_featured', 'desc')
@@ -32,10 +31,10 @@ class TicketingController extends Controller
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j • g:i A'),
-                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
-                    'image' => $event->cover_image,
+                    'price' => $minPrice ? 'From MWK '.number_format($minPrice, 0, '.', ',') : 'TBA',
+                    'image' => $event->cover_image ? Storage::url($event->cover_image) : null,
                     'category' => ucfirst($event->category),
-                    'venue' => $event->venue_name . ', ' . $event->venue_city,
+                    'venue' => $event->venue_name.', '.$event->venue_city,
                 ];
             });
 
@@ -109,8 +108,8 @@ class TicketingController extends Controller
 
         // Fetch upcoming events
         $upcomingEvents = Event::with(['ticketPackages' => function ($query) {
-                $query->where('is_active', true)->orderBy('price', 'asc');
-            }])
+            $query->where('is_active', true)->orderBy('price', 'asc');
+        }])
             ->where('service_provider_id', $organizer->id)
             ->where('status', 'published')
             ->where('start_datetime', '>', now())
@@ -118,15 +117,16 @@ class TicketingController extends Controller
             ->get()
             ->map(function ($event) {
                 $minPrice = $event->ticketPackages->min('price');
+
                 return [
                     'id' => $event->id,
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j • g:i A'),
-                    'price' => $minPrice ? 'From MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
-                    'image' => $event->cover_image,
+                    'price' => $minPrice ? 'From MWK '.number_format($minPrice, 0, '.', ',') : 'TBA',
+                    'image' => $event->cover_image ? Storage::url($event->cover_image) : null,
                     'category' => ucfirst($event->category),
-                    'venue' => $event->venue_name . ', ' . $event->venue_city,
+                    'venue' => $event->venue_name.', '.$event->venue_city,
                 ];
             });
 
@@ -139,15 +139,16 @@ class TicketingController extends Controller
             ->get()
             ->map(function ($event) {
                 $minPrice = $event->ticketPackages->min('price');
+
                 return [
                     'id' => $event->id,
                     'slug' => $event->slug,
                     'title' => $event->title,
                     'date' => $event->start_datetime->format('D, M j, Y'),
-                    'price' => $minPrice ? 'MWK ' . number_format($minPrice, 0, '.', ',') : 'TBA',
-                    'image' => $event->cover_image,
+                    'price' => $minPrice ? 'MWK '.number_format($minPrice, 0, '.', ',') : 'TBA',
+                    'image' => $event->cover_image ? Storage::url($event->cover_image) : null,
                     'category' => ucfirst($event->category),
-                    'venue' => $event->venue_name . ', ' . $event->venue_city,
+                    'venue' => $event->venue_name.', '.$event->venue_city,
                 ];
             });
 
@@ -164,8 +165,8 @@ class TicketingController extends Controller
                 'location' => $organizer->city,
                 'rating' => $organizer->average_rating ?? 4.5,
                 'reviews' => $organizer->reviews()->count(),
-                'image' => $organizer->cover_photo,
-                'logo' => $organizer->logo,
+                'image' => $organizer->cover_image ? Storage::url($organizer->cover_image) : null,
+                'logo' => $organizer->logo ? Storage::url($organizer->logo) : null,
                 'is_verified' => $organizer->verification_status === 'approved',
                 'event_count' => $totalEvents,
                 'total_attendees' => $totalAttendees,
@@ -177,5 +178,4 @@ class TicketingController extends Controller
             'pastEvents' => $pastEvents,
         ]);
     }
-
 }

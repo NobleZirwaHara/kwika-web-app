@@ -18,6 +18,7 @@ use Inertia\Inertia;
 class TicketOrderController extends Controller
 {
     protected TicketService $ticketService;
+
     protected PaymentGatewayService $paymentService;
 
     public function __construct(TicketService $ticketService, PaymentGatewayService $paymentService)
@@ -39,10 +40,11 @@ class TicketOrderController extends Controller
         ]);
 
         $event = Event::with('serviceProvider')->findOrFail($request->event_id);
-        
+
         // Get selected ticket packages with details
         $selectedTickets = collect($request->packages)->map(function ($item) {
             $package = TicketPackage::findOrFail($item['package_id']);
+
             return [
                 'package_id' => $package->id,
                 'quantity' => $item['quantity'],
@@ -60,8 +62,18 @@ class TicketOrderController extends Controller
             return $ticket['package']['price'] * $ticket['quantity'];
         });
 
+        // Transform event data with proper image URLs
+        $eventData = [
+            'id' => $event->id,
+            'title' => $event->title,
+            'cover_image' => $event->cover_image ? Storage::url($event->cover_image) : null,
+            'start_datetime' => $event->start_datetime,
+            'venue_name' => $event->venue_name,
+            'venue_city' => $event->venue_city,
+        ];
+
         return Inertia::render('Ticketing/Checkout', [
-            'event' => $event,
+            'event' => $eventData,
             'selectedTickets' => $selectedTickets,
             'totalAmount' => $totalAmount,
         ]);
@@ -112,23 +124,24 @@ class TicketOrderController extends Controller
 
             // Apply promo code if provided
             $discountAmount = 0;
-            if (!empty($validated['promo_code'])) {
+            if (! empty($validated['promo_code'])) {
                 // TODO: Implement promo code validation and discount calculation
                 // $discountAmount = $this->calculatePromoDiscount($validated['promo_code'], $totalAmount);
             }
 
             // Reserve seats if provided
-            if (!empty($validated['seats'])) {
+            if (! empty($validated['seats'])) {
                 $seatsReserved = $this->ticketService->reserveSeats($validated['seats']);
-                if (!$seatsReserved) {
+                if (! $seatsReserved) {
                     DB::rollBack();
+
                     return back()->with('error', 'Some selected seats are no longer available.');
                 }
             }
 
             // Create order
             $order = TicketOrder::create([
-                'order_number' => 'ORD-' . strtoupper(Str::random(12)),
+                'order_number' => 'ORD-'.strtoupper(Str::random(12)),
                 'user_id' => Auth::id(),
                 'event_id' => $event->id,
                 'total_amount' => $totalAmount,
@@ -147,7 +160,7 @@ class TicketOrderController extends Controller
             foreach ($ticketDetails as $detail) {
                 foreach ($detail['attendees'] as $attendee) {
                     $seatId = null;
-                    if (!empty($validated['seats'])) {
+                    if (! empty($validated['seats'])) {
                         $seatId = $validated['seats'][$seatIndex] ?? null;
                         $seatIndex++;
                     }
@@ -172,7 +185,8 @@ class TicketOrderController extends Controller
             return redirect()->route('ticket-orders.payment', $order);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to create order: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to create order: '.$e->getMessage());
         }
     }
 
@@ -201,10 +215,39 @@ class TicketOrderController extends Controller
             return redirect()->route('ticket-orders.confirmation', $order);
         }
 
-        $order->load(['event', 'eventTickets']);
+        $order->load(['event', 'eventTickets.ticketPackage']);
+
+        // Transform order data with proper image URLs
+        $orderData = [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'total_amount' => $order->total_amount,
+            'discount_amount' => $order->discount_amount,
+            'currency' => $order->currency,
+            'status' => $order->status,
+            'payment_status' => $order->payment_status,
+            'event' => [
+                'id' => $order->event->id,
+                'title' => $order->event->title,
+                'cover_image' => $order->event->cover_image ? Storage::url($order->event->cover_image) : null,
+                'start_datetime' => $order->event->start_datetime,
+                'venue_name' => $order->event->venue_name,
+                'venue_city' => $order->event->venue_city,
+            ],
+            'eventTickets' => $order->eventTickets->map(function ($ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'attendee_name' => $ticket->attendee_name,
+                    'ticket_package' => [
+                        'name' => $ticket->ticketPackage->name,
+                        'price' => $ticket->ticketPackage->price,
+                    ],
+                ];
+            }),
+        ];
 
         return Inertia::render('Ticketing/Payment', [
-            'order' => $order,
+            'order' => $orderData,
             'paymentMethods' => config('payment.methods'),
         ]);
     }
@@ -237,7 +280,7 @@ class TicketOrderController extends Controller
             // Redirect to payment gateway
             return Inertia::location($paymentIntent['payment_url']);
         } catch (\Exception $e) {
-            return back()->with('error', 'Payment processing failed: ' . $e->getMessage());
+            return back()->with('error', 'Payment processing failed: '.$e->getMessage());
         }
     }
 
@@ -250,8 +293,51 @@ class TicketOrderController extends Controller
 
         $order->load(['event', 'eventTickets.ticketPackage', 'payment']);
 
+        // Transform order data with proper image URLs
+        $orderData = [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'total_amount' => $order->total_amount,
+            'discount_amount' => $order->discount_amount,
+            'currency' => $order->currency,
+            'status' => $order->status,
+            'payment_status' => $order->payment_status,
+            'billing_email' => $order->billing_email,
+            'event' => [
+                'id' => $order->event->id,
+                'title' => $order->event->title,
+                'cover_image' => $order->event->cover_image ? Storage::url($order->event->cover_image) : null,
+                'start_datetime' => $order->event->start_datetime,
+                'end_datetime' => $order->event->end_datetime,
+                'venue_name' => $order->event->venue_name,
+                'venue_address' => $order->event->venue_address,
+                'venue_city' => $order->event->venue_city,
+            ],
+            'eventTickets' => $order->eventTickets->map(function ($ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'ticket_number' => $ticket->ticket_number,
+                    'attendee_name' => $ticket->attendee_name,
+                    'attendee_email' => $ticket->attendee_email,
+                    'status' => $ticket->status,
+                    'qr_code' => $ticket->qr_code,
+                    'ticketPackage' => [
+                        'id' => $ticket->ticketPackage->id,
+                        'name' => $ticket->ticketPackage->name,
+                        'price' => $ticket->ticketPackage->price,
+                    ],
+                ];
+            }),
+            'payment' => $order->payment ? [
+                'id' => $order->payment->id,
+                'payment_method' => $order->payment->payment_method,
+                'status' => $order->payment->status,
+                'paid_at' => $order->payment->paid_at,
+            ] : null,
+        ];
+
         return Inertia::render('Ticketing/Confirmation', [
-            'order' => $order,
+            'order' => $orderData,
         ]);
     }
 
@@ -262,7 +348,7 @@ class TicketOrderController extends Controller
     {
         $this->authorize('update', $order);
 
-        if (!$order->isPending()) {
+        if (! $order->isPending()) {
             return back()->with('error', 'Only pending orders can be cancelled.');
         }
 
@@ -285,7 +371,8 @@ class TicketOrderController extends Controller
             return redirect()->route('my-tickets')->with('success', 'Order cancelled successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to cancel order: '.$e->getMessage());
         }
     }
 
@@ -298,22 +385,63 @@ class TicketOrderController extends Controller
 
         $upcomingTickets = EventTicket::where('user_id', $user->id)
             ->whereIn('status', ['valid', 'used'])
-            ->whereHas('event', fn($q) => $q->where('start_datetime', '>', now()))
+            ->whereHas('event', fn ($q) => $q->where('start_datetime', '>', now()))
             ->with(['event', 'ticketPackage', 'seat.section'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(fn ($ticket) => $this->transformTicket($ticket));
 
         $pastTickets = EventTicket::where('user_id', $user->id)
             ->whereIn('status', ['valid', 'used'])
-            ->whereHas('event', fn($q) => $q->where('start_datetime', '<=', now()))
+            ->whereHas('event', fn ($q) => $q->where('start_datetime', '<=', now()))
             ->with(['event', 'ticketPackage', 'seat.section'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(fn ($ticket) => $this->transformTicket($ticket));
 
         return Inertia::render('Ticketing/MyTickets', [
             'upcomingTickets' => $upcomingTickets,
             'pastTickets' => $pastTickets,
         ]);
+    }
+
+    /**
+     * Transform ticket data with proper image URLs.
+     */
+    private function transformTicket(EventTicket $ticket): array
+    {
+        return [
+            'id' => $ticket->id,
+            'ticket_number' => $ticket->ticket_number,
+            'attendee_name' => $ticket->attendee_name,
+            'attendee_email' => $ticket->attendee_email,
+            'status' => $ticket->status,
+            'qr_code' => $ticket->qr_code,
+            'checked_in_at' => $ticket->checked_in_at,
+            'event' => [
+                'id' => $ticket->event->id,
+                'title' => $ticket->event->title,
+                'slug' => $ticket->event->slug,
+                'cover_image' => $ticket->event->cover_image ? Storage::url($ticket->event->cover_image) : null,
+                'start_datetime' => $ticket->event->start_datetime,
+                'end_datetime' => $ticket->event->end_datetime,
+                'venue_name' => $ticket->event->venue_name,
+                'venue_city' => $ticket->event->venue_city,
+            ],
+            'ticketPackage' => [
+                'id' => $ticket->ticketPackage->id,
+                'name' => $ticket->ticketPackage->name,
+                'price' => $ticket->ticketPackage->price,
+                'currency' => $ticket->ticketPackage->currency,
+            ],
+            'seat' => $ticket->seat ? [
+                'id' => $ticket->seat->id,
+                'seat_number' => $ticket->seat->seat_number,
+                'section' => [
+                    'name' => $ticket->seat->section->name,
+                ],
+            ] : null,
+        ];
     }
 
     /**
@@ -325,9 +453,10 @@ class TicketOrderController extends Controller
 
         try {
             $pdfPath = $this->ticketService->generateTicketPDF($ticket);
+
             return Storage::download($pdfPath);
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to generate ticket: ' . $e->getMessage());
+            return back()->with('error', 'Failed to generate ticket: '.$e->getMessage());
         }
     }
 }

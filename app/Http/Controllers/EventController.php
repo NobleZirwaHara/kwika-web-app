@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\Section;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class EventController extends Controller
@@ -86,14 +86,14 @@ class EventController extends Controller
     {
         $event = Event::with([
             'serviceProvider',
-            'ticketPackages' => fn($q) => $q->orderBy('display_order'),
-            'sections.seats' => fn($q) => $q->orderBy('seat_number'),
+            'ticketPackages' => fn ($q) => $q->orderBy('display_order'),
+            'sections.seats' => fn ($q) => $q->orderBy('seat_number'),
         ])
             ->where('slug', $slug)
             ->firstOrFail();
 
         // Get available ticket count per package
-        $ticketPackages = $event->ticketPackages->map(function ($package) use ($event) {
+        $ticketPackages = $event->ticketPackages->map(function ($package) {
             $soldCount = $package->eventTickets()
                 ->whereIn('status', ['valid', 'used'])
                 ->count();
@@ -147,10 +147,44 @@ class EventController extends Controller
                     ->orWhere('venue_city', $event->venue_city);
             })
             ->limit(4)
-            ->get();
+            ->get()
+            ->map(function ($similarEvent) {
+                return [
+                    'id' => $similarEvent->id,
+                    'title' => $similarEvent->title,
+                    'slug' => $similarEvent->slug,
+                    'cover_image' => $similarEvent->cover_image ? Storage::url($similarEvent->cover_image) : null,
+                    'start_datetime' => $similarEvent->start_datetime,
+                    'venue_city' => $similarEvent->venue_city,
+                ];
+            });
+
+        // Transform main event data
+        $eventData = [
+            'id' => $event->id,
+            'title' => $event->title,
+            'slug' => $event->slug,
+            'description' => $event->description,
+            'cover_image' => $event->cover_image ? Storage::url($event->cover_image) : null,
+            'start_datetime' => $event->start_datetime,
+            'end_datetime' => $event->end_datetime,
+            'venue_name' => $event->venue_name,
+            'venue_address' => $event->venue_address,
+            'venue_city' => $event->venue_city,
+            'category' => $event->category,
+            'type' => $event->type,
+            'max_attendees' => $event->max_attendees,
+            'registered_count' => $event->registered_count,
+            'requires_seating' => $event->requires_seating,
+            'service_provider' => [
+                'id' => $event->serviceProvider->id,
+                'business_name' => $event->serviceProvider->business_name,
+                'logo' => $event->serviceProvider->logo ? Storage::url($event->serviceProvider->logo) : null,
+            ],
+        ];
 
         return Inertia::render('Ticketing/EventDetail', [
-            'event' => $event,
+            'event' => $eventData,
             'ticketPackages' => $ticketPackages,
             'seatingData' => $seatingData,
             'similarEvents' => $similarEvents,
@@ -190,7 +224,7 @@ class EventController extends Controller
      */
     public function seating(Event $event)
     {
-        if (!$event->requires_seating) {
+        if (! $event->requires_seating) {
             return response()->json(['message' => 'Event does not require seating'], 400);
         }
 
