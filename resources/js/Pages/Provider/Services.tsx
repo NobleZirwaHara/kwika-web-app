@@ -37,6 +37,7 @@ interface Service {
   currency: string
   duration: number | null
   max_attendees: number | null
+  minimum_quantity: number
   category_name: string
   is_active: boolean
   bookings_count: number
@@ -96,6 +97,7 @@ export default function Services({ provider, services, categories }: Props) {
     max_price: '',
     duration: '',
     max_attendees: '',
+    minimum_quantity: '',
     inclusions: [''],
     is_active: true,
   })
@@ -140,6 +142,7 @@ export default function Services({ provider, services, categories }: Props) {
       max_price: service.max_price?.toString() || '',
       duration: service.duration?.toString() || '',
       max_attendees: service.max_attendees?.toString() || '',
+      minimum_quantity: service.minimum_quantity > 1 ? service.minimum_quantity.toString() : '',
       inclusions: [''],
       is_active: service.is_active,
     })
@@ -227,6 +230,7 @@ export default function Services({ provider, services, categories }: Props) {
     if (data.max_price) formData.append('max_price', data.max_price)
     if (data.duration) formData.append('duration', data.duration)
     if (data.max_attendees) formData.append('max_attendees', data.max_attendees)
+    if (data.minimum_quantity) formData.append('minimum_quantity', data.minimum_quantity)
     formData.append('is_active', data.is_active ? '1' : '0')
 
     // Append image files
@@ -592,6 +596,25 @@ export default function Services({ provider, services, categories }: Props) {
                   placeholder="100"
                 />
               </div>
+            </div>
+
+            {/* Minimum Quantity */}
+            <div className="space-y-2">
+              <Label htmlFor="minimum_quantity">Minimum Quantity</Label>
+              <Input
+                id="minimum_quantity"
+                type="number"
+                value={data.minimum_quantity}
+                onChange={(e) => setData('minimum_quantity', e.target.value)}
+                placeholder="1"
+                min="1"
+              />
+              <p className="text-xs text-muted-foreground">
+                Set the minimum quantity customers must order. Leave empty for no minimum (defaults to 1).
+              </p>
+              {errors.minimum_quantity && (
+                <p className="text-sm text-destructive">{errors.minimum_quantity}</p>
+              )}
             </div>
 
             {/* Image Uploads */}

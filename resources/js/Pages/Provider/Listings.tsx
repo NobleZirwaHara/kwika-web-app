@@ -37,6 +37,7 @@ interface Service {
   currency: string
   duration: number | null
   max_attendees: number | null
+  minimum_quantity: number
   category_name: string
   is_active: boolean
   bookings_count: number
@@ -147,6 +148,7 @@ export default function Listings({ provider, services = [], products = [], categ
     max_price: '',
     duration: '',
     max_attendees: '',
+    minimum_quantity: '',
     is_active: true,
   })
 
@@ -210,6 +212,7 @@ export default function Listings({ provider, services = [], products = [], categ
       max_price: service.max_price?.toString() || '',
       duration: service.duration?.toString() || '',
       max_attendees: service.max_attendees?.toString() || '',
+      minimum_quantity: service.minimum_quantity > 1 ? service.minimum_quantity.toString() : '',
       is_active: service.is_active,
     })
     setServicePrimaryImage(null)
@@ -289,6 +292,7 @@ export default function Listings({ provider, services = [], products = [], categ
     if (serviceData.max_price) formData.append('max_price', serviceData.max_price)
     if (serviceData.duration) formData.append('duration', serviceData.duration)
     if (serviceData.max_attendees) formData.append('max_attendees', serviceData.max_attendees)
+    if (serviceData.minimum_quantity) formData.append('minimum_quantity', serviceData.minimum_quantity)
     formData.append('is_active', serviceData.is_active ? '1' : '0')
 
     if (servicePrimaryImage) {
@@ -927,6 +931,25 @@ export default function Listings({ provider, services = [], products = [], categ
                   placeholder="100"
                 />
               </div>
+            </div>
+
+            {/* Minimum Quantity */}
+            <div className="space-y-2">
+              <Label htmlFor="minimum-quantity">Minimum Quantity</Label>
+              <Input
+                id="minimum-quantity"
+                type="number"
+                value={serviceData.minimum_quantity}
+                onChange={(e) => setServiceData('minimum_quantity', e.target.value)}
+                placeholder="1"
+                min="1"
+              />
+              <p className="text-xs text-muted-foreground">
+                Set the minimum quantity customers must order. Leave empty for no minimum (defaults to 1).
+              </p>
+              {serviceErrors.minimum_quantity && (
+                <p className="text-sm text-destructive">{serviceErrors.minimum_quantity}</p>
+              )}
             </div>
 
             {/* Image Uploads */}

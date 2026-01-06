@@ -12,7 +12,7 @@ class Service extends Model
 
     protected $fillable = [
         'service_provider_id', 'service_category_id', 'catalogue_id', 'name', 'slug', 'description',
-        'base_price', 'price_type', 'max_price', 'currency', 'duration', 'max_attendees',
+        'base_price', 'price_type', 'max_price', 'currency', 'duration', 'max_attendees', 'minimum_quantity',
         'inclusions', 'requirements', 'primary_image', 'gallery_images', 'is_active', 'requires_deposit',
         'deposit_percentage', 'cancellation_hours',
     ];
@@ -23,6 +23,7 @@ class Service extends Model
             'base_price' => 'decimal:2',
             'max_price' => 'decimal:2',
             'deposit_percentage' => 'decimal:2',
+            'minimum_quantity' => 'integer',
             'inclusions' => 'array',
             'requirements' => 'array',
             'gallery_images' => 'array',
@@ -84,8 +85,9 @@ class Service extends Model
     public function getFormattedPrice(): string
     {
         if ($this->price_type === 'custom' && $this->max_price) {
-            return "{$this->currency} " . number_format($this->base_price, 2, '.', ',') . " - " . number_format($this->max_price, 2, '.', ',');
+            return "{$this->currency} ".number_format($this->base_price, 2, '.', ',').' - '.number_format($this->max_price, 2, '.', ',');
         }
-        return "{$this->currency} " . number_format($this->base_price, 2, '.', ',') . " per " . $this->price_type;
+
+        return "{$this->currency} ".number_format($this->base_price, 2, '.', ',').' per '.$this->price_type;
     }
 }
