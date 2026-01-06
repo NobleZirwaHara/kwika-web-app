@@ -74,25 +74,13 @@ export default function MobileNavTabs() {
   const activeTab = getActiveTab()
 
   return (
+    <>
     <div className="md:hidden bg-white dark:bg-background sticky top-0 z-50 shadow-sm">
       <div className="px-6 pt-5 pb-0">
-        {/* Logo and Cart */}
-        <div className="relative flex items-center justify-center mb-5">
-          {/* Logo - Centered */}
+        {/* Logo - Centered */}
+        <div className="flex items-center justify-center mb-5">
           <Link href="/">
             <img src="/kwika-logo.png" alt="Kwika" className="h-14" />
-          </Link>
-
-          {/* Cart Icon - Absolute Right */}
-          <Link href="/cart" className="absolute right-0 top-1/2 -translate-y-1/2">
-            <Button variant="outline" size="icon" className="rounded-full h-12 w-12 shadow-md">
-              <ShoppingCart className="h-5 w-5" />
-              {cart.total_items > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                  {cart.total_items > 99 ? '99+' : cart.total_items}
-                </span>
-              )}
-            </Button>
           </Link>
         </div>
 
@@ -156,5 +144,27 @@ export default function MobileNavTabs() {
         </div>
       </div>
     </div>
+
+    {/* Floating Cart Button - positioned above bottom nav */}
+    <Link href="/cart" className="md:hidden fixed bottom-24 right-6 z-50">
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      >
+        <Button
+          size="icon"
+          className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+        >
+          <ShoppingCart className="h-6 w-6" />
+          {cart.total_items > 0 && (
+            <span className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center border-2 border-background">
+              {cart.total_items > 99 ? '99+' : cart.total_items}
+            </span>
+          )}
+        </Button>
+      </motion.div>
+    </Link>
+    </>
   )
 }
