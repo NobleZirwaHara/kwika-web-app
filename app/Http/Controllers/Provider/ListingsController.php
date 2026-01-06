@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceCategory;
 use App\Models\Catalogue;
+use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -18,7 +18,7 @@ class ListingsController extends Controller
     {
         $provider = Auth::user()->serviceProvider;
 
-        if (!$provider) {
+        if (! $provider) {
             return redirect()->route('home')->withErrors(['error' => 'Provider profile not found']);
         }
 
@@ -39,6 +39,7 @@ class ListingsController extends Controller
                     'currency' => $service->currency,
                     'duration' => $service->duration,
                     'max_attendees' => $service->max_attendees,
+                    'minimum_quantity' => $service->minimum_quantity ?? 1,
                     'category_name' => $service->category->name,
                     'is_active' => $service->is_active,
                     'bookings_count' => $service->bookings_count,
