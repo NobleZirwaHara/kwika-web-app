@@ -1,8 +1,9 @@
+Fix ticket pages image referencing
 Allows Provider to have multiple bookings 
 -Specify number of bookings allowed per day and time
 Ticket Experience full module - end to end
-Provider checklist
 Recently Viewed
+Providers near you
 
 Check on wishlist functionality and implementation
 Restyle onboarding
