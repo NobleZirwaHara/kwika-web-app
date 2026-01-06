@@ -104,3 +104,15 @@ export function formatTime(date: string | Date | null | undefined): string {
 
   return `${hours}:${minutes}`
 }
+
+/**
+ * Get the full URL for a storage file
+ * @param path - The file path (can be null, undefined, full URL, or relative path)
+ * @param fallback - Optional fallback image path (default: '/placeholder.jpg')
+ * @returns Full URL to the image
+ */
+export function getStorageUrl(path: string | null | undefined, fallback: string = '/placeholder.jpg'): string {
+  if (!path) return fallback
+  if (path.startsWith('http')) return path
+  return `/storage/${path}`
+}

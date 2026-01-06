@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { SEO, createEventSchema } from '@/components/seo'
-import { formatDate, formatPrice, formatTime } from '@/lib/utils'
+import { formatDate, formatPrice, formatTime, getStorageUrl } from '@/lib/utils'
 
 interface TicketPackage {
   id: number
@@ -121,7 +121,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
         {/* Hero Section */}
         <div className="relative h-[400px] lg:h-[500px]">
           <img
-            src={event.cover_image || '/placeholder-event.jpg'}
+            src={getStorageUrl(event.cover_image)}
             alt={event.title}
             className="w-full h-full object-cover"
           />
@@ -207,7 +207,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
                 <h2 className="text-2xl font-bold mb-4">Organized By</h2>
                 <div className="flex items-center gap-4">
                   <img
-                    src={event.service_provider.logo || '/placeholder-logo.jpg'}
+                    src={getStorageUrl(event.service_provider.logo, '/placeholder-user.jpg')}
                     alt={event.service_provider.business_name}
                     className="w-16 h-16 rounded-full object-cover"
                   />
@@ -344,7 +344,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
                   >
                     <div className="bg-card rounded-lg border overflow-hidden hover:shadow-lg transition-shadow">
                       <img
-                        src={similarEvent.cover_image || '/placeholder-event.jpg'}
+                        src={getStorageUrl(similarEvent.cover_image)}
                         alt={similarEvent.title}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
                       />

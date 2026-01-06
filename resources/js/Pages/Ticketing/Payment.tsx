@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 import { CreditCard, Smartphone, Building2, Loader2, Calendar, MapPin, Ticket } from 'lucide-react'
-import { formatDate, formatTime } from '@/lib/utils'
+import { formatDate, formatTime, getStorageUrl } from '@/lib/utils'
 
 interface TicketOrder {
   id: number
@@ -184,7 +184,7 @@ export default function Payment({ order, paymentMethods }: Props) {
                 {/* Event Info */}
                 <div className="bg-card rounded-lg border overflow-hidden">
                   <img
-                    src={order.event.cover_image || '/placeholder-event.jpg'}
+                    src={getStorageUrl(order.event.cover_image)}
                     alt={order.event.title}
                     className="w-full h-32 object-cover"
                   />

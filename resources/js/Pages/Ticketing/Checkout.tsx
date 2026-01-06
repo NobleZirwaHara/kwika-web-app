@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react'
-import { formatDate, formatPrice } from '@/lib/utils'
+import { formatDate, formatPrice, getStorageUrl } from '@/lib/utils'
 
 interface TicketPackage {
   id: number
@@ -256,7 +256,7 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
                     {/* Event Info */}
                     <div className="space-y-3">
                       <img
-                        src={event.cover_image || '/placeholder-event.jpg'}
+                        src={getStorageUrl(event.cover_image)}
                         alt={event.title}
                         className="w-full h-32 object-cover rounded-lg"
                       />

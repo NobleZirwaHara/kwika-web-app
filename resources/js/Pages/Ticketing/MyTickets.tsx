@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, MapPin, Ticket, Download, QrCode, CheckCircle2 } from 'lucide-react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getStorageUrl } from '@/lib/utils'
 import { useState } from 'react'
 import {
   Dialog,
@@ -62,7 +62,7 @@ export default function MyTickets({ upcomingTickets, pastTickets }: Props) {
           {/* Event Image */}
           <div className="md:col-span-1 relative">
             <img
-              src={ticket.event.cover_image || '/placeholder-event.jpg'}
+              src={getStorageUrl(ticket.event.cover_image)}
               alt={ticket.event.title}
               className="w-full h-full min-h-[200px] object-cover"
             />

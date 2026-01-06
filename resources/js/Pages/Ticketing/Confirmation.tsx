@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Calendar, MapPin, Ticket, Download, Mail, Share2 } from 'lucide-react'
-import { formatDate, formatTime } from '@/lib/utils'
+import { formatDate, formatTime, getStorageUrl } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
 interface TicketOrder {
@@ -130,7 +130,7 @@ export default function Confirmation({ order }: Props) {
             <div className="grid md:grid-cols-3">
               <div className="md:col-span-1">
                 <img
-                  src={order.event.cover_image || '/placeholder-event.jpg'}
+                  src={getStorageUrl(order.event.cover_image)}
                   alt={order.event.title}
                   className="w-full h-full object-cover"
                 />
