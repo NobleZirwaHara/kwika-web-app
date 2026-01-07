@@ -5,9 +5,6 @@ import { Badge } from '@/components/ui/badge'
 import {
   Heart,
   Plus,
-  Store,
-  Package,
-  Briefcase,
   ChevronRight,
   AlertCircle,
 } from 'lucide-react'
@@ -204,26 +201,23 @@ export default function WishlistIndex({ wishlists: initialWishlists, isGuest, ca
                     <CardContent className="pt-0">
                       {/* Item counts */}
                       <div className="grid grid-cols-3 gap-3 mb-4">
-                        <div className="text-center p-2 rounded-lg bg-blue-50">
-                          <Store className="h-4 w-4 mx-auto text-blue-600 mb-1" />
-                          <div className="text-lg font-bold text-blue-700">
+                        <div className="text-center p-2 rounded-lg bg-primary/10">
+                          <div className="text-lg font-bold text-primary">
                             {wishlist.provider_count}
                           </div>
-                          <div className="text-xs text-blue-600">Providers</div>
+                          <div className="text-xs text-muted-foreground">Providers</div>
                         </div>
-                        <div className="text-center p-2 rounded-lg bg-purple-50">
-                          <Package className="h-4 w-4 mx-auto text-purple-600 mb-1" />
-                          <div className="text-lg font-bold text-purple-700">
+                        <div className="text-center p-2 rounded-lg bg-primary/10">
+                          <div className="text-lg font-bold text-primary">
                             {wishlist.package_count + (wishlist.custom_package_count || 0)}
                           </div>
-                          <div className="text-xs text-purple-600">Packages</div>
+                          <div className="text-xs text-muted-foreground">Packages</div>
                         </div>
-                        <div className="text-center p-2 rounded-lg bg-green-50">
-                          <Briefcase className="h-4 w-4 mx-auto text-green-600 mb-1" />
-                          <div className="text-lg font-bold text-green-700">
+                        <div className="text-center p-2 rounded-lg bg-primary/10">
+                          <div className="text-lg font-bold text-primary">
                             {wishlist.service_count}
                           </div>
-                          <div className="text-xs text-green-600">Services</div>
+                          <div className="text-xs text-muted-foreground">Services</div>
                         </div>
                       </div>
 

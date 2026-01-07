@@ -360,14 +360,14 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
 
           {/* Package Total Summary */}
           {wishlist.package_count > 0 && (
-            <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <Card className="mb-6 bg-primary/5 border-primary/20">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-purple-600" />
+                    <Package className="h-5 w-5 text-primary" />
                     <span className="font-medium">Package Total</span>
                   </div>
-                  <span className="text-2xl font-bold text-purple-700">
+                  <span className="text-2xl font-bold text-primary">
                     {wishlist.formatted_total}
                   </span>
                 </div>
@@ -495,11 +495,11 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                   <div className="space-y-4">
                     {/* Request All Packages Button */}
                     {getBookablePackagesCount() > 0 && (
-                      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+                      <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                              <Send className="h-5 w-5 text-purple-600" />
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Send className="h-5 w-5 text-primary" />
                             </div>
                             <div>
                               <p className="font-medium">Request All Packages</p>
@@ -511,7 +511,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                           {isGuest ? (
                             <Button
                               asChild
-                              className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                              className="whitespace-nowrap"
                             >
                               <Link href="/login">
                                 <Send className="h-4 w-4 mr-2" />
@@ -521,7 +521,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                           ) : (
                             <Button
                               onClick={() => openBulkBookingDialog('packages')}
-                              className="bg-purple-600 hover:bg-purple-700 whitespace-nowrap"
+                              className="whitespace-nowrap"
                             >
                               <Send className="h-4 w-4 mr-2" />
                               Request All
@@ -669,11 +669,11 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                   <div className="space-y-4">
                     {/* Request All Services Button */}
                     {getBookableServicesCount() > 0 && (
-                      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                      <Card className="bg-primary/5 border-primary/20">
                         <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                              <Send className="h-5 w-5 text-blue-600" />
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Send className="h-5 w-5 text-primary" />
                             </div>
                             <div>
                               <p className="font-medium">Request All Services</p>
@@ -685,7 +685,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                           {isGuest ? (
                             <Button
                               asChild
-                              className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                              className="whitespace-nowrap"
                             >
                               <Link href="/login">
                                 <Send className="h-4 w-4 mr-2" />
@@ -695,7 +695,7 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
                           ) : (
                             <Button
                               onClick={() => openBulkBookingDialog('services')}
-                              className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                              className="whitespace-nowrap"
                             >
                               <Send className="h-4 w-4 mr-2" />
                               Request All
@@ -976,7 +976,6 @@ export default function WishlistShow({ wishlist, isGuest, categories = [], auth 
               <Button
                 type="submit"
                 disabled={bulkBookingForm.processing}
-                className={bulkBookingType === 'packages' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'}
               >
                 {bulkBookingForm.processing ? (
                   <>
