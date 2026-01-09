@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
-import { Users, TrendingUp, Shield, Zap, Building2, Home, Play } from 'lucide-react'
+import { Users, TrendingUp, Shield, Zap, Building2, Calendar, Play } from 'lucide-react'
 
 export default function Welcome() {
   const benefits = [
@@ -86,25 +86,28 @@ export default function Welcome() {
                 <div className="lg:col-span-5">
                   <div className="bg-card/95 backdrop-blur border rounded-2xl p-6 sm:p-8 shadow-lg">
                     <h2 className="text-xl font-semibold mb-4">What would you like to list?</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                       <Link href="/onboarding/step1" className="cursor-pointer">
                         <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
-                          <Building2 className="h-5 w-5 text-primary" />
+                          <div className="flex -space-x-1">
+                            <Building2 className="h-5 w-5 text-primary" />
+                            <Calendar className="h-5 w-5 text-primary" />
+                          </div>
                           <div className="text-left">
-                            <p className="font-medium">Event Services</p>
-                            <p className="text-xs text-muted-foreground">Vendors, DJs, decor, etc.</p>
+                            <p className="font-medium">Both Services & Events</p>
+                            <p className="text-xs text-muted-foreground">Offer services and host events</p>
                           </div>
                         </Button>
                       </Link>
-                      <a href="#" onClick={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Link href="/onboarding/step1" className="cursor-pointer">
                         <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
-                          <Home className="h-5 w-5 text-primary" />
+                          <Calendar className="h-5 w-5 text-primary" />
                           <div className="text-left">
-                            <p className="font-medium">Venues</p>
-                            <p className="text-xs text-muted-foreground">Coming soon</p>
+                            <p className="font-medium">Just Events</p>
+                            <p className="text-xs text-muted-foreground">Host and sell tickets to events</p>
                           </div>
                         </Button>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
