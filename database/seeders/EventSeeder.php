@@ -2,19 +2,19 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Event;
-use App\Models\TicketPackage;
 use App\Models\ServiceProvider;
+use App\Models\TicketPackage;
 use App\Models\User;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Database\Seeders\Traits\UploadsSeederImages;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class EventSeeder extends Seeder
 {
     use UploadsSeederImages;
+
     /**
      * Run the database seeds.
      */
@@ -30,6 +30,9 @@ class EventSeeder extends Seeder
             ]
         );
 
+        // Upload kwika logo for the organizer
+        $logoPath = $this->uploadImage('/kwika-logo.png', 'providers/logos');
+
         $provider = ServiceProvider::firstOrCreate(
             ['user_id' => $user->id],
             [
@@ -41,6 +44,7 @@ class EventSeeder extends Seeder
                 'location' => 'Lilongwe',
                 'city' => 'Lilongwe',
                 'verification_status' => 'approved',
+                'logo' => $logoPath,
             ]
         );
 
@@ -206,12 +210,12 @@ class EventSeeder extends Seeder
             unset($eventData['packages']);
 
             // Upload cover image to storage
-            if (!empty($eventData['cover_image'])) {
+            if (! empty($eventData['cover_image'])) {
                 $eventData['cover_image'] = $this->uploadImage($eventData['cover_image'], 'events/covers');
             }
 
             // Generate slug
-            $slug = Str::slug($eventData['title']) . '-' . Str::random(6);
+            $slug = Str::slug($eventData['title']).'-'.Str::random(6);
 
             $event = Event::create(array_merge($eventData, [
                 'service_provider_id' => $provider->id,
@@ -229,23 +233,23 @@ class EventSeeder extends Seeder
                 TicketPackage::create([
                     'event_id' => $event->id,
                     'name' => $package['name'],
-                    'description' => 'Access to ' . strtolower($package['name']) . ' area',
+                    'description' => 'Access to '.strtolower($package['name']).' area',
                     'price' => $package['price'],
                     'currency' => 'MWK',
                     'quantity_available' => $package['quantity'],
-                    'quantity_sold' => rand(0, (int)($package['quantity'] * 0.3)),
+                    'quantity_sold' => rand(0, (int) ($package['quantity'] * 0.3)),
                     'min_per_order' => 1,
                     'max_per_order' => 10,
                     'is_active' => true,
                     'display_order' => $index,
                     'features' => json_encode([
                         'Event access',
-                        $package['name'] . ' seating area',
+                        $package['name'].' seating area',
                     ]),
                 ]);
             }
         }
 
-        $this->command->info('✅ Created ' . count($events) . ' sample events with ticket packages!');
+        $this->command->info('✅ Created '.count($events).' sample events with ticket packages!');
     }
 }

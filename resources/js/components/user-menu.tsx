@@ -80,85 +80,35 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                 </div>
               </Link>
 
-              {isProvider ? (
-                <Link href="/provider/bookings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5" />
-                    <span className="font-medium">Bookings</span>
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/bookings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5" />
-                    <span className="font-medium">My Bookings</span>
-                  </div>
-                </Link>
-              )}
+              <Link href="/user/bookings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5" />
+                  <span className="font-medium">My Bookings</span>
+                </div>
+              </Link>
 
-              {isProvider ? (
-                <Link href="/provider/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="h-5 w-5" />
-                    <span className="font-medium">Messages</span>
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/user/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="h-5 w-5" />
-                    <span className="font-medium">Messages</span>
-                  </div>
-                </Link>
-              )}
+              <Link href="/user/messages" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="font-medium">Messages</span>
+                </div>
+              </Link>
 
-              {isAdmin ? (
-                <Link href="/admin/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <UserCircle className="h-5 w-5" />
-                    <span className="font-medium">Profile</span>
-                  </div>
-                </Link>
-              ) : isProvider ? (
-                <Link href="/provider/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <UserCircle className="h-5 w-5" />
-                    <span className="font-medium">Profile</span>
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/profile" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <UserCircle className="h-5 w-5" />
-                    <span className="font-medium">Profile</span>
-                  </div>
-                </Link>
-              )}
+              <Link href="/profile" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <UserCircle className="h-5 w-5" />
+                  <span className="font-medium">Profile</span>
+                </div>
+              </Link>
 
               <div className="border-t border-border my-2"></div>
 
-              {isAdmin ? (
-                <Link href="/admin/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">Account settings</span>
-                  </div>
-                </Link>
-              ) : isProvider ? (
-                <Link href="/provider/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">Account settings</span>
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/settings" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">Account settings</span>
-                  </div>
-                </Link>
-              )}
+              <Link href="user/profile" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <Settings className="h-5 w-5" />
+                  <span className="font-medium">Account settings</span>
+                </div>
+              </Link>
 
               {/* <Link href="/settings/language" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
