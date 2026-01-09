@@ -4,7 +4,7 @@ import WizardLayout from '@/components/WizardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Mail, Phone, Lock, IdCard } from 'lucide-react'
+import { User, Mail, Phone, Lock, IdCard, CheckCircle } from 'lucide-react'
 
 interface Props {
   user?: {
@@ -15,6 +15,8 @@ interface Props {
 }
 
 export default function Step1PersonalDetails({ user }: Props) {
+  const isExistingUser = !!user
+
   const { data, setData, post, processing, errors } = useForm({
     name: user?.name || '',
     email: user?.email || '',
@@ -32,10 +34,22 @@ export default function Step1PersonalDetails({ user }: Props) {
   return (
     <WizardLayout
       currentStep={1}
-      title="Create Your Provider Account"
-      description="Let's start with your personal information"
+      title={isExistingUser ? "Become a Provider" : "Create Your Provider Account"}
+      description={isExistingUser ? "We'll use your existing account details" : "Let's start with your personal information"}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Existing User Notice */}
+        {isExistingUser && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-sm">Continuing with your existing account</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                You're signed in as <span className="font-medium">{user?.email}</span>. Your account will be upgraded to a provider account.
+              </p>
+            </div>
+          </div>
+        )}
         {/* Full Name */}
         <div className="space-y-2">
           <Label htmlFor="name">
@@ -71,6 +85,7 @@ export default function Step1PersonalDetails({ user }: Props) {
               placeholder="your.email@example.com"
               className="pl-10"
               required
+              disabled={isExistingUser}
             />
           </div>
           {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
@@ -115,50 +130,54 @@ export default function Step1PersonalDetails({ user }: Props) {
           {errors.national_id && <p className="text-sm text-destructive">{errors.national_id}</p>}
         </div>
 
-        {/* Password */}
-        <div className="space-y-2">
-          <Label htmlFor="password">
-            Password <span className="text-destructive">*</span>
-          </Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="password"
-              type="password"
-              value={data.password}
-              onChange={(e) => setData('password', e.target.value)}
-              placeholder="Create a strong password"
-              className="pl-10"
-              required
-            />
-          </div>
-          {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-          <p className="text-xs text-muted-foreground">
-            Must be at least 8 characters with a mix of letters, numbers & symbols
-          </p>
-        </div>
+        {/* Password - only for new users */}
+        {!isExistingUser && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                Password <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={data.password}
+                  onChange={(e) => setData('password', e.target.value)}
+                  placeholder="Create a strong password"
+                  className="pl-10"
+                  required
+                />
+              </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+              <p className="text-xs text-muted-foreground">
+                Must be at least 8 characters with a mix of letters, numbers & symbols
+              </p>
+            </div>
 
-        {/* Confirm Password */}
-        <div className="space-y-2">
-          <Label htmlFor="password_confirmation">
-            Confirm Password <span className="text-destructive">*</span>
-          </Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="password_confirmation"
-              type="password"
-              value={data.password_confirmation}
-              onChange={(e) => setData('password_confirmation', e.target.value)}
-              placeholder="Confirm your password"
-              className="pl-10"
-              required
-            />
-          </div>
-          {errors.password_confirmation && (
-            <p className="text-sm text-destructive">{errors.password_confirmation}</p>
-          )}
-        </div>
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password_confirmation">
+                Confirm Password <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password_confirmation"
+                  type="password"
+                  value={data.password_confirmation}
+                  onChange={(e) => setData('password_confirmation', e.target.value)}
+                  placeholder="Confirm your password"
+                  className="pl-10"
+                  required
+                />
+              </div>
+              {errors.password_confirmation && (
+                <p className="text-sm text-destructive">{errors.password_confirmation}</p>
+              )}
+            </div>
+          </>
+        )}
 
         {/* General Errors */}
         {errors.error && (
@@ -182,17 +201,19 @@ export default function Step1PersonalDetails({ user }: Props) {
             className="flex-1"
             disabled={processing}
           >
-            {processing ? 'Creating Account...' : 'Continue'}
+            {processing ? (isExistingUser ? 'Upgrading Account...' : 'Creating Account...') : 'Continue'}
           </Button>
         </div>
 
-        {/* Already have an account */}
-        <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-          Already have an account?{' '}
-          <a href="/login" className="text-primary hover:underline font-medium cursor-pointer">
-            Sign in
-          </a>
-        </div>
+        {/* Already have an account - only for new users */}
+        {!isExistingUser && (
+          <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+            Already have an account?{' '}
+            <a href="/login" className="text-primary hover:underline font-medium cursor-pointer">
+              Sign in
+            </a>
+          </div>
+        )}
       </form>
     </WizardLayout>
   )

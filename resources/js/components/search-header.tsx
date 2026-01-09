@@ -20,10 +20,14 @@ interface SearchHeaderProps {
 
 export function SearchHeader({ categories = [], variant = 'search' }: SearchHeaderProps) {
   const { auth } = usePage().props as any
+  const currentUrl = usePage().url || ''
   const user = auth?.user
   const isProvider = auth?.user?.is_provider || false
   const isAdmin = auth?.user?.is_admin || false
   const [isScrolled, setIsScrolled] = useState(false)
+
+  // Check if we're on a ticketing/events page
+  const isTicketingPage = currentUrl.startsWith('/ticketing') || currentUrl.startsWith('/events')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +65,7 @@ export function SearchHeader({ categories = [], variant = 'search' }: SearchHead
             {!isProvider && !isAdmin && !user && (
               <Link href="/onboarding/welcome" className="cursor-pointer">
                 <Button variant="ghost" className="text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                  Become a provider
+                  {isTicketingPage ? 'Become an organizer' : 'Become a provider'}
                 </Button>
               </Link>
             )}

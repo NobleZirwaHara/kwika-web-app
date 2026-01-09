@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Menu, User, Heart, Calendar, MessageCircle, UserCircle, Settings, Globe, HelpCircle, LogOut, LayoutDashboard } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 
 interface UserMenuProps {
   user?: any
@@ -13,6 +13,10 @@ interface UserMenuProps {
 export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const currentUrl = usePage().url || ''
+
+  // Check if we're on a ticketing/events page
+  const isTicketingPage = currentUrl.startsWith('/ticketing') || currentUrl.startsWith('/events')
 
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {
@@ -192,12 +196,12 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                 <Link href="/onboarding/welcome" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
                   <div className="flex items-start gap-3">
                     <div className="flex-1">
-                      <div className="font-semibold">Become a provider</div>
+                      <div className="font-semibold">{isTicketingPage ? 'Become an organizer' : 'Become a provider'}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">
-                        It's easy to start hosting and earn extra income.
+                        {isTicketingPage ? 'Start hosting events and sell tickets.' : 'It\'s easy to start hosting and earn extra income.'}
                       </div>
                     </div>
-                    <img src="/icons/platter.png" alt="Become a provider" className="w-6 h-6" />
+                    <span className="text-2xl">{isTicketingPage ? '🎫' : '🎉'}</span>
                   </div>
                 </Link>
               ) : null}
@@ -229,12 +233,12 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
               <Link href="/onboarding/welcome" className="block px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer">
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
-                    <div className="font-semibold">Become a provider</div>
+                    <div className="font-semibold">{isTicketingPage ? 'Become an organizer' : 'Become a provider'}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      It's easy to start hosting and earn extra income.
+                      {isTicketingPage ? 'Start hosting events and sell tickets.' : 'It\'s easy to start hosting and earn extra income.'}
                     </div>
                   </div>
-                  <div className="text-2xl">🎉</div>
+                  <span className="text-2xl">{isTicketingPage ? '🎫' : '🎉'}</span>
                 </div>
               </Link>
 

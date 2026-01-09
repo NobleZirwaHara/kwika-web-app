@@ -22,7 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, MoreVertical, Eye, Edit, Trash2, Package, Briefcase, X, DollarSign, Clock } from 'lucide-react'
+import { Plus, MoreVertical, Eye, Edit, Trash2, Package, Briefcase, X, DollarSign, Clock, Calendar } from 'lucide-react'
+import { Link } from '@inertiajs/react'
 import { processCroppedImage, createImagePreview } from '@/lib/imageUtils'
 import { ImageCropperDialog } from '@/components/ImageCropperDialog'
 
@@ -591,6 +592,12 @@ export default function Listings({ provider, services = [], products = [], categ
             </p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/provider/events/create">
+                <Calendar className="h-4 w-4 mr-2" />
+                Add Event
+              </Link>
+            </Button>
             <Button variant="outline" onClick={openCreateProductDialog}>
               <Plus className="h-4 w-4 mr-2" />
               Add Product
@@ -612,7 +619,13 @@ export default function Listings({ provider, services = [], products = [], categ
             <p className="text-muted-foreground mb-6 max-w-md">
               Create your first listing to start getting bookings and orders from customers.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap justify-center">
+              <Button variant="outline" asChild>
+                <Link href="/provider/events/create">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Add Event
+                </Link>
+              </Button>
               <Button variant="outline" onClick={openCreateProductDialog}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product

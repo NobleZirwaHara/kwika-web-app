@@ -55,25 +55,50 @@ class ProviderOnboardingController extends Controller
      */
     public function storeStep1(Request $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'max:20'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
-            'national_id' => ['nullable', 'string', 'max:50'],
-        ]);
+        $existingUser = Auth::user();
+
+        // Different validation rules for existing users vs new users
+        if ($existingUser) {
+            // Existing user - no password required, email can match their own
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'phone' => ['required', 'string', 'max:20'],
+                'national_id' => ['nullable', 'string', 'max:50'],
+            ]);
+        } else {
+            // New user - full validation
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'phone' => ['required', 'string', 'max:20'],
+                'password' => ['required', Password::defaults(), 'confirmed'],
+                'national_id' => ['nullable', 'string', 'max:50'],
+            ]);
+        }
 
         DB::beginTransaction();
         try {
-            // Create user account
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'password' => Hash::make($validated['password']),
-                'role' => 'provider',
-                'national_id' => $validated['national_id'] ?? null,
-            ]);
+            if ($existingUser) {
+                // Upgrade existing user to provider
+                $existingUser->update([
+                    'name' => $validated['name'],
+                    'phone' => $validated['phone'],
+                    'role' => 'provider',
+                    'national_id' => $validated['national_id'] ?? $existingUser->national_id,
+                ]);
+
+                $user = $existingUser;
+            } else {
+                // Create new user account
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'password' => Hash::make($validated['password']),
+                    'role' => 'provider',
+                    'national_id' => $validated['national_id'] ?? null,
+                ]);
+            }
 
             // Create provider record
             $provider = ServiceProvider::create([
@@ -81,7 +106,7 @@ class ProviderOnboardingController extends Controller
                 'business_name' => 'Pending',
                 'slug' => Str::slug($user->name.'-'.$user->id),
                 'phone' => $validated['phone'],
-                'email' => $validated['email'],
+                'email' => $user->email,
                 'location' => 'Pending',
                 'city' => 'Pending',
                 'onboarding_step' => 2,
@@ -92,8 +117,10 @@ class ProviderOnboardingController extends Controller
 
             DB::commit();
 
-            // Log in the user
-            Auth::login($user);
+            // Log in the user (only needed for new users, but harmless for existing)
+            if (! $existingUser) {
+                Auth::login($user);
+            }
 
             return redirect()->route('onboarding.step2');
         } catch (\Exception $e) {
@@ -350,7 +377,7 @@ class ProviderOnboardingController extends Controller
 
         // Sync categories from onboarding_data to pivot table
         $onboardingData = $provider->onboarding_data ?? [];
-        if (isset($onboardingData['category_ids']) && !empty($onboardingData['category_ids'])) {
+        if (isset($onboardingData['category_ids']) && ! empty($onboardingData['category_ids'])) {
             // Validate that all selected categories are subcategories
             $categoryIds = $onboardingData['category_ids'];
             $validCategories = ServiceCategory::whereIn('id', $categoryIds)
@@ -358,7 +385,7 @@ class ProviderOnboardingController extends Controller
                 ->pluck('id')
                 ->toArray();
 
-            if (!empty($validCategories)) {
+            if (! empty($validCategories)) {
                 $provider->categories()->sync($validCategories);
             }
         }

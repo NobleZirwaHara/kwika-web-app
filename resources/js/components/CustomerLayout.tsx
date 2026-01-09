@@ -43,6 +43,9 @@ export default function CustomerLayout({ children, title }: CustomerLayoutProps)
   const { auth } = usePage().props as any
   const user = auth?.user
 
+  // Check if we're on a ticketing/events page
+  const isTicketingPage = currentPath.startsWith('/ticketing') || currentPath.startsWith('/events')
+
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {
     if (!name) return 'U'
@@ -116,7 +119,7 @@ export default function CustomerLayout({ children, title }: CustomerLayoutProps)
                     href="/onboarding/welcome"
                     className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Become a Provider
+                    {isTicketingPage ? 'Become an Organizer' : 'Become a Provider'}
                   </Link>
                 )}
 

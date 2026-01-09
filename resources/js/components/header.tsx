@@ -10,12 +10,16 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/contexts/CartContext"
 
 export function Header() {
-  const { auth } = usePage().props as any
+  const { auth, url } = usePage().props as any
+  const currentUrl = typeof url === 'string' ? url : (usePage().url || '')
   const user = auth?.user
   const isProvider = auth?.user?.is_provider || false
   const isAdmin = auth?.user?.is_admin || false
   const [isScrolled, setIsScrolled] = useState(false)
   const { cart } = useCart()
+
+  // Check if we're on a ticketing/events page
+  const isTicketingPage = currentUrl.startsWith('/ticketing') || currentUrl.startsWith('/events')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +81,7 @@ export function Header() {
               {!isProvider && !isAdmin && !user && (
                 <Link href="/onboarding/welcome" className="cursor-pointer">
                   <Button variant="ghost" className="hidden lg:flex text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                    Become a provider
+                    {isTicketingPage ? 'Become an organizer' : 'Become a provider'}
                   </Button>
                 </Link>
               )}
