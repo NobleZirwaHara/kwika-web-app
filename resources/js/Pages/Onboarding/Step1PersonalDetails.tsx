@@ -12,9 +12,10 @@ interface Props {
     email: string
     phone: string
   } | null
+  providerType?: 'both' | 'events_only'
 }
 
-export default function Step1PersonalDetails({ user }: Props) {
+export default function Step1PersonalDetails({ user, providerType = 'both' }: Props) {
   const isExistingUser = !!user
 
   const { data, setData, post, processing, errors } = useForm({
@@ -24,6 +25,7 @@ export default function Step1PersonalDetails({ user }: Props) {
     password: '',
     password_confirmation: '',
     national_id: '',
+    provider_type: providerType,
   })
 
   function handleSubmit(e: FormEvent) {
@@ -36,6 +38,7 @@ export default function Step1PersonalDetails({ user }: Props) {
       currentStep={1}
       title={isExistingUser ? "Become a Provider" : "Create Your Provider Account"}
       description={isExistingUser ? "We'll use your existing account details" : "Let's start with your personal information"}
+      providerType={providerType}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Existing User Notice */}

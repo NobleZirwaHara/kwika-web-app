@@ -31,9 +31,11 @@ interface Props {
     slug: string
     icon: string | null
   }>
+  providerType?: 'both' | 'events_only'
 }
 
-export default function Step2BusinessInfo({ provider, categories }: Props) {
+export default function Step2BusinessInfo({ provider, categories, providerType = 'both' }: Props) {
+  const isEventsOnly = providerType === 'events_only'
   const { data, setData, post, processing, errors } = useForm({
     business_name: provider.business_name || '',
     description: provider.description || '',
@@ -63,6 +65,7 @@ export default function Step2BusinessInfo({ provider, categories }: Props) {
       currentStep={2}
       title="Business Information"
       description="Tell us about your business"
+      providerType={providerType}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Business Name */}
@@ -295,7 +298,7 @@ export default function Step2BusinessInfo({ provider, categories }: Props) {
             className="flex-1"
             disabled={processing}
           >
-            {processing ? 'Saving...' : 'Continue to Services'}
+            {processing ? 'Saving...' : isEventsOnly ? 'Continue to Branding' : 'Continue to Services'}
           </Button>
         </div>
       </form>

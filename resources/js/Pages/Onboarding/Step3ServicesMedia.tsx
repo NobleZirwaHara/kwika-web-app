@@ -27,9 +27,11 @@ interface Props {
     cover_image: string | null
   }
   categories: Category[]
+  providerType?: 'both' | 'events_only'
 }
 
-export default function Step3ServicesMedia({ provider, categories }: Props) {
+export default function Step3ServicesMedia({ provider, categories, providerType = 'both' }: Props) {
+  const isEventsOnly = providerType === 'events_only'
   const { data, setData, post, processing, errors } = useForm({
     category_ids: [] as number[],
     logo: null as File | null,
@@ -123,9 +125,12 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
     // Create FormData to handle file uploads
     const formData = new FormData()
 
-    data.category_ids.forEach(id => {
-      formData.append('category_ids[]', id.toString())
-    })
+    // Only include categories for 'both' type
+    if (!isEventsOnly) {
+      data.category_ids.forEach(id => {
+        formData.append('category_ids[]', id.toString())
+      })
+    }
 
     if (data.logo) {
       formData.append('logo', data.logo)
@@ -135,9 +140,12 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
       formData.append('cover_image', data.cover_image)
     }
 
-    data.portfolio_images.forEach((file, index) => {
-      formData.append(`portfolio_images[${index}]`, file)
-    })
+    // Only include portfolio images for 'both' type
+    if (!isEventsOnly) {
+      data.portfolio_images.forEach((file, index) => {
+        formData.append(`portfolio_images[${index}]`, file)
+      })
+    }
 
     post('/onboarding/step3', {
       data: formData as any,
@@ -148,11 +156,13 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
   return (
     <WizardLayout
       currentStep={3}
-      title="Services & Media"
-      description="Showcase your services and upload images"
+      title={isEventsOnly ? "Branding" : "Services & Media"}
+      description={isEventsOnly ? "Upload your logo and cover image" : "Showcase your services and upload images"}
+      providerType={providerType}
     >
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Service Categories */}
+        {/* Service Categories - Only for 'both' type */}
+        {!isEventsOnly && (
         <div className="space-y-4">
           <div>
             <Label className="text-lg font-semibold">
@@ -244,6 +254,7 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
           </div>
           {errors.category_ids && <p className="text-sm text-destructive mt-2">{errors.category_ids}</p>}
         </div>
+        )}
 
         {/* Logo Upload */}
         <div className="space-y-4">
@@ -325,7 +336,8 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
           {errors.cover_image && <p className="text-sm text-destructive">{errors.cover_image}</p>}
         </div>
 
-        {/* Portfolio Images */}
+        {/* Portfolio Images - Only for 'both' type */}
+        {!isEventsOnly && (
         <div className="space-y-4">
           <div>
             <Label className="text-lg font-semibold">Portfolio Images</Label>
@@ -368,6 +380,7 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
             <p className="text-sm text-destructive">{errors.portfolio_images}</p>
           )}
         </div>
+        )}
 
         {/* General Errors */}
         {errors.error && (
@@ -389,7 +402,7 @@ export default function Step3ServicesMedia({ provider, categories }: Props) {
           <Button
             type="submit"
             className="flex-1"
-            disabled={processing || data.category_ids.length === 0}
+            disabled={processing || (!isEventsOnly && data.category_ids.length === 0)}
           >
             {processing ? 'Uploading...' : 'Continue to Review'}
           </Button>

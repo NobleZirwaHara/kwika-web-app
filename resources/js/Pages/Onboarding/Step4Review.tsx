@@ -50,9 +50,11 @@ interface Props {
     id: number
     url: string
   }>
+  providerType?: 'both' | 'events_only'
 }
 
-export default function Step4Review({ user, provider, categories, portfolioImages }: Props) {
+export default function Step4Review({ user, provider, categories, portfolioImages, providerType = 'both' }: Props) {
+  const isEventsOnly = providerType === 'events_only'
   const { post, processing } = useForm({})
 
   function handleSubmit(e: FormEvent) {
@@ -65,6 +67,7 @@ export default function Step4Review({ user, provider, categories, portfolioImage
       currentStep={4}
       title="Review Your Information"
       description="Please review and confirm all details before submitting"
+      providerType={providerType}
     >
       <div className="space-y-6">
         {/* Personal Information */}
@@ -231,74 +234,76 @@ export default function Step4Review({ user, provider, categories, portfolioImage
           </div>
         </section>
 
-        {/* Services & Media */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Services & Media</h2>
-            <Link href="/onboarding/step3" className="cursor-pointer">
-              <Button variant="ghost" size="sm" className="cursor-pointer">
-                <Edit2 className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </Link>
-          </div>
-
-          <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Service Categories</p>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Badge key={category.id} variant="secondary" className="px-3 py-1">
-                    {category.name}
-                  </Badge>
-                ))}
-              </div>
+        {/* Services & Media - Only show for 'both' type */}
+        {!isEventsOnly && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Services & Media</h2>
+              <Link href="/onboarding/step3" className="cursor-pointer">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </Link>
             </div>
 
-            {(provider.logo || provider.cover_image) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {provider.logo && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Logo</p>
-                    <img
-                      src={`/storage/${provider.logo}`}
-                      alt="Business logo"
-                      className="h-24 w-24 object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
-                {provider.cover_image && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Cover Image</p>
-                    <img
-                      src={`/storage/${provider.cover_image}`}
-                      alt="Cover"
-                      className="w-full aspect-[3/1] object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {portfolioImages.length > 0 && (
+            <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
               <div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Portfolio Images ({portfolioImages.length})
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {portfolioImages.map((image) => (
-                    <img
-                      key={image.id}
-                      src={image.url}
-                      alt="Portfolio"
-                      className="aspect-square object-cover rounded-lg border"
-                    />
+                <p className="text-sm text-muted-foreground mb-2">Service Categories</p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Badge key={category.id} variant="secondary" className="px-3 py-1">
+                      {category.name}
+                    </Badge>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-        </section>
+
+              {(provider.logo || provider.cover_image) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {provider.logo && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Logo</p>
+                      <img
+                        src={`/storage/${provider.logo}`}
+                        alt="Business logo"
+                        className="h-24 w-24 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                  {provider.cover_image && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Cover Image</p>
+                      <img
+                        src={`/storage/${provider.cover_image}`}
+                        alt="Cover"
+                        className="w-full aspect-[3/1] object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {portfolioImages.length > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Portfolio Images ({portfolioImages.length})
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                    {portfolioImages.map((image) => (
+                      <img
+                        key={image.id}
+                        src={image.url}
+                        alt="Portfolio"
+                        className="aspect-square object-cover rounded-lg border"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Confirmation Notice */}
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">

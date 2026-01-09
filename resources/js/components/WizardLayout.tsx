@@ -15,9 +15,10 @@ interface WizardLayoutProps {
   title: string
   description?: string
   variant?: 'horizontal' | 'sidebar'
+  providerType?: 'both' | 'events_only'
 }
 
-const steps: WizardStep[] = [
+const fullSteps: WizardStep[] = [
   {
     number: 1,
     title: 'Personal Details',
@@ -40,7 +41,34 @@ const steps: WizardStep[] = [
   }
 ]
 
-export default function WizardLayout({ children, currentStep, title, description, variant = 'sidebar' }: WizardLayoutProps) {
+const eventsOnlySteps: WizardStep[] = [
+  {
+    number: 1,
+    title: 'Personal Details',
+    description: 'Create your account'
+  },
+  {
+    number: 2,
+    title: 'Business Information',
+    description: 'Tell us about your business'
+  },
+  {
+    number: 3,
+    title: 'Branding',
+    description: 'Upload your logo & cover'
+  },
+  {
+    number: 4,
+    title: 'Review & Submit',
+    description: 'Confirm your details'
+  }
+]
+
+export default function WizardLayout({ children, currentStep, title, description, variant = 'sidebar', providerType = 'both' }: WizardLayoutProps) {
+  const isEventsOnly = providerType === 'events_only'
+  const steps = isEventsOnly ? eventsOnlySteps : fullSteps
+
+  const displayStep = currentStep
   return (
     <>
       <Head title={title} />
@@ -70,14 +98,14 @@ export default function WizardLayout({ children, currentStep, title, description
                     <div
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
-                        currentStep > step.number
+                        displayStep > step.number
                           ? "border-primary bg-primary text-primary-foreground"
-                          : currentStep === step.number
+                          : displayStep === step.number
                           ? "border-primary bg-background text-primary shadow-lg shadow-primary/20"
                           : "border-muted bg-background text-muted-foreground"
                       )}
                     >
-                      {currentStep > step.number ? (
+                      {displayStep > step.number ? (
                         <CheckCircle2 className="h-5 w-5" />
                       ) : (
                         <span className="text-sm font-semibold">{step.number}</span>
@@ -88,7 +116,7 @@ export default function WizardLayout({ children, currentStep, title, description
                     <div
                       className={cn(
                         "h-0.5 flex-1 mx-2 transition-all",
-                        currentStep > step.number ? "bg-primary" : "bg-muted"
+                        displayStep > step.number ? "bg-primary" : "bg-muted"
                       )}
                     />
                   )}
@@ -114,14 +142,14 @@ export default function WizardLayout({ children, currentStep, title, description
                       <div
                         className={cn(
                           "mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-semibold",
-                          currentStep > step.number
+                          displayStep > step.number
                             ? "border-primary bg-primary text-primary-foreground"
-                            : currentStep === step.number
+                            : displayStep === step.number
                             ? "border-primary bg-background text-primary"
                             : "border-muted bg-background text-muted-foreground"
                         )}
                       >
-                        {currentStep > step.number ? (
+                        {displayStep > step.number ? (
                           <CheckCircle2 className="h-4 w-4" />
                         ) : (
                           <span>{step.number}</span>
@@ -130,7 +158,7 @@ export default function WizardLayout({ children, currentStep, title, description
                       <div>
                         <p className={cn(
                           "text-sm font-medium",
-                          currentStep >= step.number ? "text-foreground" : "text-muted-foreground"
+                          displayStep >= step.number ? "text-foreground" : "text-muted-foreground"
                         )}>{step.title}</p>
                         <p className="text-xs text-muted-foreground">{step.description}</p>
                       </div>
@@ -160,7 +188,7 @@ export default function WizardLayout({ children, currentStep, title, description
 
               {/* Progress Indicator */}
               <div className="mt-6 text-center text-sm text-muted-foreground">
-                Step {currentStep} of {steps.length}
+                Step {displayStep} of {steps.length}
               </div>
             </div>
           </div>

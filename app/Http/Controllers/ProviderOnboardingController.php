@@ -27,7 +27,7 @@ class ProviderOnboardingController extends Controller
     /**
      * Step 1: Personal Details
      */
-    public function step1()
+    public function step1(Request $request)
     {
         $user = Auth::user();
 
@@ -41,12 +41,18 @@ class ProviderOnboardingController extends Controller
             return redirect()->route('onboarding.step', ['step' => $provider->onboarding_step]);
         }
 
+        $providerType = $request->query('type', 'both');
+        if (! in_array($providerType, ['both', 'events_only'])) {
+            $providerType = 'both';
+        }
+
         return Inertia::render('Onboarding/Step1PersonalDetails', [
             'user' => $user ? [
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
             ] : null,
+            'providerType' => $providerType,
         ]);
     }
 
@@ -64,6 +70,7 @@ class ProviderOnboardingController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'string', 'max:20'],
                 'national_id' => ['nullable', 'string', 'max:50'],
+                'provider_type' => ['nullable', 'string', 'in:both,events_only'],
             ]);
         } else {
             // New user - full validation
@@ -73,8 +80,11 @@ class ProviderOnboardingController extends Controller
                 'phone' => ['required', 'string', 'max:20'],
                 'password' => ['required', Password::defaults(), 'confirmed'],
                 'national_id' => ['nullable', 'string', 'max:50'],
+                'provider_type' => ['nullable', 'string', 'in:both,events_only'],
             ]);
         }
+
+        $providerType = $validated['provider_type'] ?? 'both';
 
         DB::beginTransaction();
         try {
@@ -100,7 +110,7 @@ class ProviderOnboardingController extends Controller
                 ]);
             }
 
-            // Create provider record
+            // Create provider record with provider_type in onboarding_data
             $provider = ServiceProvider::create([
                 'user_id' => $user->id,
                 'business_name' => 'Pending',
@@ -113,6 +123,7 @@ class ProviderOnboardingController extends Controller
                 'onboarding_completed' => false,
                 'verification_status' => 'pending',
                 'is_active' => false,
+                'onboarding_data' => ['provider_type' => $providerType],
             ]);
 
             DB::commit();
@@ -148,6 +159,7 @@ class ProviderOnboardingController extends Controller
         }
 
         $categories = ServiceCategory::active()->get(['id', 'name', 'slug', 'icon']);
+        $providerType = $provider->onboarding_data['provider_type'] ?? 'both';
 
         return Inertia::render('Onboarding/Step2BusinessInfo', [
             'provider' => [
@@ -162,6 +174,7 @@ class ProviderOnboardingController extends Controller
                 'social_links' => $provider->social_links ?? [],
             ],
             'categories' => $categories,
+            'providerType' => $providerType,
         ]);
     }
 
@@ -227,7 +240,9 @@ class ProviderOnboardingController extends Controller
             return redirect()->route('onboarding.step2');
         }
 
-        // Get parent categories with their subcategories
+        $providerType = $provider->onboarding_data['provider_type'] ?? 'both';
+
+        // Get parent categories with their subcategories (only needed for 'both' type)
         $parentCategories = ServiceCategory::with('children')
             ->parents()
             ->active()
@@ -254,7 +269,8 @@ class ProviderOnboardingController extends Controller
                 'logo' => $provider->logo,
                 'cover_image' => $provider->cover_image,
             ],
-            'categories' => $parentCategories,
+            'categories' => $providerType === 'events_only' ? [] : $parentCategories,
+            'providerType' => $providerType,
         ]);
     }
 
@@ -265,15 +281,22 @@ class ProviderOnboardingController extends Controller
     {
         $user = Auth::user();
         $provider = $user->serviceProvider;
+        $providerType = $provider->onboarding_data['provider_type'] ?? 'both';
 
-        $validated = $request->validate([
-            'category_ids' => ['required', 'array', 'min:1'],
-            'category_ids.*' => ['exists:service_categories,id'],
+        // Categories are required only for 'both' type, not for events_only
+        $rules = [
             'logo' => ['nullable', 'image', 'max:2048'],
             'cover_image' => ['nullable', 'image', 'max:5120'],
-            'portfolio_images' => ['nullable', 'array', 'max:10'],
-            'portfolio_images.*' => ['image', 'max:5120'],
-        ]);
+        ];
+
+        if ($providerType !== 'events_only') {
+            $rules['category_ids'] = ['required', 'array', 'min:1'];
+            $rules['category_ids.*'] = ['exists:service_categories,id'];
+            $rules['portfolio_images'] = ['nullable', 'array', 'max:10'];
+            $rules['portfolio_images.*'] = ['image', 'max:5120'];
+        }
+
+        $validated = $request->validate($rules);
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
@@ -287,17 +310,19 @@ class ProviderOnboardingController extends Controller
             $provider->cover_image = $coverPath;
         }
 
-        // Store category selection in onboarding_data for now
+        // Store category selection in onboarding_data for 'both' type only
         $onboardingData = $provider->onboarding_data ?? [];
-        $onboardingData['category_ids'] = $validated['category_ids'];
+        if (isset($validated['category_ids'])) {
+            $onboardingData['category_ids'] = $validated['category_ids'];
+        }
 
         $provider->update([
             'onboarding_data' => $onboardingData,
             'onboarding_step' => 4,
         ]);
 
-        // Handle portfolio images if provided
-        if ($request->hasFile('portfolio_images')) {
+        // Handle portfolio images if provided (only for 'both' type)
+        if ($providerType !== 'events_only' && $request->hasFile('portfolio_images')) {
             foreach ($request->file('portfolio_images') as $image) {
                 $path = $image->store('providers/portfolio', 'public');
                 $provider->media()->create([
@@ -326,9 +351,12 @@ class ProviderOnboardingController extends Controller
         }
 
         $provider = $user->serviceProvider;
+        $providerType = $provider->onboarding_data['provider_type'] ?? 'both';
 
-        if (! $provider || $provider->onboarding_step < 4) {
-            return redirect()->route('onboarding.step3');
+        // For events_only, step 4 comes after step 2, so check for step >= 4 or (events_only and step >= 2)
+        $minStep = $providerType === 'events_only' ? 4 : 4;
+        if (! $provider || $provider->onboarding_step < $minStep) {
+            return redirect()->route('onboarding.step2');
         }
 
         $categoryIds = $provider->onboarding_data['category_ids'] ?? [];
@@ -360,6 +388,7 @@ class ProviderOnboardingController extends Controller
                     'url' => Storage::url($media->file_path),
                 ];
             }),
+            'providerType' => $providerType,
         ]);
     }
 

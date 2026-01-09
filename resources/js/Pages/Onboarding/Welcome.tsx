@@ -87,7 +87,7 @@ export default function Welcome() {
                   <div className="bg-card/95 backdrop-blur border rounded-2xl p-6 sm:p-8 shadow-lg">
                     <h2 className="text-xl font-semibold mb-4">What would you like to list?</h2>
                     <div className="grid grid-cols-1 gap-3">
-                      <Link href="/onboarding/step1" className="cursor-pointer">
+                      <Link href="/onboarding/step1?type=both" className="cursor-pointer">
                         <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
                           <div className="flex -space-x-1">
                             <Building2 className="h-5 w-5 text-primary" />
@@ -99,7 +99,7 @@ export default function Welcome() {
                           </div>
                         </Button>
                       </Link>
-                      <Link href="/onboarding/step1" className="cursor-pointer">
+                      <Link href="/onboarding/step1?type=events_only" className="cursor-pointer">
                         <Button variant="outline" className="w-full h-20 justify-start gap-3 hover:bg-primary/10 cursor-pointer hover:text-primary hover:-translate-y-1 transition-all">
                           <Calendar className="h-5 w-5 text-primary" />
                           <div className="text-left">

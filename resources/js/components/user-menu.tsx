@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Menu, User, Heart, Calendar, MessageCircle, UserCircle, Settings, Globe, HelpCircle, LogOut, LayoutDashboard } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
+import { Menu, User, Heart, Calendar, MessageCircle, UserCircle, Settings, Globe, HelpCircle, LogOut, LayoutDashboard, Ticket } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
 import { Link, usePage } from "@inertiajs/react"
 
 interface UserMenuProps {
@@ -201,7 +201,11 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                         {isTicketingPage ? 'Start hosting events and sell tickets.' : 'It\'s easy to start hosting and earn extra income.'}
                       </div>
                     </div>
-                    <span className="text-2xl">{isTicketingPage ? '🎫' : '🎉'}</span>
+                    {isTicketingPage ? (
+                      <Ticket className="w-8 h-8 text-primary" />
+                    ) : (
+                      <img src="/icons/platter.png" alt="" className="w-8 h-8 object-contain" />
+                    )}
                   </div>
                 </Link>
               ) : null}
@@ -238,7 +242,11 @@ export function UserMenu({ user, isProvider = false, isAdmin = false }: UserMenu
                       {isTicketingPage ? 'Start hosting events and sell tickets.' : 'It\'s easy to start hosting and earn extra income.'}
                     </div>
                   </div>
-                  <span className="text-2xl">{isTicketingPage ? '🎫' : '🎉'}</span>
+                  {isTicketingPage ? (
+                    <Ticket className="w-8 h-8 text-primary" />
+                  ) : (
+                    <img src="/icons/platter.png" alt="" className="w-8 h-8 object-contain" />
+                  )}
                 </div>
               </Link>
 
