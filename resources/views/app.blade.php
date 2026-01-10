@@ -43,6 +43,14 @@
         <meta name="theme-color" content="#7c3aed">
         <meta name="msapplication-TileColor" content="#7c3aed">
 
+        {{-- PWA Meta Tags --}}
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="Kwika Events">
+        <meta name="application-name" content="Kwika Events">
+        <meta name="format-detection" content="telephone=no">
+
         {{-- Favicon --}}
         <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('favicon/apple-icon-57x57.png') }}">
         <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('favicon/apple-icon-60x60.png') }}">

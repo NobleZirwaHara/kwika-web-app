@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Api\PushNotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,5 +26,15 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/{conversationId}/read', [MessageController::class, 'markAsRead'])->name('read');
         Route::post('/{conversationId}/upload', [MessageController::class, 'uploadFile'])->name('upload');
         Route::post('/{conversationId}/typing', [MessageController::class, 'typing'])->name('typing');
+    });
+
+    // Push Notification API routes
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::post('/subscribe', [PushNotificationController::class, 'subscribe'])->name('subscribe');
+        Route::post('/unsubscribe', [PushNotificationController::class, 'unsubscribe'])->name('unsubscribe');
+        Route::post('/preferences', [PushNotificationController::class, 'updatePreferences'])->name('preferences');
+        Route::get('/pending', [PushNotificationController::class, 'pending'])->name('pending');
+        Route::post('/dismissed', [PushNotificationController::class, 'dismissed'])->name('dismissed');
+        Route::post('/test', [PushNotificationController::class, 'test'])->name('test');
     });
 });

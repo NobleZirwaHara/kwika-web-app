@@ -4,6 +4,9 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { WishlistButton } from "@/components/wishlist-button"
+import { OptimizedImage } from "@/components/OptimizedImage"
+import { useHapticFeedback } from "@/hooks/useSwipeGestures"
+import { motion } from 'framer-motion'
 
 export interface Provider {
   id: number
@@ -31,7 +34,8 @@ export function ProviderCard({
   provider,
   className
 }: ProviderCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const haptic = useHapticFeedback()
+  const [isPressed, setIsPressed] = useState(false)
 
   const formatPrice = (price?: number) => {
     if (!price) return null
@@ -42,29 +46,39 @@ export function ProviderCard({
     }).format(price)
   }
 
-  return (
-    <Link
-      href={`/providers/${provider.slug}`}
-      className={cn("group cursor-pointer block", className)}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-xl mb-3">
-        {/* Loading skeleton */}
-        {!imageLoaded && (
-          <div className="absolute inset-0 bg-muted animate-pulse" />
-        )}
+  const handlePress = () => {
+    haptic.light()
+    setIsPressed(true)
+  }
 
-        {/* Image */}
-        <img
-          src={provider.image || "/placeholder.svg"}
-          alt={provider.name}
-          className={cn(
-            "h-full w-full object-cover transition-all duration-300",
-            "group-hover:scale-105",
-            imageLoaded ? "opacity-100" : "opacity-0"
-          )}
-          onLoad={() => setImageLoaded(true)}
-          loading="lazy"
-        />
+  const handleRelease = () => {
+    setIsPressed(false)
+  }
+
+  return (
+    <motion.div
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+    >
+      <Link
+        href={`/providers/${provider.slug}`}
+        className={cn("group cursor-pointer block", className)}
+        onMouseDown={handlePress}
+        onMouseUp={handleRelease}
+        onTouchStart={handlePress}
+        onTouchEnd={handleRelease}
+      >
+        <div className={cn(
+          "relative aspect-square overflow-hidden rounded-xl mb-3",
+          isPressed && "ring-2 ring-primary/20"
+        )}>
+          {/* Optimized Image */}
+          <OptimizedImage
+            src={provider.image || "/placeholder.svg"}
+            alt={provider.name}
+            aspectRatio="square"
+            className="group-hover:scale-105 transition-transform duration-300"
+          />
 
         {/* Featured badge */}
         {provider.featured && (
@@ -120,5 +134,6 @@ export function ProviderCard({
         </div>
       </div>
     </Link>
+    </motion.div>
   )
 }
