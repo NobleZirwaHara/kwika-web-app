@@ -87,9 +87,10 @@ export default function BookingShow({ admin, booking }: Props) {
 
   function getPaymentBadge(status: string) {
     switch (status) {
-      case 'paid': return <Badge className="bg-green-50 text-green-700 border-green-200">Paid</Badge>
+      case 'fully_paid': return <Badge className="bg-green-50 text-green-700 border-green-200">Fully Paid</Badge>
       case 'pending': return <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>
-      case 'partial': return <Badge className="bg-orange-50 text-orange-700 border-orange-200">Partial</Badge>
+      case 'pending_verification': return <Badge className="bg-blue-50 text-blue-700 border-blue-200">Pending Verification</Badge>
+      case 'deposit_paid': return <Badge className="bg-orange-50 text-orange-700 border-orange-200">Deposit Paid</Badge>
       case 'refunded': return <Badge className="bg-gray-50 text-gray-700 border-gray-200">Refunded</Badge>
       default: return <Badge>{status}</Badge>
     }
@@ -175,7 +176,6 @@ export default function BookingShow({ admin, booking }: Props) {
                   <div>
                     <p className="text-sm text-muted-foreground">Service</p>
                     <p className="font-medium">{booking.service.name}</p>
-                    <p className="text-sm text-muted-foreground">{booking.service.category}</p>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
@@ -350,8 +350,9 @@ export default function BookingShow({ admin, booking }: Props) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="partial">Partial</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="pending_verification">Pending Verification</SelectItem>
+                    <SelectItem value="deposit_paid">Deposit Paid</SelectItem>
+                    <SelectItem value="fully_paid">Fully Paid</SelectItem>
                     <SelectItem value="refunded">Refunded</SelectItem>
                   </SelectContent>
                 </Select>

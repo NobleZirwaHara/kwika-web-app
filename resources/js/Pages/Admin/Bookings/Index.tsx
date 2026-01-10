@@ -237,12 +237,14 @@ export default function BookingsIndex({ admin, bookings, stats, providers, servi
 
   function getPaymentStatusBadge(paymentStatus: string) {
     switch (paymentStatus) {
-      case 'paid':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Paid</Badge>
+      case 'fully_paid':
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Fully Paid</Badge>
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>
-      case 'partial':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Partial</Badge>
+      case 'pending_verification':
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Pending Verification</Badge>
+      case 'deposit_paid':
+        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Deposit Paid</Badge>
       case 'refunded':
         return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Refunded</Badge>
       default:
@@ -355,9 +357,10 @@ export default function BookingsIndex({ admin, bookings, stats, providers, servi
                 <Tabs value={filters.payment_status} onValueChange={handlePaymentStatusChange}>
                   <TabsList>
                     <TabsTrigger value="all">All Payments</TabsTrigger>
-                    <TabsTrigger value="pending">Payment Pending</TabsTrigger>
-                    <TabsTrigger value="partial">Partial</TabsTrigger>
-                    <TabsTrigger value="paid">Paid</TabsTrigger>
+                    <TabsTrigger value="pending">Pending</TabsTrigger>
+                    <TabsTrigger value="pending_verification">Verifying</TabsTrigger>
+                    <TabsTrigger value="deposit_paid">Deposit Paid</TabsTrigger>
+                    <TabsTrigger value="fully_paid">Fully Paid</TabsTrigger>
                     <TabsTrigger value="refunded">Refunded</TabsTrigger>
                   </TabsList>
                 </Tabs>

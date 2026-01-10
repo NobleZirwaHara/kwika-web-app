@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceProvider;
 use App\Models\ServiceCategory;
+use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +18,10 @@ class ServiceProviderController extends Controller
      */
     public function index(Request $request)
     {
-        //return ServiceProvider::all();
+        // return ServiceProvider::all();
         $admin = Auth::user();
 
-        if (!$admin->isAdmin()) {
+        if (! $admin->isAdmin()) {
             return redirect()->route('home')->with('error', 'Unauthorized access.');
         }
 
@@ -43,7 +43,7 @@ class ServiceProviderController extends Controller
                         ->orWhere('city', 'like', "%{$search}%")
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('name', 'like', "%{$search}%")
-                              ->orWhere('email', 'like', "%{$search}%");
+                                ->orWhere('email', 'like', "%{$search}%");
                         });
                 });
             })
@@ -140,7 +140,7 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_providers')) {
+        if (! $admin->canAdmin('manage_providers')) {
             return back()->with('error', 'You do not have permission to edit providers.');
         }
 
@@ -179,7 +179,6 @@ class ServiceProviderController extends Controller
                 'email' => $provider->email,
                 'website' => $provider->website,
                 'social_links' => $provider->social_links,
-                'is_verified' => $provider->is_verified,
                 'is_featured' => $provider->is_featured,
                 'is_active' => $provider->is_active,
                 'verification_status' => $provider->verification_status,
@@ -216,7 +215,7 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_providers')) {
+        if (! $admin->canAdmin('manage_providers')) {
             return back()->with('error', 'You do not have permission to edit providers.');
         }
 
@@ -246,7 +245,7 @@ class ServiceProviderController extends Controller
                 $baseSlug = $validated['slug'];
                 $counter = 1;
                 while (ServiceProvider::where('slug', $validated['slug'])->where('id', '!=', $id)->exists()) {
-                    $validated['slug'] = $baseSlug . '-' . $counter;
+                    $validated['slug'] = $baseSlug.'-'.$counter;
                     $counter++;
                 }
             }
@@ -268,7 +267,8 @@ class ServiceProviderController extends Controller
             return back()->with('success', 'Provider updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to update provider: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to update provider: '.$e->getMessage());
         }
     }
 
@@ -279,14 +279,14 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_providers')) {
+        if (! $admin->canAdmin('manage_providers')) {
             return back()->with('error', 'You do not have permission to manage provider status.');
         }
 
         $provider = ServiceProvider::findOrFail($id);
 
         $oldValue = $provider->is_active;
-        $provider->update(['is_active' => !$provider->is_active]);
+        $provider->update(['is_active' => ! $provider->is_active]);
 
         // Log admin action
         $admin->logAdminAction(
@@ -308,14 +308,14 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('manage_providers')) {
+        if (! $admin->canAdmin('manage_providers')) {
             return back()->with('error', 'You do not have permission to feature providers.');
         }
 
         $provider = ServiceProvider::findOrFail($id);
 
         $oldValue = $provider->is_featured;
-        $provider->update(['is_featured' => !$provider->is_featured]);
+        $provider->update(['is_featured' => ! $provider->is_featured]);
 
         // Log admin action
         $admin->logAdminAction(
@@ -337,7 +337,7 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('ban_providers')) {
+        if (! $admin->canAdmin('ban_providers')) {
             return back()->with('error', 'You do not have permission to ban providers.');
         }
 
@@ -352,7 +352,7 @@ class ServiceProviderController extends Controller
             // Deactivate the provider
             $provider->update([
                 'is_active' => false,
-                'rejection_reason' => 'Banned: ' . $request->input('reason'),
+                'rejection_reason' => 'Banned: '.$request->input('reason'),
             ]);
 
             // Soft delete
@@ -365,7 +365,7 @@ class ServiceProviderController extends Controller
                 $provider->id,
                 ['is_active' => true, 'deleted_at' => null],
                 ['is_active' => false, 'deleted_at' => now()],
-                'Provider banned: ' . $request->input('reason')
+                'Provider banned: '.$request->input('reason')
             );
 
             DB::commit();
@@ -374,7 +374,8 @@ class ServiceProviderController extends Controller
                 ->with('success', 'Provider banned successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to ban provider: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to ban provider: '.$e->getMessage());
         }
     }
 
@@ -385,7 +386,7 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->canAdmin('ban_providers')) {
+        if (! $admin->canAdmin('ban_providers')) {
             return back()->with('error', 'You do not have permission to unban providers.');
         }
 
@@ -417,7 +418,8 @@ class ServiceProviderController extends Controller
             return back()->with('success', 'Provider unbanned successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to unban provider: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to unban provider: '.$e->getMessage());
         }
     }
 
@@ -428,7 +430,7 @@ class ServiceProviderController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->isSuperAdmin()) {
+        if (! $admin->isSuperAdmin()) {
             return back()->with('error', 'Only super admins can permanently delete providers.');
         }
 
@@ -458,7 +460,8 @@ class ServiceProviderController extends Controller
                 ->with('success', 'Provider permanently deleted.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to delete provider: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to delete provider: '.$e->getMessage());
         }
     }
 }
