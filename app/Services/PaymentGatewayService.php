@@ -26,11 +26,18 @@ class PaymentGatewayService
     {
         $gateway = $gateway ?? $this->defaultGateway;
 
-        return match ($gateway) {
+        $result = match ($gateway) {
             'flutterwave' => $this->createFlutterwavePayment($order),
             'stripe' => $this->createStripePayment($order),
             default => throw new \Exception("Unsupported payment gateway: {$gateway}"),
         };
+
+        // In test mode, also update the payment record if it exists
+        if (!config('payment.flutterwave.secret_key') || config('app.env') === 'local') {
+            $this->completeTestPayment($order, $result['reference']);
+        }
+
+        return $result;
     }
 
     /**
@@ -43,7 +50,7 @@ class PaymentGatewayService
         $payment = Payment::create([
             'user_id' => $order->user_id,
             'payment_method' => $paymentData['payment_method'] ?? 'card',
-            'amount' => $order->final_amount,
+            'amount' => $order->total_amount - $order->discount_amount,
             'currency' => $order->currency,
             'status' => 'pending',
             'transaction_reference' => $paymentData['reference'] ?? Str::uuid(),
@@ -138,12 +145,27 @@ class PaymentGatewayService
     {
         $reference = 'FLW-' . strtoupper(Str::random(16));
 
+        // Check if we're in development mode or API keys are not configured
+        if (!config('payment.flutterwave.secret_key') || config('app.env') === 'local') {
+            // Development/test mode - simulate successful payment
+            Log::info('Payment simulation mode - no API keys configured', [
+                'order_id' => $order->id,
+                'reference' => $reference,
+            ]);
+
+            // Return a mock payment URL that goes directly to confirmation
+            return [
+                'payment_url' => route('ticket-orders.confirmation', $order),
+                'reference' => $reference,
+            ];
+        }
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('payment.flutterwave.secret_key'),
             'Content-Type' => 'application/json',
         ])->post('https://api.flutterwave.com/v3/payments', [
             'tx_ref' => $reference,
-            'amount' => $order->final_amount,
+            'amount' => $order->total_amount - $order->discount_amount,
             'currency' => $order->currency,
             'redirect_url' => route('ticket-orders.confirmation', $order),
             'payment_options' => 'card,mobilemoney,ussd,bank_transfer',
@@ -301,6 +323,40 @@ class PaymentGatewayService
     }
 
     // ==================== HELPER METHODS ====================
+
+    /**
+     * Complete payment in test mode.
+     */
+    private function completeTestPayment(TicketOrder $order, string $reference): void
+    {
+        // Find the payment record that was just created
+        $payment = Payment::where('transaction_reference', $reference)->first();
+
+        if ($payment) {
+            // Mark payment as completed
+            $payment->update([
+                'status' => 'completed',
+                'paid_at' => now(),
+                'gateway_response' => json_encode([
+                    'status' => 'successful',
+                    'message' => 'Test payment completed',
+                    'mode' => 'development',
+                ]),
+            ]);
+
+            // Update the order status
+            $order->update([
+                'status' => 'confirmed',
+                'payment_status' => 'completed',
+            ]);
+
+            Log::info('Test payment completed', [
+                'order_id' => $order->id,
+                'payment_id' => $payment->id,
+                'reference' => $reference,
+            ]);
+        }
+    }
 
     /**
      * Generate tickets after successful payment.

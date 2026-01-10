@@ -30,7 +30,9 @@
       "Bash(git worktree add:*)",
       "Bash(npm install:*)",
       "Bash(vendor/bin/pint:*)",
-      "Bash(git -C \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\" merge feature/booking-checklists --no-edit)"
+      "Bash(git -C \"C:\\\\Users\\\\haran\\\\Herd\\\\kwika-web-app\" merge feature/booking-checklists --no-edit)",
+      "mcp__laravel-boost__application-info",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

@@ -14,13 +14,18 @@ class Payment extends Model
         'payment_type', 'amount', 'currency', 'payment_method', 'status',
         'payment_gateway', 'gateway_transaction_id', 'gateway_response',
         'proof_of_payment', 'phone_number', 'notes', 'paid_at',
+        'transaction_reference', 'metadata', 'refunded_at', 'refund_amount',
     ];
 
     protected function casts(): array
     {
         return [
             'amount' => 'decimal:2',
+            'refund_amount' => 'decimal:2',
             'paid_at' => 'datetime',
+            'refunded_at' => 'datetime',
+            'metadata' => 'array',
+            'gateway_response' => 'array',
         ];
     }
 

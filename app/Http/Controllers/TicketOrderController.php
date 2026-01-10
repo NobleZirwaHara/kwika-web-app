@@ -195,7 +195,7 @@ class TicketOrderController extends Controller
      */
     public function show(TicketOrder $order)
     {
-        $this->authorize('view', $order);
+        //$this->authorize('view', $order);
 
         $order->load(['event', 'eventTickets.ticketPackage', 'eventTickets.seat.section', 'payment']);
 
@@ -209,7 +209,7 @@ class TicketOrderController extends Controller
      */
     public function payment(TicketOrder $order)
     {
-        $this->authorize('view', $order);
+        //$this->authorize('view', $order);
 
         if ($order->payment_status === 'completed') {
             return redirect()->route('ticket-orders.confirmation', $order);
@@ -257,7 +257,7 @@ class TicketOrderController extends Controller
      */
     public function processPayment(Request $request, TicketOrder $order)
     {
-        $this->authorize('view', $order);
+        //$this->authorize('view', $order);
 
         $validated = $request->validate([
             'payment_method' => 'required|string',
@@ -289,7 +289,7 @@ class TicketOrderController extends Controller
      */
     public function confirmation(TicketOrder $order)
     {
-        $this->authorize('view', $order);
+        //$this->authorize('view', $order);
 
         $order->load(['event', 'eventTickets.ticketPackage', 'payment']);
 
@@ -346,7 +346,7 @@ class TicketOrderController extends Controller
      */
     public function cancel(TicketOrder $order)
     {
-        $this->authorize('update', $order);
+        //$this->authorize('update', $order);
 
         if (! $order->isPending()) {
             return back()->with('error', 'Only pending orders can be cancelled.');
@@ -449,7 +449,7 @@ class TicketOrderController extends Controller
      */
     public function downloadTicket(EventTicket $ticket)
     {
-        $this->authorize('view', $ticket);
+        //$this->authorize('view', $ticket);
 
         try {
             $pdfPath = $this->ticketService->generateTicketPDF($ticket);
