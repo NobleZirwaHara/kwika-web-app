@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
 import { Users, TrendingUp, Shield, Zap, Building2, Calendar, Play } from 'lucide-react'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 export default function Welcome() {
   const benefits = [
@@ -29,7 +30,7 @@ export default function Welcome() {
   // steps removed in redesigned hero; process now conveyed via copy and sections
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title="Become a Service Provider" />
 
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -201,6 +202,6 @@ export default function Welcome() {
           </div>
         </footer>
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

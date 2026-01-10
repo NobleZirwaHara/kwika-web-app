@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Upload, Image as ImageIcon, X, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface Subcategory {
   id: number
@@ -154,7 +155,8 @@ export default function Step3ServicesMedia({ provider, categories, providerType 
   }
 
   return (
-    <WizardLayout
+    <AnimatedLayout>
+      <WizardLayout
       currentStep={3}
       title={isEventsOnly ? "Branding" : "Services & Media"}
       description={isEventsOnly ? "Upload your logo and cover image" : "Showcase your services and upload images"}
@@ -409,5 +411,6 @@ export default function Step3ServicesMedia({ provider, categories, providerType 
         </div>
       </form>
     </WizardLayout>
+    </AnimatedLayout>
   )
 }

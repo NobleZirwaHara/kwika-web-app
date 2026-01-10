@@ -9,6 +9,7 @@ import { Footer } from "@/components/footer"
 import { Share2, MapPin } from "lucide-react"
 import { SEO, createLocalBusinessSchema, createBreadcrumbSchema } from "@/components/seo"
 import { WishlistButton } from "@/components/wishlist-button"
+import AnimatedLayout from "@/layouts/AnimatedLayout"
 
 interface ProviderData {
   id: string | number
@@ -117,7 +118,7 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
   ])
 
   return (
-    <>
+    <AnimatedLayout>
       <SEO
         title={`${provider.name} - Event Services in ${provider.city}`}
         description={`${provider.description?.substring(0, 155) || `Book ${provider.name} for your events in ${provider.city}, Malawi.`}...`}
@@ -199,6 +200,6 @@ export default function ProviderDetail({ provider, services, packages, reviews, 
         </main>
         <Footer />
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

@@ -3,6 +3,7 @@ import { SearchHeader } from '@/components/search-header'
 import { Footer } from '@/components/footer'
 import { TimeSlotPicker } from '@/components/time-slot-picker'
 import { WishlistButton } from '@/components/wishlist-button'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -199,7 +200,7 @@ export default function ServiceDetail({ service, relatedServices, similarService
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`${service.name} - ${service.provider.business_name}`} />
       <SearchHeader categories={categories} variant="detail" />
 
@@ -887,6 +888,6 @@ export default function ServiceDetail({ service, relatedServices, similarService
       )}
 
       <Footer />
-    </>
+    </AnimatedLayout>
   )
 }

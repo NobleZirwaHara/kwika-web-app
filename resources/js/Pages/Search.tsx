@@ -4,6 +4,7 @@ import { ServicesListingContainer } from "@/components/ServicesListing/ServicesL
 import type { Provider } from "@/components/ServicesListing/ProviderCard"
 import type { Service } from "@/components/ServicesListing/ServiceCard"
 import { SEO, createBreadcrumbSchema } from "@/components/seo"
+import AnimatedLayout from "@/layouts/AnimatedLayout"
 
 interface Category {
   id: number
@@ -138,7 +139,7 @@ export default function Search({
   ]
 
   return (
-    <>
+    <AnimatedLayout>
       <SEO
         title={getPageTitle()}
         description={getPageDescription()}
@@ -176,6 +177,6 @@ export default function Search({
 
         <Footer />
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

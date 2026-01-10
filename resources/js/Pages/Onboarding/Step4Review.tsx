@@ -17,6 +17,7 @@ import {
   Edit2,
   CheckCircle2
 } from 'lucide-react'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface Props {
   user: {
@@ -63,7 +64,8 @@ export default function Step4Review({ user, provider, categories, portfolioImage
   }
 
   return (
-    <WizardLayout
+    <AnimatedLayout>
+      <WizardLayout
       currentStep={4}
       title="Review Your Information"
       description="Please review and confirm all details before submitting"
@@ -345,5 +347,6 @@ export default function Step4Review({ user, provider, categories, portfolioImage
         </form>
       </div>
     </WizardLayout>
+    </AnimatedLayout>
   )
 }

@@ -613,6 +613,105 @@ if (filters.new_filter) {
 - **Leaflet**: ~45KB gzipped
 - **Total JS**: ~113KB gzipped
 
+## Page Transitions & Animations
+
+### Overview
+The app uses production-grade page transitions that work properly with Inertia.js, providing a native app-like experience without causing navigation issues or page reloads.
+
+### Core Components
+- **`PageTransitionWrapper`** (`resources/js/components/PageTransitionWrapper.tsx`) - Core transition logic using Inertia router events
+- **`AnimatedLayout`** (`resources/js/layouts/AnimatedLayout.tsx`) - HOC that maps pages to appropriate transition modes
+
+### Available Transition Modes
+- **`slide`** - Horizontal sliding motion for main navigation pages
+- **`fade`** - Simple opacity transition for auth/dashboard pages
+- **`scale`** - Scale + fade for progression feel (onboarding flow)
+- **`none`** - Disables transitions when not needed
+
+### How to Add Transitions to Pages
+
+#### Method 1: Wrap with AnimatedLayout (Recommended)
+```tsx
+import AnimatedLayout from '@/layouts/AnimatedLayout'
+
+export default function YourPage({ data }) {
+  return (
+    <AnimatedLayout>
+      {/* Your page content */}
+      <SearchHeader />
+      <main>
+        {/* ... */}
+      </main>
+      <Footer />
+    </AnimatedLayout>
+  )
+}
+```
+
+#### Method 2: Using HOC with Custom Mode
+```tsx
+import { withPageTransition } from '@/layouts/AnimatedLayout'
+
+function YourPage({ data }) {
+  return (
+    <div>
+      {/* Your page content */}
+    </div>
+  )
+}
+
+// Apply fade transition specifically
+export default withPageTransition(YourPage, 'fade')
+```
+
+#### Method 3: Override Mode Dynamically
+```tsx
+<AnimatedLayout mode="scale">
+  {/* Content with scale transition */}
+</AnimatedLayout>
+```
+
+### Configuring Page-Specific Transitions
+Edit `pageTransitionModes` in `AnimatedLayout.tsx`:
+```typescript
+const pageTransitionModes: Record<string, 'slide' | 'fade' | 'scale' | 'none'> = {
+  // Main navigation - slide
+  'Search': 'slide',
+  'ServiceProviders/Show': 'slide',
+
+  // Onboarding - scale for progression
+  'Onboarding/Welcome': 'scale',
+  'Onboarding/Step1PersonalDetails': 'scale',
+
+  // Auth pages - fade
+  'Auth/Login': 'fade',
+  'Auth/Register': 'fade',
+
+  // Default for unlisted pages
+  'default': 'slide'
+}
+```
+
+### Mobile Optimizations
+- Faster spring physics on mobile devices
+- Haptic feedback on navigation (when supported)
+- Separate `mobileTransitions` config for optimized mobile experience
+- Auto-detection of mobile viewport
+
+### Important Notes
+- **DO NOT** wrap the main App component in `app.tsx` - causes navigation breaks
+- **DO** wrap individual page components
+- Transitions use Inertia router events (`router.on('start')`, `router.on('finish')`)
+- No URL-based keying to prevent full page remounts
+- Tab navigation (MobileBottomNav) doesn't trigger transitions
+- Build and test with `npm run build` to catch TypeScript errors
+
+### Troubleshooting
+- **Page reloads on navigation**: Check that AnimatedLayout wraps the page content, not the App wrapper
+- **No transitions visible**: Ensure `npm run dev` is running and page is wrapped with AnimatedLayout
+- **TypeScript errors**: Import paths should use `@/` alias
+- **Transition too fast/slow**: Adjust spring `stiffness` and `damping` in PageTransitionWrapper
+
 ## Next Steps / Future Enhancements
 
 - [ ] Configure Laravel Sanctum for authentication

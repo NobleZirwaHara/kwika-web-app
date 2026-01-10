@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User, Mail, Phone, Lock, IdCard, CheckCircle } from 'lucide-react'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface Props {
   user?: {
@@ -34,7 +35,8 @@ export default function Step1PersonalDetails({ user, providerType = 'both' }: Pr
   }
 
   return (
-    <WizardLayout
+    <AnimatedLayout>
+      <WizardLayout
       currentStep={1}
       title={isExistingUser ? "Become a Provider" : "Create Your Provider Account"}
       description={isExistingUser ? "We'll use your existing account details" : "Let's start with your personal information"}
@@ -219,5 +221,6 @@ export default function Step1PersonalDetails({ user, providerType = 'both' }: Pr
         )}
       </form>
     </WizardLayout>
+    </AnimatedLayout>
   )
 }

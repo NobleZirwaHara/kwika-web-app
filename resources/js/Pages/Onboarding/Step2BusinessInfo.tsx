@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { LocationPicker } from '@/components/location-picker'
 import { Building2, FileText, Phone, Mail, Globe, Hash } from 'lucide-react'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface Props {
   provider: {
@@ -61,7 +62,8 @@ export default function Step2BusinessInfo({ provider, categories, providerType =
   }
 
   return (
-    <WizardLayout
+    <AnimatedLayout>
+      <WizardLayout
       currentStep={2}
       title="Business Information"
       description="Tell us about your business"
@@ -303,5 +305,6 @@ export default function Step2BusinessInfo({ provider, categories, providerType =
         </div>
       </form>
     </WizardLayout>
+    </AnimatedLayout>
   )
 }
