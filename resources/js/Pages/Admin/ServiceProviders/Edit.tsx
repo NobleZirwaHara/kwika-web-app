@@ -504,11 +504,11 @@ export default function ServiceProviderEdit({ admin, provider, categories }: Pro
                   <p className="text-sm text-muted-foreground">Total Reviews</p>
                   <p className="text-2xl font-bold">{provider.total_reviews}</p>
                 </div>
-                {provider.average_rating > 0 && (
+                {provider.average_rating && Number(provider.average_rating) > 0 && (
                   <div>
                     <p className="text-sm text-muted-foreground">Average Rating</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-2xl font-bold">{provider.average_rating.toFixed(1)}</p>
+                      <p className="text-2xl font-bold">{Number(provider.average_rating).toFixed(1)}</p>
                       <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
                     </div>
                   </div>

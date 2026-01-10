@@ -358,10 +358,10 @@ export default function ServiceProvidersIndex({ admin, providers, stats, cities,
                           <span className="font-medium">{provider.reviews_count}</span>
                           <span className="text-muted-foreground">reviews</span>
                         </div>
-                        {provider.average_rating > 0 && (
+                        {provider.average_rating && Number(provider.average_rating) > 0 && (
                           <div className="flex items-center gap-1.5">
                             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                            <span className="font-medium">{provider.average_rating.toFixed(1)}</span>
+                            <span className="font-medium">{Number(provider.average_rating).toFixed(1)}</span>
                             <span className="text-muted-foreground">rating</span>
                           </div>
                         )}
