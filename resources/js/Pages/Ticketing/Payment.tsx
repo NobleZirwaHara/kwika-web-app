@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 import { CreditCard, Smartphone, Building2, Loader2, Calendar, MapPin, Ticket } from 'lucide-react'
 import { formatDate, formatTime, getStorageUrl } from '@/lib/utils'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface TicketOrder {
   id: number
@@ -67,7 +68,7 @@ export default function Payment({ order, paymentMethods }: Props) {
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`Payment - Order ${order.order_number}`} />
 
       <div className="min-h-screen bg-muted/30 py-12">
@@ -275,6 +276,6 @@ export default function Payment({ order, paymentMethods }: Props) {
           </div>
         </div>
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

@@ -4,6 +4,7 @@ import { Calendar, MapPin, Clock, Users, Share2, Heart, ArrowLeft } from 'lucide
 import { useState } from 'react'
 import { SEO, createEventSchema } from '@/components/seo'
 import { formatDate, formatPrice, formatTime, getStorageUrl } from '@/lib/utils'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface TicketPackage {
   id: number
@@ -107,7 +108,7 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
   })
 
   return (
-    <>
+    <AnimatedLayout>
       <SEO
         title={`${event.title} - Tickets & Info`}
         description={`Get tickets for ${event.title} at ${event.venue_name}, ${event.venue_city}. ${event.description?.substring(0, 100) || ''}`}
@@ -367,6 +368,6 @@ export default function EventDetail({ event, ticketPackages, similarEvents }: Pr
           )}
         </div>
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { router } from "@inertiajs/react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import AnimatedLayout from "@/layouts/AnimatedLayout"
 
 interface Event {
   id: number
@@ -127,7 +128,7 @@ export default function OrganizerDetail({
   )
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`${organizer.name} - Events & Ticketing`} />
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -285,6 +286,6 @@ export default function OrganizerDetail({
 
         <Footer />
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

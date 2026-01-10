@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react'
 import { SearchHeader } from '@/components/search-header'
 import { Footer } from '@/components/footer'
 import { WishlistButton } from '@/components/wishlist-button'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -101,7 +102,7 @@ export default function PackageDetail({ package: pkg, relatedPackages, similarPa
     : 0
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`${pkg.name} - ${provider.business_name}`} />
       <SearchHeader variant="back" />
 
@@ -459,6 +460,6 @@ export default function PackageDetail({ package: pkg, relatedPackages, similarPa
       </main>
 
       <Footer />
-    </>
+    </AnimatedLayout>
   )
 }

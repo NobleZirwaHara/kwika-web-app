@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle2, Calendar, MapPin, Ticket, Download, Mail, Share2 } from 'lucide-react'
 import { formatDate, formatTime, getStorageUrl } from '@/lib/utils'
 import { motion } from 'framer-motion'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface TicketOrder {
   id: number
@@ -68,7 +69,7 @@ export default function Confirmation({ order }: Props) {
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`Order Confirmed - ${order.order_number}`} />
 
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-background dark:from-green-950/20 dark:to-background py-12">
@@ -295,6 +296,6 @@ export default function Confirmation({ order }: Props) {
           </motion.div>
         </div>
       </div>
-    </>
+    </AnimatedLayout>
   )
 }

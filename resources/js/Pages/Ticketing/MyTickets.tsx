@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Calendar, MapPin, Ticket, Download, QrCode, CheckCircle2 } from 'lucide-react'
 import { formatDate, getStorageUrl } from '@/lib/utils'
 import { useState } from 'react'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 import {
   Dialog,
   DialogContent,
@@ -157,7 +158,7 @@ export default function MyTickets({ upcomingTickets, pastTickets }: Props) {
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title="My Tickets" />
 
       <div className="min-h-screen bg-background py-12">
@@ -294,6 +295,6 @@ export default function MyTickets({ upcomingTickets, pastTickets }: Props) {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </AnimatedLayout>
   )
 }

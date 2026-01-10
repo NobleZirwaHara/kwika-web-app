@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator'
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react'
 import { formatDate, formatPrice, getStorageUrl } from '@/lib/utils'
+import AnimatedLayout from '@/layouts/AnimatedLayout'
 
 interface TicketPackage {
   id: number
@@ -75,7 +76,7 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
   }
 
   return (
-    <>
+    <AnimatedLayout>
       <Head title={`Checkout - ${event.title}`} />
 
       <div className="min-h-screen bg-background py-8">
@@ -316,6 +317,6 @@ export default function Checkout({ event, selectedTickets, totalAmount }: Props)
           </div>
         </div>
       </div>
-    </>
+    </AnimatedLayout>
   )
 }
