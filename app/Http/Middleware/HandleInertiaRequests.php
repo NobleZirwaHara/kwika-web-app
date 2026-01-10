@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ComponentCacheService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,6 +36,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $cacheService = app(ComponentCacheService::class);
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user() ? [
@@ -43,12 +46,19 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
                     'is_admin' => $request->user()->is_admin,
-                    'is_provider' => $request->user()->provider //&& $request->user()->provider->status === 'approved',
+                    'is_provider' => $request->user()->provider, // && $request->user()->provider->status === 'approved',
                 ] : null,
             ],
             'ziggy' => fn () => [
                 ...(new \Tighten\Ziggy\Ziggy)->toArray(),
                 'location' => $request->url(),
+            ],
+            // Cached shared data for headers/footers
+            'shared' => [
+                'categories' => fn () => $cacheService->getCategories(),
+                'cities' => fn () => $cacheService->getCities(),
+                'footerData' => fn () => $cacheService->getFooterData(),
+                'userMenu' => fn () => $cacheService->getUserMenuData($request->user()),
             ],
         ]);
     }

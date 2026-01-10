@@ -1,4 +1,5 @@
-import { Header } from "@/components/header"
+import CachedHeader, { useCachedHeaderScroll } from "@/components/CachedHeader"
+import CachedFooter from "@/components/CachedFooter"
 import { HeroFeatured } from "@/components/hero-featured"
 import { ServiceCategories } from "@/components/service-categories"
 import { FeaturedProducts } from "@/components/featured-products"
@@ -6,11 +7,11 @@ import { FeaturedProviders } from "@/components/featured-providers"
 import { BenefitsSection } from "@/components/benefits-section"
 import { PromotionsSection } from "@/components/promotions-section"
 import { Testimonials } from "@/components/testimonials"
-import { Footer } from "@/components/footer"
 import { EventHighlight } from "@/components/event-highlight"
 import { KwikaRewards } from "@/components/kwika-rewards"
 import { HeroCarouselProvider } from "@/contexts/HeroCarouselContext"
 import { SEO } from "@/components/seo"
+import { usePage } from "@inertiajs/react"
 
 interface Category {
   id: number
@@ -67,6 +68,10 @@ interface HomeProps {
 }
 
 export default function Home({ categories, featuredProviders, topProviders, lilongweProviders, newProviders, featuredProducts }: HomeProps) {
+  const { props } = usePage()
+  const hasScrolled = useCachedHeaderScroll()
+  const sharedData = (props as any).shared
+
   return (
     <HeroCarouselProvider>
       <SEO
@@ -75,7 +80,10 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
         keywords="events Malawi, wedding services Lilongwe, event planning Blantyre, photographers, caterers, venues, decorators, DJ services, event rentals, wedding planner, party supplies Malawi"
       />
       <div className="min-h-screen pb-20 md:pb-0">
-        <Header />
+        <CachedHeader
+          categories={sharedData?.categories || []}
+          hasScrolled={hasScrolled}
+        />
         <main>
           <HeroFeatured />
           <ServiceCategories categories={categories} />
@@ -103,7 +111,7 @@ export default function Home({ categories, featuredProviders, topProviders, lilo
 
           {/* <Testimonials /> */}
         </main>
-        <Footer />
+        <CachedFooter />
       </div>
     </HeroCarouselProvider>
   )

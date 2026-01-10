@@ -1,10 +1,11 @@
-import { SearchHeader } from "@/components/search-header"
-import { Footer } from "@/components/footer"
+import CachedSearchHeader from "@/components/CachedSearchHeader"
+import CachedFooter from "@/components/CachedFooter"
 import { ServicesListingContainer } from "@/components/ServicesListing/ServicesListingContainer"
 import type { Provider } from "@/components/ServicesListing/ProviderCard"
 import type { Service } from "@/components/ServicesListing/ServiceCard"
 import { SEO, createBreadcrumbSchema } from "@/components/seo"
 import AnimatedLayout from "@/layouts/AnimatedLayout"
+import { usePage } from "@inertiajs/react"
 
 interface Category {
   id: number
@@ -60,6 +61,8 @@ export default function Search({
   searchParams,
   totalResults
 }: SearchProps) {
+  const { props } = usePage()
+  const sharedData = (props as any).shared
   const getPageTitle = () => {
     const parts = []
 
@@ -147,7 +150,10 @@ export default function Search({
         structuredData={createBreadcrumbSchema(breadcrumbs)}
       />
       <div className="min-h-screen pb-20 md:pb-0">
-        <SearchHeader />
+        <CachedSearchHeader
+          variant="search"
+          categories={sharedData?.categories || categories}
+        />
 
         <main className="pt-24 pb-12">
           <div className="container mx-auto px-6 lg:px-20">
@@ -175,7 +181,7 @@ export default function Search({
           </div>
         </main>
 
-        <Footer />
+        <CachedFooter />
       </div>
     </AnimatedLayout>
   )
