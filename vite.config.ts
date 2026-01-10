@@ -184,9 +184,8 @@ export default defineConfig({
                 clientsClaim: true
             },
             devOptions: {
-                enabled: true,
+                enabled: false, // Disable PWA in development to prevent navigation issues
                 type: 'module',
-                navigateFallback: 'index.html',
                 suppressWarnings: true
             }
         })

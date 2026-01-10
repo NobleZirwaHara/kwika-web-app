@@ -13,7 +13,6 @@ import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
-import { PageTransition } from '@/components/PageTransition';
 import { PushNotifications } from '@/components/PushNotifications';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Kwika Events';
@@ -33,9 +32,7 @@ function AppWrapper({ App, props }: { App: any; props: any }) {
 
   return (
     <>
-      <PageTransition>
-        <App {...props} />
-      </PageTransition>
+      <App {...props} />
       <MobileBottomNav user={user} />
       <PWAInstallPrompt />
       <PushNotifications />
